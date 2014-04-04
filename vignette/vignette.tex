@@ -1,0 +1,171 @@
+\documentclass[10pt]{article}
+\usepackage{amsmath, amsfonts, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage[margin=2cm]{geometry}
+
+
+\title{ExomeDepth}
+\author{Vincent Plagnol}
+\date{\today}
+
+\usepackage{Sweave}
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+
+\section{Create count data from BAM files}
+\texttt{ExomeDepth} assumes that the user starts with a table of read count for all human exons and for each BAM file.
+Several tools can create this but the inst directory of the package includes a C++ code called \texttt{readDepthMapper} compiled for a Linux 64b environment which can do exactly this. The syntax is:\\
+
+\begin{verbatim}
+./readDepthMapper -e -r  exonPos_hg19.tab  -b file1.bam,file2.bam,...,filen.bam  -o my.output.file
+\end{verbatim}
+
+Note that the exon position file \texttt{exonPos\_hg19.tab} is in the same \texttt{inst/readDepthMapper} folder of the package.
+The resulting output file should be self explanatory and can be used in \texttt{ExomeDepth}.
+Please ask for the source code of you need it for another platform.
+
+
+\section{First load an example dataset}
+We first load a dataset of four exome samples, using only chromosome 1 to make the computation quicker.
+\begin{Schunk}
+\begin{Sinput}
+> #.libPaths(c("/ugi/home/shared/vincent/libraries/R/installed", .libPaths()))
+> library(ExomeDepth) 
+\end{Sinput}
+\begin{Soutput}
+Package aod, version 1.2 
+\end{Soutput}
+\begin{Sinput}
+> print(.libPaths())
+\end{Sinput}
+\begin{Soutput}
+[1] "/ugi/home/shared/vincent/libraries/R/installed"    
+[2] "/ugi/home/shared/vincent/Software/R-2.14.0/library"
+\end{Soutput}
+\begin{Sinput}
+> library(aod)
+> data(ExomeCount)
+> print(head(ExomeCount))
+\end{Sinput}
+\begin{Soutput}
+  chromosome start   end          exons camfid.032KA_sorted_unique.bam
+1          1 12011 12058 DDX11L10-201_1                              0
+2          1 12180 12228 DDX11L10-201_2                              0
+3          1 12614 12698 DDX11L10-201_3                            110
+4          1 12976 13053 DDX11L10-201_4                             82
+5          1 13222 13375 DDX11L10-201_5                            348
+6          1 13454 13671 DDX11L10-201_6                            286
+  camfid.033ahw_sorted_unique.bam camfid.035if_sorted_unique.bam
+1                               0                              0
+2                               0                              0
+3                             228                            114
+4                              54                             68
+5                             608                            327
+6                             808                            373
+  camfid.034pc_sorted_unique.bam        GC
+1                              0 0.6041667
+2                              0 0.4897959
+3                            154 0.5882353
+4                             56 0.6025641
+5                            448 0.5909091
+6                            402 0.5871560
+\end{Soutput}
+\end{Schunk}
+
+
+We can run a first test to make sure that the model can be fitted properly. 
+Note the use of the subset.for.speed option that subsets some rows purely to speed up this computation.
+
+\begin{Schunk}
+\begin{Sinput}
+> test <- new('ExomeDepth',
++             test = ExomeCount$camfid.033ahw_sorted_unique.bam,
++             reference = ExomeCount$camfid.035if_sorted_unique.bam,
++             formula = 'cbind(test, reference) ~ 1',
++             subset.for.speed = seq(1, nrow(ExomeCount), 100))
+> show(test)
+\end{Sinput}
+\begin{Soutput}
+Number of data points:  256 
+Formula:  cbind(test, reference) ~ 1 
+Phi parameter:  0.02835598 
+Likelihood computed
+\end{Soutput}
+\end{Schunk}
+
+\section{Build the most appropriate reference set}
+
+Moving on toward a more useful computation, the first step is to select the most appropriate reference sample.
+This step is demonstrated below.
+
+\begin{Schunk}
+\begin{Sinput}
+> my.test <- ExomeCount$camfid.034pc_sorted_unique.bam
+> my.reference.set <- as.matrix(ExomeCount[, c('camfid.032KA_sorted_unique.bam', 'camfid.033ahw_sorted_unique.bam', 'camfid.035if_sorted_unique.bam')])
+> my.choice <- select.reference.set (test.counts = my.test, reference.counts = my.reference.set, bin.length = (ExomeCount$end - ExomeCount$start)/1000, n.bins.reduced = 10000)
+> print(my.choice[[1]])
+\end{Sinput}
+\begin{Soutput}
+[1] "camfid.033ahw_sorted_unique.bam" "camfid.032KA_sorted_unique.bam" 
+\end{Soutput}
+\end{Schunk}
+
+Using the output of this procedure we can construct the reference set.
+\begin{Schunk}
+\begin{Sinput}
+> my.reference.selected <- apply(as.matrix( ExomeCount[, my.choice$reference.choice] ), MAR = 1, FUN = sum)
+\end{Sinput}
+\end{Schunk}
+
+
+\section{CNV calling}
+Now the following step is the longest one as the beta-binomial model is applied to the full set of exons:
+\begin{Schunk}
+\begin{Sinput}
+> all.exons <- new('ExomeDepth',
++             test = my.test,
++             reference = my.reference.selected,
++             formula = 'cbind(test, reference) ~ 1')
+\end{Sinput}
+\end{Schunk}
+
+
+We can now call the CNV by running the underlying hidden Markov model:
+\begin{Schunk}
+\begin{Sinput}
+> my.calls <- CallCNVs(all.exons, prior = 10^-4, chromosome = ExomeCount$chromosome, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$exons)
+\end{Sinput}
+\begin{Soutput}
+Number of hidden states: 3
+Number of data points: 25592
+Initializing the HMM
+Done with the first step of the HMM, now running the trace back
+Total number of calls: 31
+\end{Soutput}
+\begin{Sinput}
+> print(head(my.calls$calls))
+\end{Sinput}
+\begin{Soutput}
+  start.p end.p        type nexons    start      end chromosome
+1      51    64    deletion     14   324440   523834          1
+2     553   553    deletion      1  1569828  1570002          1
+3     562   568    deletion      7  1573863  1603069          1
+4     571   573    deletion      3  1607818  1624084          1
+5    2258  2262    deletion      5 12958048 12980570          1
+6    2297  2301 duplication      5 13328197 13352741          1
+                      id    BF reads.expected reads.observed reads.ratio
+1     chr1:324440-523834 15.60            406            204       0.502
+2   chr1:1569828-1570002  4.72             43             12       0.279
+3   chr1:1573863-1603069 22.00           1476            686       0.465
+4   chr1:1607818-1624084  6.05            134             68       0.507
+5 chr1:12958048-12980570 11.20           1292            764       0.591
+6 chr1:13328197-13352741 12.80            374            615       1.640
+\end{Soutput}
+\end{Schunk}
+
+%\section{Annotations}
+
+\end{document}

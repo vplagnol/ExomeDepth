@@ -1,0 +1,7 @@
+source("scripts/ExoDepth/R/class_definition.R")
+source("scripts/ExoDepth/R/optimize_reference_set.R")
+source('scripts/ExoDepth/R/tools.R')
+dyn.load('/ugi/home/shared/vincent/libraries/R/installed/ExomeDepth/libs/ExomeDepth.so' )
+
+load('debug.RData')
+

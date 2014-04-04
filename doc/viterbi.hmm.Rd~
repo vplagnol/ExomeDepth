@@ -1,0 +1,74 @@
+\name{viterbi.hmm}
+\alias{viterbi.hmm}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{
+Computes the Viterbi path for a hidden markov model
+}
+\description{
+  Estimates the most likely path for a hidden Markov Chain using the
+  Viterbu algorithm.
+}
+\usage{
+viterbi.hmm(transitions, loglikelihood, positions)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{transitions}{
+%%     ~~Describe \code{transitions} here~~
+}
+  \item{loglikelihood}{
+%%     ~~Describe \code{loglikelihood} here~~
+}
+  \item{positions}{
+%%     ~~Describe \code{positions} here~~
+}
+}
+\details{
+%%  ~~ If necessary, more details than the description above ~~
+}
+\value{
+%%  ~Describe the value returned
+%%  If it is a LIST, use
+%%  \item{comp1 }{Description of 'comp1'}
+%%  \item{comp2 }{Description of 'comp2'}
+%% ...
+}
+\references{
+%% ~put references to the literature/web site here ~
+}
+\author{
+%%  ~~who you are~~
+}
+\note{
+%%  ~~further notes~~
+}
+
+%% ~Make other sections like Warning with \section{Warning }{....} ~
+
+\seealso{
+%% ~~objects to See Also as \code{\link{help}}, ~~~
+}
+\examples{
+##---- Should be DIRECTLY executable !! ----
+##-- ==>  Define data, use random,
+##--	or do  help(data=index)  for the standard data sets.
+
+## The function is currently defined as
+function(transitions, loglikelihood, positions) {
+  if ( nrow(transitions) != ncol(transitions) ) stop("Transition matrix is not square")
+  nstates <- nrow(transitions)
+  nobs <- nrow(loglikelihood)
+  
+  res <- .Call("C_hmm", nstates, nobs, transitions, loglikelihood, positions, PACKAGE = 'ExoDepth') 
+  #res <- .Call("C_hmm", nstates, nobs, transitions, loglikelihood, positions)
+  dimnames(res[[2]])[[2]] <- c('start.p', 'end.p', 'type', 'nexons')
+  res[[2]] <- as.data.frame(res[[2]])
+  names(res) <- c('Viterbi.path', 'calls')
+  
+  return(res)
+  }
+}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{ ~kwd1 }
+\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

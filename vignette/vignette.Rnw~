@@ -1,0 +1,388 @@
+\documentclass[10pt]{article}
+\usepackage{amsmath, amsfonts, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage[margin=2cm]{geometry}
+
+%\VignetteIndexEntry{Using ExomeDepth}
+
+\title{ExomeDepth}
+\author{Vincent Plagnol}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\section{What is new?}
+
+Version 1.0.0:
+\begin{itemize}
+\item New warning when the correlation between the test and reference samples is low, so that the user knows he should expect unreliable results.
+\item New function to count everted reads (characteristic of segmental duplications)
+\item Updated \texttt{genes.hg19} and \texttt{exons.hg19} objects. The number of exons tested is now 10\% lower, because it excludes some non coding regions as well as UTRs that are typically not well covered. My test data suggest that removing these difficult regions cleans up the signal quite a bit and the quality of established CNVs calls has improved significantly as a consequence of this. 
+\end{itemize}
+
+
+
+\section{What ExomeDepth does and tips for QC}
+
+\subsection{What ExomeDepth does and does not do}
+
+ExomeDepth uses read depth data to call CNVs from exome sequencing experiments.
+A key idea is that the test exome should be compared to a matched aggregate reference set.
+This aggregate reference set should combine exomes from the same batch and it should also be optimized for each exome.
+It will certainly differ from one exome to the next.
+
+Importantly, ExomeDepth assumes that the CNV of interest is absent from the aggregate reference set.
+Hence related individuals should be excluded from the aggregate reference.
+It also means that ExomeDepth can miss common CNVs, if the call is also present in the aggregate reference.
+ExomeDepth is really suited to detect rare CNV calls (typically for rare Mendelian disorder analysis).
+
+The ideas used in this package are of course not specific to exome sequencing and could be applied to other targeted sequencing datasets, as long as they contain a sufficiently large number of exons to estimate the parameters (at least 20 genes, say, but probably more would be useful).
+Also note that PCR based enrichment studies are often not well suited for this type of read depth analysis.
+The reason is that as the number of cycles is often set to a high number in order to equalize the representation of each amplicon, which can discard the CNV information.
+
+
+\subsection{Useful quality checks}
+Just to give some general expectations I usually obtain 150-280 CNV calls per exome sample (two third of them deletions).
+Any number clearly outside of this range is suspicious and suggests that either the model was inappropriate or that something went wrong while running the code.
+Less important and less precise, I also expect the aggregate reference to contain 5-10 exome samples. 
+While there is no set rule for this number, and the code may work very well with fewer exomes in the aggregate reference set, numbers outside of this range suggest potential technical artifacts.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Create count data from BAM files}
+
+
+\subsection{Count for the autosomes}
+Firstly, to facilitate the generation of read count data,  exon positions for the hg19 build of the human genome are available within \texttt{ExomeDepth}.
+This \texttt{exons.hg19} data frame can be directly passed as an argument of \texttt{getBAMCounts} (see below).
+
+<<exons>>=
+library(ExomeDepth)
+data(exons.hg19)
+print(head(exons.hg19))
+@ 
+
+To generate read count data, the function \texttt{getBamCounts} in \texttt{ExomeDepth} is set up to parse the BAM files. 
+It generates an array of read count, stored in a GenomicRanges object.
+It is a wrapper around the function \texttt{countBamInGRanges.exomeDepth} which is derived from an equivalent function in the \texttt{exomeCopy} package.
+You can refer to the help page of \texttt{getBAMCounts} to obtain the full list of options. 
+An example line of code (not evaluated here) would look like this:
+
+<<read.count, eval=FALSE>>=
+data(exons.hg19)
+my.counts <- getBamCounts(bed.frame = exons.hg19,
+                          bam.files = my.bam,
+                          include.chr = FALSE,
+                          referenceFasta = fasta)
+@ 
+
+\texttt{my.bam} is a set character vector of indexed BAM files. 
+\texttt{fasta} is the reference genome in fasta format (only useful if one wants to obtain the GC content).
+\texttt{exons.hg19} are the positions and names of the exons on the hg19 reference genome (as shown above). 
+\texttt{include.chr} defaults to false: if the BAM file are aligned to a reference sequence with the convention \texttt{chr1} for chromosomes instead of simply \texttt{1} (i.e. the UCSC convention vs. the Ensembl one) you need to set \texttt{include.chr = TRUE}, otherwise the counts will be equal to 0. Note that the data frame with exon locations provided with \texttt{ExomeDepth} uses the Ensembl location (i.e. no \texttt{chr} prefix before the chromosome names) but what matters to set this option is how the BAM files were aligned.
+
+\texttt{getBAMCounts} creates an object of the GRanges class which can easily be converted into a matrix or a data frame (which is the input format for \texttt{ExomeDepth}).
+An example of GenomicRanges output generated by \texttt{getBAMCounts} is provided in this package (chromosome 1 only to keep the size manageable). 
+Here is how this object could for example be used to obtain a more generic data frame:
+
+
+<<Rsamtools.load>>=
+library(ExomeDepth)
+data(ExomeCount)
+ExomeCount.dafr <- as(ExomeCount[,  colnames(ExomeCount)], 'data.frame')
+ExomeCount.dafr$chromosome <- gsub(as.character(ExomeCount.dafr$space), 
+                                        pattern = 'chr', 
+                                        replacement = '')  ##remove the annoying chr letters
+print(head(ExomeCount.dafr))
+@ 
+
+
+\subsection{Counts for chromosome X}
+Calling CNVs on the X chromosome can create issues if the exome sample of interest and the reference exome samples it is being compared to (what I call the aggregate reference) are not gender matched.
+For this reason the chromosome X exonic regions are not included by default in the data frame \texttt{exons.hg19}, mostly to avoid users getting low quality CNV calls because of this issue.
+However, loading the same dataset in R also brings another object called \texttt{exons.hg19.X} that containts the chromosome X exons.
+
+<<<read.count>>=
+data(exons.hg19.X)
+head(exons.hg19.X)
+@ 
+
+This object can be used to generate CNV counts and further down the line CNV calls, in the same way as \texttt{exons.hg19}.
+While this is not really necessary, I would recommend calling CNV on the X separately from the autosomes.
+Also make sure that the genders are matched properly (i.e. do not use male as a reference for female samples and vice versa).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Load an example dataset}
+We have already loaded a dataset of chromosome 1 data for four exome samples.
+We run a first test to make sure that the model can be fitted properly. 
+Note the use of the subset.for.speed option that subsets some rows purely to speed up this computation.
+
+<<first.test>>=
+test <- new('ExomeDepth',
+            test = ExomeCount.dafr$Exome2,
+            reference = ExomeCount.dafr$Exome3,
+            formula = 'cbind(test, reference) ~ 1',
+            subset.for.speed = seq(1, nrow(ExomeCount.dafr), 100))
+
+show(test)
+@ 
+
+
+
+\section{Build the most appropriate reference set}
+
+A key idea behing ExomeDepth is that each exome should not be compared to all other exomes but rather to an optimized set of exomes that are well correlated with that exome.
+This is what I call the optimized aggregate reference set, which is optimized for each exome sample.
+So the first step is to select the most appropriate reference sample.
+This step is demonstrated below.
+
+<<reference.selection>>=
+my.test <- ExomeCount$Exome4
+my.ref.samples <- c('Exome1', 'Exome2', 'Exome3')
+my.reference.set <- as.matrix(ExomeCount.dafr[, my.ref.samples])
+my.choice <- select.reference.set (test.counts = my.test, 
+                                   reference.counts = my.reference.set, 
+                                   bin.length = (ExomeCount.dafr$end - ExomeCount.dafr$start)/1000, 
+                                   n.bins.reduced = 10000)
+
+print(my.choice[[1]])
+@ 
+
+Using the output of this procedure we can construct the reference set.
+<<construct.ref>>=
+my.matrix <- as.matrix( ExomeCount.dafr[, my.choice$reference.choice, drop = FALSE])
+my.reference.selected <- apply(X = my.matrix, 
+                               MAR = 1, 
+                               FUN = sum)
+@ 
+
+Note that the \texttt{drop = FALSE} option is just used in case the reference set contains a single sample. 
+If this is the case, it makes sure that the subsetted object is a data frame, not a numeric vector.
+
+\section{CNV calling}
+Now the following step is the longest one as the beta-binomial model is applied to the full set of exons:
+<<build.complete>>=
+all.exons <- new('ExomeDepth',
+                 test = my.test,
+                 reference = my.reference.selected,
+                 formula = 'cbind(test, reference) ~ 1')
+@ 
+
+
+We can now call the CNV by running the underlying hidden Markov model:
+<<call.CNVs>>=
+all.exons <- CallCNVs(x = all.exons, 
+                      transition.probability = 10^-4, 
+                      chromosome = ExomeCount.dafr$space, 
+                      start = ExomeCount.dafr$start, 
+                      end = ExomeCount.dafr$end, 
+                      name = ExomeCount.dafr$names)
+head(all.exons@CNV.calls)
+@ 
+
+Now the last thing to do is to save it in an easily readable format (csv in this example, which can be opened in excel if needed):
+<<write.results, eval = FALSE>>=
+output.file <- 'exome_calls.csv'
+write.csv(file = output.file,
+          x = all.exons@CNV.calls,
+          row.names = FALSE)
+@ 
+
+Note that it is probably best to annotate the calls before creating that csv file (see below for annotation tools).
+
+
+\section{Ranking the CNV calls by confidence level}
+
+\texttt{ExomeDepth} tries to be quite aggressive to call CNVs. 
+Therefore the number of calls may be relatively high compared to other tools that try to accomplish the same task.
+One important information is the BF column, which stands for Bayes factor. 
+It quantifies the statistical support for each CNV. 
+It is in fact the log10 of the likelihood ratio of data for the CNV call divided by the null (normal copy number).
+The higher that number, the more confident once can be about the presence of a CNV.
+While it is difficult to give an ideal threshold, and for short exons the Bayes Factor are bound to be unconvincing, the most obvious large calls should be easily flagged by ranking them according to this quantity.
+
+<<ranking>>=
+head(all.exons@CNV.calls[ order ( all.exons@CNV.calls$BF, decreasing = TRUE),])
+@
+
+
+
+
+
+\section{Better annotation of CNV calls}
+Much can be done to annotate CNV calls and this is an open problem.
+While this is a work in progress, I have started adding basic options.
+Importantly, the key function uses the more recent syntax from the package \texttt{GenomicRanges}.
+Hence the function will only return a warning and not add the annotations if you use a version of \texttt{GenomicRanges} prior to \texttt{1.8.10}.
+The best way to upgrade is probably to use \texttt{R 2.15.0} or later and let \texttt{Bioconductor} scripts do the install for you.
+If you use \texttt{R 2.14} or earlier the annotation steps described below will probably only return a warning and not annotate the calls.
+
+Perhaps the most useful step is to identify the overlap with a set of common CNVs identified in Conrad et al, Nature 2010.
+If one is looking for rare CNVs, these should probably be filtered out.
+The first step is to load these reference data from Conrad et al. To make things as practical as possible, these data are now available as part of ExomeDepth.
+
+<<Conrad>>=
+data(Conrad.hg19)
+head(Conrad.hg19.common.CNVs)
+@ 
+
+Then one can use this information to annotate our CNV calls with the function \texttt{AnnotateExtra}.
+
+<<anno.extra>>=
+all.exons <- AnnotateExtra(x = all.exons,
+                           reference.annotation = Conrad.hg19.common.CNVs,
+                           min.overlap = 0.5,
+                           column.name = 'Conrad.hg19')
+@
+
+
+The \texttt{min.overlap} argument set to 0.5 requires that the Conrad reference call overlaps at least 50\% of our CNV calls to declare an overlap.
+The \texttt{column.name} argument simply defines the name of the column that will store the overlap information.
+The outcome of this procedure can be checked with:
+
+<<anno.check>>=
+print(head(all.exons@CNV.calls))
+@ 
+
+
+I have processed the Conrad et al data in the GRanges format. 
+Potentially any other reference dataset could be converted as well. See for example the exon information:
+
+<< prep.GRanges>>=
+exons.hg19.GRanges <- GRanges(seqnames = exons.hg19$chromosome,
+                                IRanges(start=exons.hg19$start,end=exons.hg19$end),
+                                names = exons.hg19$name)
+all.exons <- AnnotateExtra(x = all.exons,
+                           reference.annotation = exons.hg19.GRanges,
+                           min.overlap = 0.0001,
+                           column.name = 'exons.hg19')
+all.exons@CNV.calls[3:6,]
+@ 
+
+This time I report any overlap with an exon by specifying a value close to 0 in the \texttt{min.overlap} argument.
+Note the metadata column \texttt{names} which MUST be specified for the annotation to work properly.
+
+
+
+
+
+\section{A visual example}
+
+The ExomeDepth object includes a plot function. This function shows the ratio between observed and expected read depth.
+The 95\% confidence interval is marked by a grey shaded area.
+Here we use a common CNV located in the {\it RHD} gene as an example. 
+We can see that the individual in question has more copies than the average (in fact two functional copies of {\it RHD}, which corresponds to rhesus positive).
+
+<<fig = TRUE, echo = TRUE>>=
+plot (all.exons,
+      sequence = '1',
+      xlim = c(25598981 - 100000, 25633433 + 100000),
+      count.threshold = 20,
+      main = 'RHD gene',
+      with.gene = TRUE)
+@ 
+
+
+
+\section{How to loop over the multiple samples}
+A FAQ is a way to deal with a set of a significant number of exomes, i.e. how to loop over all of them using ExomeDepth.
+This can be done with a loop.
+I show below an example of how I would code things.
+The code is not executed in the vignette to save time when building the package, but it can give some hints to users who do not have extensive experience with R.
+
+<<loop, eval=FALSE>>=
+
+#### get the annotation datasets to be used later
+data(Conrad.hg19)
+exons.hg19.GRanges <- GRanges(seqnames = exons.hg19$chromosome,
+                              IRanges(start=exons.hg19$start,end=exons.hg19$end),
+                              names = exons.hg19$name)
+
+
+### prepare the main matrix of read count data
+ExomeCount.mat <- as.matrix(ExomeCount.dafr[, grep(names(ExomeCount.dafr), pattern = 'Exome.*')])
+nsamples <- ncol(ExomeCount.mat)
+
+### start looping over each sample
+for (i in 1:nsamples) {
+  
+#### Create the aggregate reference set for this sample
+  my.choice <- select.reference.set (test.counts =  ExomeCount.mat[,i],
+                                     reference.counts = ExomeCount.mat[,-i],
+                                     bin.length = (ExomeCount.dafr$end - ExomeCount.dafr$start)/1000,
+                                     n.bins.reduced = 10000)
+  
+  my.reference.selected <- apply(X = ExomeCount.mat[, my.choice$reference.choice, drop = FALSE],
+                                 MAR = 1,
+                                 FUN = sum)
+  
+  message('Now creating the ExomeDepth object')
+  all.exons <- new('ExomeDepth',
+                   test = ExomeCount.mat[,i],
+                   reference = my.reference.selected,
+                   formula = 'cbind(test, reference) ~ 1')
+  
+################ Now call the CNVs
+  all.exons <- CallCNVs(x = all.exons,
+                        transition.probability = 10^-4,
+                        chromosome = ExomeCount.dafr$space,
+                        start = ExomeCount.dafr$start,
+                        end = ExomeCount.dafr$end,
+                        name = ExomeCount.dafr$names)
+  
+########################### Now annotate the ExomeDepth object
+  all.exons <- AnnotateExtra(x = all.exons,
+                             reference.annotation = Conrad.hg19.common.CNVs,
+                             min.overlap = 0.5,
+                             column.name = 'Conrad.hg19')
+  
+  all.exons <- AnnotateExtra(x = all.exons,
+                             reference.annotation = exons.hg19.GRanges,
+                             min.overlap = 0.0001,
+                             column.name = 'exons.hg19')
+    
+  output.file <- paste('Exome_', i, 'csv', sep = '')
+  write.csv(file = output.file, x = all.exons@CNV.calls, row.names = FALSE)
+  
+}
+
+
+@
+
+\section{Counting everted reads}
+
+This issue of everted reads is a bit of a side story that has nothing to do with read depth. 
+It is based on a ``read pair'' analysis but it was practical for me (and I hope for others) to write simple functions to find such a pattern in my exome data.
+The motivation is that everted reads (read pairs pointing outward instead of inward) are characteristic of tandem duplications. 
+I often argue that a paired end approach is not very well suited for exome sequence data, because the reads must be located very close to the junction of interest.
+However, experience does show that this happens once in a while, and it can be effective at identifying duplications.
+The function below will return a data frame with the number of everted reads in each gene.
+More documentation is needed on this, and will be added in later versions. But it is a useful screen to pick up segmental duplications.
+
+<<everted, eval = FALSE>>=
+data(genes.hg19)
+everted <- count.everted.reads (bed.frame = genes.hg19,
+                               bam.files = bam.files,
+                               min.mapq = 20,
+                               include.chr = FALSE)
+
+@
+
+Note the option \texttt{include.chr = FALSE} is you aligned your reads to the NCBI version of the reference genome (i.e. chromosome denoted as 1,2, \dots) but set to \texttt{TRUE} if you used the UCSC reference genome (i.e. chromosomes denoted as chr1, chr2, \dots). As a filtering step one probably wants to look in the resulting table for genes that show no everted reads in the vast majority of samples, with the exception of a few cases where a duplication may be rare but real.
+
+
+
+
+\section{Technical information about R session}
+
+<<session>>=
+sessionInfo()
+@ 
+
+
+
+\end{document}

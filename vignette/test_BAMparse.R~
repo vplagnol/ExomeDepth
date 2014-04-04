@@ -1,0 +1,8 @@
+
+library(ExomeDepth)
+
+data(exons.hg19)
+my.counts <- getBamCounts(bed.frame = exons.hg19,
+                          bam.files = my.bam,
+                          referenceFasta = fasta)
+

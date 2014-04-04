@@ -1,0 +1,14 @@
+#include<iostream>
+#include<vector>
+#include<string>
+#include <cmath>
+
+#include <Rinternals.h>
+#include <cstdlib>
+#include <sstream>
+
+using namespace std;
+
+extern "C" {
+  SEXP C_overlap (const SEXP nstates, const SEXP nobs, const SEXP transitions, const SEXP probabilities, const SEXP positions);
+}

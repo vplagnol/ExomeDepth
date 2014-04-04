@@ -1,0 +1,10 @@
+exportPattern("^[[:alpha:]]+")
+exportClasses("ExomeDepth")
+exportMethods("TestCNV", "CallCNVs")
+useDynLib(ExomeDepth, .registration=TRUE)
+importFrom(VGAM)
+importFrom(GenomicRanges)
+importFrom(Rsamtools)
+importFrom(aod)
+importFrom(methods)
+
