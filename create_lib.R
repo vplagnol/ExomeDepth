@@ -1,6 +1,6 @@
 
 
-base <- '/home/ucbtvyp/vyp/vincent/libraries/R/working'
+base <- 'working'
 system(paste('rm ', base, '/ExomeDepth/R/*', sep = ''))
 package.skeleton(name="ExomeDepth",
                  code_files = c('R/class_definition.R', 'R/optimize_reference_set.R', 'R/tools.R', 'R/countBamInGranges.R', 'R/plot_CNVs_method.R'),
