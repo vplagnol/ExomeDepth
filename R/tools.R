@@ -2,6 +2,7 @@
 
 
 qbetabinom <- function(p, size, phi, prob) {  ##parameterize with phi, prob instead of a,b
+  print("Anna fowler: working version")
   a <- prob*(1-phi)/phi
   b <- (1-prob)*(1-phi)/phi
   return( qbetabinom.ab (p = p, size = size, shape1 = a, shape2 = b)  )
