@@ -74,7 +74,7 @@ complete <- TRUE
 
 if (complete) {
   system(paste("/share/apps/R-3.0.2/bin/R CMD build --resave-data ", base, "/ExomeDepth", sep = ''))
-  system("/share/apps/R-3.0.2/bin/R CMD INSTALL  ExomeDepth_1.0.0.tar.gz")
+  system("/share/apps/R-3.0.2/bin/R CMD INSTALL  ExomeDepth_1.0.1.tar.gz")
   system(paste('cp /home/ucbtvyp/vyp/vincent/libraries/R/installed/ExomeDepth/doc/ExomeDepth-vignette.pdf .'))
 
 }
@@ -82,7 +82,7 @@ if (complete) {
 if (!complete) {
   system(paste("/share/apps/R-3.0.2/bin/R CMD build --no-vignettes ", base, "/ExomeDepth", sep = ''))
 
-  system("/share/apps/R-3.0.2/bin/R CMD INSTALL  ExomeDepth_1.0.0.tar.gz")
+  system("/share/apps/R-3.0.2/bin/R CMD INSTALL  ExomeDepth_1.0.1.tar.gz")
 }
 
 
