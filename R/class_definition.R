@@ -166,7 +166,7 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
     good.pos <- which (x@annotations$chromosome == chrom)
     loc.annotations <- x@annotations[  good.pos , ]
     loc.expected <- x@expected[ good.pos ]
-    loc.test <- x@expected[ good.pos ]
+    loc.test <- x@test[ good.pos ]
     loc.total <- total[ good.pos ]
     
     loc.likelihood <-  rbind(c(- Inf, 0, -Inf), x@likelihood[good.pos, c(2, 1, 3)]) ##add a dummy exon so that we start at cn = 2 (normal)
@@ -176,15 +176,7 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
 
     my.calls$calls$start.p <- my.calls$calls$start.p -1  ##remove the dummy exon, which has now served its purpose
     my.calls$calls$end.p <- my.calls$calls$end.p -1  ##remove the dummy exon, which has now served its purpose
-    loc.likelihood <- loc.likelihood[-1, ]  ##remove the dummy exon, which has now served its purpose
-
-    
-                                        #my.breaks <- which(diff(as.numeric(x@annotations$chromosome)) != 0) + 1
-                                        #x@likelihood[ my.breaks,1 ] <- - Inf
-                                        #x@likelihood[ my.breaks,3  ] <- - Inf
-    
-                                        #my.calls <- viterbi.hmm (transitions, loglikelihood = x@likelihood[, c(2, 1, 3)], positions = NA)
-
+    loc.likelihood <- loc.likelihood[ -1, c(2,1, 3) ]  ##remove the dummy exon, which has now served its purpose
 
   ################################ Now make it look better, add relevant info
     if (nrow(my.calls$calls) > 0) {
