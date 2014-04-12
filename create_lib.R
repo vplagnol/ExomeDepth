@@ -8,7 +8,7 @@ package.skeleton(name="ExomeDepth",
                  force=TRUE)
 
 
-for (folder in c('data', 'src')) {
+for (folder in c('data', 'src', 'vignette')) {
   my.folder <- paste(base, '/ExomeDepth/', folder, sep = '')
   if (!file.exists(my.folder)) dir.create(path = my.folder)
 }
