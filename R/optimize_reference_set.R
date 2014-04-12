@@ -6,6 +6,14 @@
 select.reference.set <- function(test.counts, reference.counts, bin.length = NULL, n.bins.reduced = 0, data = NULL, formula = 'cbind(test, reference) ~ 1', phi.bins = 1) {
 
   message('Optimization of the choice of aggregate reference set')
+
+  if (sum(test.counts > 2) < 5) {
+    message('It looks like the test samples has only ', sum(test.counts > 2), ' bins with 2 or more reads. The coverage is too small to perform any meaningful inference so no likelihood will be computed.')
+    my.res <- list(reference.choice = dimnames(reference.counts)[[2]][1], summary.stats = NULL)
+    return(my.res)
+  }
+  
+
   
   if (class(reference.counts) != 'matrix') stop('The reference sequence count data must be provided as a matrix')
   if (nrow(reference.counts) != length(test.counts)) stop("The number of rows of the reference matrix must match the length of the test count data\n")

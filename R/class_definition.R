@@ -25,6 +25,10 @@ setMethod("initialize", "ExomeDepth", function(.Object,
                                                subset.for.speed = NULL) {
   if (length(test) != length(reference)) stop("Length of test and numeric must match")
 
+  if (sum(test > 2) < 5) {
+    message('It looks like the test samples has only ', sum(test > 2), ' bins with 2 or more reads. The coverage is too small to perform any meaningful inference so no likelihood will be computed.')
+    return(.Object)
+  }
   
 
   if (is.null(data)) data <- data.frame(intercept = rep(1, length(test)))
@@ -64,12 +68,13 @@ setMethod("initialize", "ExomeDepth", function(.Object,
       .Object@phi <- data$phi.linear
     }
 
+
   
   .Object@formula <- formula
   .Object@test <- test
   .Object@reference <- reference
   .Object@expected <- aod::fitted(mod)
-
+  
   
   .Object@annotations <- data.frame()
   
@@ -128,6 +133,12 @@ setGeneric("CallCNVs", def = function(x, chromosome, start, end, name, transitio
 
 setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, transition.probability) {
 
+  if (length(x@phi) == 0) {
+    message('The vector phi does not seem initialized. This may be because the read count is too low and the test vector cannot be processed. No calling will happen')
+    x@CNV.calls <- data.frame()
+    return(x)
+  }
+  
   if ( length(start) != length(chromosome) || length(end) != length(chromosome) || length(name) != length(chromosome) ) stop('Chromosome, start and end vector must have the same lengths.\n')
   if (nrow(x@likelihood) != length(chromosome) ) stop('The annotation vectors must have the same length as the data in the ExomeDepth x')
 
