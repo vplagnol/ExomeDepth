@@ -1,0 +1,1001 @@
+library(ExomeDepth)
+load('Documents/MCG/ExomeDepth/LargeVariants/extra_counts.RData')
+ExomeCount<-as(counts, 'data.frame')                                        #converts counts, a ranged data object, to a data frame
+ExomeCount$chromosome <- gsub(as.character(ExomeCount$space),pattern = 'chr',replacement = '')
+colnames(ExomeCount)[1:length(sample.names)+6]=sample.names                 #assigns the sample names to each column
+sample.names
+which(sample.names=="7")
+i=which(sample.names=="7")
+my.test <- ExomeCount[,sample.names1[i]]                                 #extracts the sample to be tested
+sample.names1<-sample.names
+my.test <- ExomeCount[,sample.names1[i]]                                 #extracts the sample to be tested
+my.ref.samples <- sample.names1[-i]                                      #uses all other samples as the reference set
+my.matrix <- as.matrix( ExomeCount[, my.ref.samples])                   #uses all other files as reference instead of selecting ones which are highly correlated
+my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon
+all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')
+all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)
+trans_prob=0.01
+all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)
+all.exons@CNVcalls
+all.exons@CNV.calls
+my.choice$ref
+my.reference.selected
+my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested
+my.ref.samples <- sample.names[-i]                                      #uses all other samples as the reference set
+my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix
+my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)
+my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])
+my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon
+all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')
+all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)
+all.exons@CNV.calls
+my.choice$ref
+my.choice
+load('Documents/MCG/ExomeDepth/Ovarian/35_extra_counts.RData)
+''
+'
+load('Documents/MCG/ExomeDepth/Ovarian/35_extra_counts.RData')
+ExomeCount<-as(counts, 'data.frame')                                        #converts counts, a ranged data object, to a data frame
+ExomeCount$chromosome <- gsub(as.character(ExomeCount$space),pattern = 'chr',replacement = '')
+colnames(ExomeCount)[1:length(sample.names)+6]=sample.names                 #assigns the sample names to each column
+for(i in 1:length(sample.names)){                                           #for each sample:
+print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))
+my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested
+my.ref.samples <- sample.names[-i]                                      #uses all other samples as the reference set
+my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)
+my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])
+my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon
+all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')
+all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)
+}
+my.choice$ref
+choose(19030,10000)
+choose(19030,19030-1)
+choose(19030,19030-10)
+choose(19030,19030-100)
+choose(19030,19030-1000)
+choose
+choose(10,5)
+choose(10,4)/(5*5)
+choose(10,4)/(25)
+choose(10,4)
+choose(10,4)*(4/5)
+choose(10,4)*(6/5)
+choose(10,0)
+choose(10,1)
+choose(10,0)*(10/1)
+choose(1000,1000)
+choose(1000,999)
+choose(1000,998)
+choose(1000,3)
+choose(1000,2)
+choose(1001,2)
+choose(1000,2)
+choose(1000,0)
+choose(1000,1)
+choose(100,1)
+choose(100,2)
+choose(100,97)
+choose(100,98)
+load('Documents/MCG/ExomeDepth/LargeVariants/extra_counts.RData')
+i=40
+sample.names[i]
+ExomeCount<-as(counts, 'data.frame')                                        #converts counts, a ranged data object, to a data frame
+ExomeCount$chromosome <- gsub(as.character(ExomeCount$space),pattern = 'chr',replacement = '')
+colnames(ExomeCount)[1:length(sample.names)+6]=sample.names                 #assigns the sample names to each column
+my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested
+my.ref.samples <- sample.names[-i]                                      #uses all other samples as the reference set
+my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix
+my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)
+my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])
+my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon
+all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')
+all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)
+all.exons@CNV.calls
+my.choice$ref
+length(my.choice$ref)
+load('Documents/MCG/ExomeDepth/Ovarian/35_extra_counts.RData')
+ExomeCount<-as(counts, 'data.frame')                                        #converts counts, a ranged data object, to a data frame
+ExomeCount$chromosome <- gsub(as.character(ExomeCount$space),pattern = 'chr',replacement = '')
+colnames(ExomeCount)[1:length(sample.names)+6]=sample.names                 #assigns the sample names to each column
+i=1
+my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested
+my.ref.samples <- sample.names[-i]                                      #uses all other samples as the reference set
+my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix
+my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)
+my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])
+my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon
+all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')
+all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)
+sample.names[i]
+length(my.choice$ref)
+my.choice$ref
+CNVCalls = NULL#
+B1B2Calls = NULL#
+for(i in 1:length(sample.names)){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+	my.test <- ExomeCount[,known_variants[i]]                                 #extracts the sample to be tested#
+	my.ref.samples = sample.names[-i]#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1b2=all.exons@CNV.calls[all.exons@CNV.calls$start.p%in%brca12 |all.exons@CNV.calls$end.p%in%brca12 , ]	#
+	if(nrow(b1b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1b2))}	#
+}
+CNVCalls = NULL#
+B1B2Calls = NULL#
+for(i in 1:length(sample.names)){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples = sample.names[-i]#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1b2=all.exons@CNV.calls[all.exons@CNV.calls$start.p%in%brca12 |all.exons@CNV.calls$end.p%in%brca12 , ]	#
+	if(nrow(b1b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1b2))}	#
+}
+brca12<-which(bed.file[,4]=="BRCA1"|bed.file[,4]=="BRCA2")
+brca12
+CNVCalls = NULL#
+B1B2Calls = NULL#
+for(i in 1:length(sample.names)){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples = sample.names[-i]#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1b2=all.exons@CNV.calls[all.exons@CNV.calls$start.p%in%brca12 |all.exons@CNV.calls$end.p%in%brca12 , ]	#
+	if(nrow(b1b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1b2))}	#
+}
+B1B2Calls
+CNVCalls
+dim(CNVCalls)
+i=1
+print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples = sample.names[-i]#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)
+my.choice
+trans_prob
+i=2
+print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples = sample.names[-i]#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)
+my.choice$
+my.choice
+length(my.choice$ref)
+dim(CNVCalls)
+CNVCalls
+i=1
+print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples = sample.names[-i]#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)
+my.choice
+dim(ExomeCount)
+rowSums(ExomeCount)
+head(ExomeCount)
+rowSums(ExomeCount[,-c(1:6,55)])
+rowSums(ExomeCount[,-c(1:6,55)])>30
+sum(rowSums(ExomeCount[,-c(1:6,55)])>30)
+cor(ExomeCount$sample.names[i],ExomeCount$FH105292_Processed)
+ExomeCount$FH105292_Processed
+ExomeCount$sample.names[i]
+i
+ExomeCount$sample.names[1]
+sample.names[i]
+cor(ExomeCount$FH104190_Processed,ExomeCount$FH105292_Processed)
+my.choice
+10^6
+print(10^6)
+print(1e+06)
+print(10^5)
+print(10^4)
+select.reference.set <- function(test.counts, reference.counts, bin.length = NULL, n.bins.reduced = 0, data = NULL, formula = 'cbind(test, reference) ~ 1', phi.bins = 1) {#
+#
+  message('Optimization of the choice of aggregate reference set')#
+  if (class(reference.counts) != 'matrix') stop('The reference sequence count data must be provided as a matrix')#
+  if (nrow(reference.counts) != length(test.counts)) stop("The number of rows of the reference matrix must match the length of the test count data\n")#
+  if (is.null(bin.length)) bin.length <- rep(1, length(selected))#
+  n.ref.samples <- ncol(reference.counts)#
+#
+  ############ select the subset of bins which will be used for the selection of the reference set#
+  total.counts <- apply(reference.counts, MARGIN = 1, FUN = sum) + test.counts#
+  selected <- which(total.counts > 30 & bin.length > 0)#
+  if ( (n.bins.reduced < length(selected)) && (n.bins.reduced > 0) ){ selected <- selected[ seq(1, length(selected), length(selected) / n.bins.reduced) ]}#
+browser()#
+  test.counts <- test.counts[ selected ]#
+  reference.counts <- reference.counts[ selected, , drop = FALSE ]#
+  bin.length <- bin.length[ selected]#
+  if (!is.null(data)) data <- data[ selected, ]#
+  n.bins <- length(selected)#
+  message('Number of selected bins: ', n.bins)#
+print(length(selected))#
+#
+  ############### Now sort the data according to the correlation#
+  my.correlations <- apply(reference.counts, MARGIN = 2, FUN = function(x) {cor(x/(bin.length*sum(x)/10^6), test.counts/(bin.length*sum(test.counts)/10^6))})#
+  reference.counts <- reference.counts[, order(my.correlations, decreasing = TRUE), drop = FALSE]#
+  my.correlations <- my.correlations[ order(my.correlations, decreasing = TRUE) ]#
+  #########################################
+  res.data.frame <- data.frame(ref.samples = dimnames(reference.counts)[[2]],#
+                               correlations = my.correlations,#
+                               expected.BF = NA,#
+                               phi = NA,#
+                               RatioSd = NA,#
+                               mean.p = NA,#
+                               median.depth = NA,#
+                               selected = FALSE)#
+#
+  reference <- rep(0, n.bins)#
+  for (i in 1:n.ref.samples) {#
+    reference <- reference + reference.counts[,i]#
+#
+    #print(head(data))#
+    #print(length(reference))#
+    #print(nrow(data))#
+#
+    my.mod <- new('ExomeDepth',#
+                  test = test.counts,#
+                  reference = reference,#
+                  formula = formula,#
+                  data = data,#
+                  phi.bins = phi.bins)#
+    res.data.frame$phi[ i ] <- mean(my.mod@phi)#
+    res.data.frame$mean.p[ i ] <- mean(my.mod@expected)#
+    res.data.frame$median.depth[ i ] <- median(reference)#
+    res.data.frame$RatioSd[ i ] <-  mean(sqrt(1 + (test.counts + reference - 1)*my.mod@phi))#
+#
+    if ( (i > 2) && (res.data.frame$mean.p[ i ] < 0.05)) break;#
+    ##########determine the expected proportion of reads assuming a deletion#
+    alt.odds <- res.data.frame$mean.p[ i ]/(1-res.data.frame$mean.p[ i ]) * 0.5#
+    alt.mean.p <- alt.odds/(1+alt.odds)#
+#
+    res.data.frame$expected.BF[ i ] <- get.power.betabinom (size = round(res.data.frame$median.depth[ i ]),#
+                                                            my.phi = res.data.frame$phi[ i ],#
+                                                            my.p = res.data.frame$mean.p[ i ],#
+                                                            my.alt.p = alt.mean.p,#
+                                                            theory = FALSE)#
+  }#
+#
+  my.max <- which.max( res.data.frame$expected.BF )#
+  res.data.frame$selected[ my.max ] <- TRUE#
+  my.res <- list(reference.choice = as.character(res.data.frame$ref.samples[ 1:my.max ]), summary.stats = res.data.frame)#
+  return(my.res)#
+}
+i
+print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples = sample.names[-i]#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)
+select.reference.set <- function(test.counts, reference.counts, bin.length = NULL, n.bins.reduced = 0, data = NULL, formula = 'cbind(test, reference) ~ 1', phi.bins = 1) {#
+#
+  message('Optimization of the choice of aggregate reference set')#
+  if (class(reference.counts) != 'matrix') stop('The reference sequence count data must be provided as a matrix')#
+  if (nrow(reference.counts) != length(test.counts)) stop("The number of rows of the reference matrix must match the length of the test count data\n")#
+  if (is.null(bin.length)) bin.length <- rep(1, length(selected))#
+  n.ref.samples <- ncol(reference.counts)#
+#
+  ############ select the subset of bins which will be used for the selection of the reference set#
+  total.counts <- apply(reference.counts, MARGIN = 1, FUN = sum) + test.counts#
+  selected <- which(total.counts > 30 & bin.length > 0)#
+  if ( (n.bins.reduced < length(selected)) && (n.bins.reduced > 0) ){ selected <- selected[ seq(1, length(selected), length(selected) / n.bins.reduced) ]}#
+browser()#
+  test.counts <- test.counts[ selected ]#
+  reference.counts <- reference.counts[ selected, , drop = FALSE ]#
+  bin.length <- bin.length[ selected]#
+  if (!is.null(data)) data <- data[ selected, ]#
+  n.bins <- length(selected)#
+  message('Number of selected bins: ', n.bins)#
+#
+  ############### Now sort the data according to the correlation#
+  my.correlations <- apply(reference.counts, MARGIN = 2, FUN = function(x) {cor(x/(bin.length*sum(x)/10^6), test.counts/(bin.length*sum(test.counts)/10^6))})#
+  reference.counts <- reference.counts[, order(my.correlations, decreasing = TRUE), drop = FALSE]#
+  my.correlations <- my.correlations[ order(my.correlations, decreasing = TRUE) ]#
+  #########################################
+  res.data.frame <- data.frame(ref.samples = dimnames(reference.counts)[[2]],#
+                               correlations = my.correlations,#
+                               expected.BF = NA,#
+                               phi = NA,#
+                               RatioSd = NA,#
+                               mean.p = NA,#
+                               median.depth = NA,#
+                               selected = FALSE)#
+#
+  reference <- rep(0, n.bins)#
+  for (i in 1:n.ref.samples) {#
+    reference <- reference + reference.counts[,i]#
+#
+    #print(head(data))#
+    #print(length(reference))#
+    #print(nrow(data))#
+#
+    my.mod <- new('ExomeDepth',#
+                  test = test.counts,#
+                  reference = reference,#
+                  formula = formula,#
+                  data = data,#
+                  phi.bins = phi.bins)#
+    res.data.frame$phi[ i ] <- mean(my.mod@phi)#
+    res.data.frame$mean.p[ i ] <- mean(my.mod@expected)#
+    res.data.frame$median.depth[ i ] <- median(reference)#
+    res.data.frame$RatioSd[ i ] <-  mean(sqrt(1 + (test.counts + reference - 1)*my.mod@phi))#
+#
+    if ( (i > 2) && (res.data.frame$mean.p[ i ] < 0.05)) break;#
+    ##########determine the expected proportion of reads assuming a deletion#
+    alt.odds <- res.data.frame$mean.p[ i ]/(1-res.data.frame$mean.p[ i ]) * 0.5#
+    alt.mean.p <- alt.odds/(1+alt.odds)#
+#
+    res.data.frame$expected.BF[ i ] <- get.power.betabinom (size = round(res.data.frame$median.depth[ i ]),#
+                                                            my.phi = res.data.frame$phi[ i ],#
+                                                            my.p = res.data.frame$mean.p[ i ],#
+                                                            my.alt.p = alt.mean.p,#
+                                                            theory = FALSE)#
+  }#
+#
+  my.max <- which.max( res.data.frame$expected.BF )#
+  res.data.frame$selected[ my.max ] <- TRUE#
+  my.res <- list(reference.choice = as.character(res.data.frame$ref.samples[ 1:my.max ]), summary.stats = res.data.frame)#
+  return(my.res)#
+}
+print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples = sample.names[-i]#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)
+my.choice
+select.reference.set <- function(test.counts, reference.counts, bin.length = NULL, n.bins.reduced = 0, data = NULL, formula = 'cbind(test, reference) ~ 1', phi.bins = 1) {#
+#
+  message('Optimization of the choice of aggregate reference set')#
+  if (class(reference.counts) != 'matrix') stop('The reference sequence count data must be provided as a matrix')#
+  if (nrow(reference.counts) != length(test.counts)) stop("The number of rows of the reference matrix must match the length of the test count data\n")#
+  if (is.null(bin.length)) bin.length <- rep(1, length(selected))#
+  n.ref.samples <- ncol(reference.counts)#
+#
+  ############ select the subset of bins which will be used for the selection of the reference set#
+  total.counts <- apply(reference.counts, MARGIN = 1, FUN = sum) + test.counts#
+  selected <- which(total.counts > 30 & bin.length > 0)#
+  if ( (n.bins.reduced < length(selected)) && (n.bins.reduced > 0) ){ selected <- selected[ seq(1, length(selected), length(selected) / n.bins.reduced) ]}#
+browser()#
+  test.counts <- test.counts[ selected ]#
+  reference.counts <- reference.counts[ selected, , drop = FALSE ]#
+  bin.length <- bin.length[ selected]#
+  if (!is.null(data)) data <- data[ selected, ]#
+  n.bins <- length(selected)#
+  message('Number of selected bins: ', n.bins)#
+#
+  ############### Now sort the data according to the correlation#
+  my.correlations <- apply(reference.counts, MARGIN = 2, FUN = function(x) {cor(x/(bin.length*sum(x)/10^6), test.counts/(bin.length*sum(test.counts)/10^6))})#
+  reference.counts <- reference.counts[, order(my.correlations, decreasing = TRUE), drop = FALSE]#
+  my.correlations <- my.correlations[ order(my.correlations, decreasing = TRUE) ]#
+print(bin.length)#
+  #########################################
+  res.data.frame <- data.frame(ref.samples = dimnames(reference.counts)[[2]],#
+                               correlations = my.correlations,#
+                               expected.BF = NA,#
+                               phi = NA,#
+                               RatioSd = NA,#
+                               mean.p = NA,#
+                               median.depth = NA,#
+                               selected = FALSE)#
+#
+  reference <- rep(0, n.bins)#
+  for (i in 1:n.ref.samples) {#
+    reference <- reference + reference.counts[,i]#
+#
+    #print(head(data))#
+    #print(length(reference))#
+    #print(nrow(data))#
+#
+    my.mod <- new('ExomeDepth',#
+                  test = test.counts,#
+                  reference = reference,#
+                  formula = formula,#
+                  data = data,#
+                  phi.bins = phi.bins)#
+    res.data.frame$phi[ i ] <- mean(my.mod@phi)#
+    res.data.frame$mean.p[ i ] <- mean(my.mod@expected)#
+    res.data.frame$median.depth[ i ] <- median(reference)#
+    res.data.frame$RatioSd[ i ] <-  mean(sqrt(1 + (test.counts + reference - 1)*my.mod@phi))#
+#
+    if ( (i > 2) && (res.data.frame$mean.p[ i ] < 0.05)) break;#
+    ##########determine the expected proportion of reads assuming a deletion#
+    alt.odds <- res.data.frame$mean.p[ i ]/(1-res.data.frame$mean.p[ i ]) * 0.5#
+    alt.mean.p <- alt.odds/(1+alt.odds)#
+#
+    res.data.frame$expected.BF[ i ] <- get.power.betabinom (size = round(res.data.frame$median.depth[ i ]),#
+                                                            my.phi = res.data.frame$phi[ i ],#
+                                                            my.p = res.data.frame$mean.p[ i ],#
+                                                            my.alt.p = alt.mean.p,#
+                                                            theory = FALSE)#
+  }#
+#
+  my.max <- which.max( res.data.frame$expected.BF )#
+  res.data.frame$selected[ my.max ] <- TRUE#
+  my.res <- list(reference.choice = as.character(res.data.frame$ref.samples[ 1:my.max ]), summary.stats = res.data.frame)#
+  return(my.res)#
+}
+print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples = sample.names[-i]#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)
+select.reference.set <- function(test.counts, reference.counts, bin.length = NULL, n.bins.reduced = 0, data = NULL, formula = 'cbind(test, reference) ~ 1', phi.bins = 1) {#
+#
+  message('Optimization of the choice of aggregate reference set')#
+  if (class(reference.counts) != 'matrix') stop('The reference sequence count data must be provided as a matrix')#
+  if (nrow(reference.counts) != length(test.counts)) stop("The number of rows of the reference matrix must match the length of the test count data\n")#
+  if (is.null(bin.length)) bin.length <- rep(1, length(selected))#
+  n.ref.samples <- ncol(reference.counts)#
+#
+  ############ select the subset of bins which will be used for the selection of the reference set#
+  total.counts <- apply(reference.counts, MARGIN = 1, FUN = sum) + test.counts#
+  selected <- which(total.counts > 30 & bin.length > 0)#
+  if ( (n.bins.reduced < length(selected)) && (n.bins.reduced > 0) ){ selected <- selected[ seq(1, length(selected), length(selected) / n.bins.reduced) ]}#
+browser()#
+  test.counts <- test.counts[ selected ]#
+  reference.counts <- reference.counts[ selected, , drop = FALSE ]#
+  bin.length <- bin.length[ selected]#
+  if (!is.null(data)) data <- data[ selected, ]#
+  n.bins <- length(selected)#
+  message('Number of selected bins: ', n.bins)#
+#
+  ############### Now sort the data according to the correlation#
+  my.correlations <- apply(reference.counts, MARGIN = 2, FUN = function(x) {cor(x/(bin.length*sum(x)/10^6), test.counts/(bin.length*sum(test.counts)/10^6))})#
+  reference.counts <- reference.counts[, order(my.correlations, decreasing = TRUE), drop = FALSE]#
+  my.correlations <- my.correlations[ order(my.correlations, decreasing = TRUE) ]#
+print(test.counts/(bin.length*sum(test.counts)/10^6))#
+  #########################################
+  res.data.frame <- data.frame(ref.samples = dimnames(reference.counts)[[2]],#
+                               correlations = my.correlations,#
+                               expected.BF = NA,#
+                               phi = NA,#
+                               RatioSd = NA,#
+                               mean.p = NA,#
+                               median.depth = NA,#
+                               selected = FALSE)#
+#
+  reference <- rep(0, n.bins)#
+  for (i in 1:n.ref.samples) {#
+    reference <- reference + reference.counts[,i]#
+#
+    #print(head(data))#
+    #print(length(reference))#
+    #print(nrow(data))#
+#
+    my.mod <- new('ExomeDepth',#
+                  test = test.counts,#
+                  reference = reference,#
+                  formula = formula,#
+                  data = data,#
+                  phi.bins = phi.bins)#
+    res.data.frame$phi[ i ] <- mean(my.mod@phi)#
+    res.data.frame$mean.p[ i ] <- mean(my.mod@expected)#
+    res.data.frame$median.depth[ i ] <- median(reference)#
+    res.data.frame$RatioSd[ i ] <-  mean(sqrt(1 + (test.counts + reference - 1)*my.mod@phi))#
+#
+    if ( (i > 2) && (res.data.frame$mean.p[ i ] < 0.05)) break;#
+    ##########determine the expected proportion of reads assuming a deletion#
+    alt.odds <- res.data.frame$mean.p[ i ]/(1-res.data.frame$mean.p[ i ]) * 0.5#
+    alt.mean.p <- alt.odds/(1+alt.odds)#
+#
+    res.data.frame$expected.BF[ i ] <- get.power.betabinom (size = round(res.data.frame$median.depth[ i ]),#
+                                                            my.phi = res.data.frame$phi[ i ],#
+                                                            my.p = res.data.frame$mean.p[ i ],#
+                                                            my.alt.p = alt.mean.p,#
+                                                            theory = FALSE)#
+  }#
+#
+  my.max <- which.max( res.data.frame$expected.BF )#
+  res.data.frame$selected[ my.max ] <- TRUE#
+  my.res <- list(reference.choice = as.character(res.data.frame$ref.samples[ 1:my.max ]), summary.stats = res.data.frame)#
+  return(my.res)#
+}
+print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples = sample.names[-i]#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)
+sample.names[40]
+my.choice
+sample.names[41]
+temp<-sample.names[-i]
+temp[41]
+i
+length(my.choice$ref)
+i=2
+print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples = sample.names[-i]#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)
+length(my.choice$ref)
+dim(CNVCalls)
+CNVCalls
+load('Documents/MCG/ExomeDepth/LargeVariants/extra_counts.RData')
+ExomeCount<-as(counts, 'data.frame')                                        #converts counts, a ranged data object, to a data frame
+ExomeCount$chromosome <- gsub(as.character(ExomeCount$space),pattern = 'chr',replacement = '')
+colnames(ExomeCount)[1:length(sample.names)+6]=sample.names                 #assigns the sample names to each column
+CNVCalls = NULL#
+B1B2Calls = NULL#
+for(i in 1:length(sample.names)){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples = sample.names[-i]#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1b2=all.exons@CNV.calls[all.exons@CNV.calls$start.p%in%brca12 |all.exons@CNV.calls$end.p%in%brca12 , ]	#
+	if(nrow(b1b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1b2))}	#
+}
+Q
+library(ExomeDepth)
+CNVCalls = NULL#
+B1B2Calls = NULL#
+for(i in 1:length(sample.names)){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples = sample.names[-i]#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1b2=all.exons@CNV.calls[all.exons@CNV.calls$start.p%in%brca12 |all.exons@CNV.calls$end.p%in%brca12 , ]	#
+	if(nrow(b1b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1b2))}	#
+}
+dim(B1B2)
+dim(B1B2Calls)
+dim(CNVCalls)
+B1B2Calls
+head(ExomeCount)
+ExomeCount$55
+ExomeCount$"55"
+which(sample.names==55)
+which(sample.names=="55")
+samples.names
+sample.names
+ExomeCount$100
+ExomeCount$"100"
+bed.file[1,]
+bed.file[2,]
+library(ExomeDepth)
+qbetabinom
+library(ExomeDepth)
+sessionInfo
+sessionInfo()
+packageVersion(ExomeDepth)
+installed.packages()
+packageDescription('ExomeDepth')
+setwd('Documents/MCG/ExomeDepth/GH_code/')
+install.packages(ExomeDepth)
+?install.packages
+install.packages('ExomeDepth/ExomeDepth_12.0.tar.gz')
+install.packages('ExomeDepth/ExomeDepth_12.0.tar.gz',repos=NULL)
+install.packages(ExomeDepth/ExomeDepth_12.0.tar.gz,repos=NULL)
+setwd('ExomeDepth)
+'
+)
+setwd('ExomeDepth')
+install.packages(ExomeDepth_12.0.tar.gz,repos=NULL)
+install.packages('ExomeDepth_12.0.tar.gz',repos=NULL)
+library(ExomeDepth)
+load('../../LargeVariants/extra_counts.RData')
+CNVCalls=NULL#
+B1B2Calls=NULL#
+brca1 = which(bed.file[bed.file[,1]==17,4]=="BRCA1")#
+brca2 = which(bed.file[bed.file[,1]==13,4]=="BRCA2")#
+for(i in 1:length(sample.names)){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+ 	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples <- sample.names[-i]			                                  #uses all other samples as the reference set#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca1 |all.exons@CNV.calls$end.p%in%brca1) & all.exons@CNV.calls$chr==17 , ]	#
+	if(nrow(b1)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1))}	#
+	b2=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca2 |all.exons@CNV.calls$end.p%in%brca2) & all.exons@CNV.calls$chr==13 , ]	#
+	if(nrow(b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b2))}	#
+}
+ExomeCount<-as(counts, 'data.frame')                                        #converts counts, a ranged data object, to a data frame
+ExomeCount$chromosome <- gsub(as.character(ExomeCount$space),pattern = 'chr',replacement = '')        #remove any chr letters, and coerce to a string.
+colnames(ExomeCount)[1:length(sample.names)+6]=sample.names
+CNVCalls=NULL#
+B1B2Calls=NULL#
+brca1 = which(bed.file[bed.file[,1]==17,4]=="BRCA1")#
+brca2 = which(bed.file[bed.file[,1]==13,4]=="BRCA2")#
+for(i in 1:length(sample.names)){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+ 	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples <- sample.names[-i]			                                  #uses all other samples as the reference set#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca1 |all.exons@CNV.calls$end.p%in%brca1) & all.exons@CNV.calls$chr==17 , ]	#
+	if(nrow(b1)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1))}	#
+	b2=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca2 |all.exons@CNV.calls$end.p%in%brca2) & all.exons@CNV.calls$chr==13 , ]	#
+	if(nrow(b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b2))}	#
+}
+trans_prob=0.01
+CNVCalls=NULL#
+B1B2Calls=NULL#
+brca1 = which(bed.file[bed.file[,1]==17,4]=="BRCA1")#
+brca2 = which(bed.file[bed.file[,1]==13,4]=="BRCA2")#
+for(i in 1:length(sample.names)){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+ 	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples <- sample.names[-i]			                                  #uses all other samples as the reference set#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca1 |all.exons@CNV.calls$end.p%in%brca1) & all.exons@CNV.calls$chr==17 , ]	#
+	if(nrow(b1)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1))}	#
+	b2=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca2 |all.exons@CNV.calls$end.p%in%brca2) & all.exons@CNV.calls$chr==13 , ]	#
+	if(nrow(b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b2))}	#
+}
+CNVCalls=NULL#
+B1B2Calls=NULL#
+brca1 = which(bed.file[bed.file[,1]==17,4]=="BRCA1")#
+brca2 = which(bed.file[bed.file[,1]==13,4]=="BRCA2")#
+for(i in 1:5){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+ 	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples <- sample.names[-i]			                                  #uses all other samples as the reference set#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca1 |all.exons@CNV.calls$end.p%in%brca1) & all.exons@CNV.calls$chr==17 , ]	#
+	if(nrow(b1)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1))}	#
+	b2=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca2 |all.exons@CNV.calls$end.p%in%brca2) & all.exons@CNV.calls$chr==13 , ]	#
+	if(nrow(b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b2))}	#
+}
+trans_prob
+trans_prob=.25
+CNVCalls=NULL#
+B1B2Calls=NULL#
+brca1 = which(bed.file[bed.file[,1]==17,4]=="BRCA1")#
+brca2 = which(bed.file[bed.file[,1]==13,4]=="BRCA2")#
+for(i in 1:5){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+ 	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples <- sample.names[-i]			                                  #uses all other samples as the reference set#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca1 |all.exons@CNV.calls$end.p%in%brca1) & all.exons@CNV.calls$chr==17 , ]	#
+	if(nrow(b1)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1))}	#
+	b2=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca2 |all.exons@CNV.calls$end.p%in%brca2) & all.exons@CNV.calls$chr==13 , ]	#
+	if(nrow(b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b2))}	#
+}
+trans_prob=0.01
+search()
+detatch(2)
+detach(2)
+sessionInfo()
+library(ExomeDepth)
+CNVCalls=NULL#
+B1B2Calls=NULL#
+brca1 = which(bed.file[bed.file[,1]==17,4]=="BRCA1")#
+brca2 = which(bed.file[bed.file[,1]==13,4]=="BRCA2")#
+for(i in 1:5){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+ 	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples <- sample.names[-i]			                                  #uses all other samples as the reference set#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca1 |all.exons@CNV.calls$end.p%in%brca1) & all.exons@CNV.calls$chr==17 , ]	#
+	if(nrow(b1)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1))}	#
+	b2=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca2 |all.exons@CNV.calls$end.p%in%brca2) & all.exons@CNV.calls$chr==13 , ]	#
+	if(nrow(b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b2))}	#
+}
+search()
+detach(2)
+library(ExomeDepth)
+CNVCalls=NULL#
+B1B2Calls=NULL#
+brca1 = which(bed.file[bed.file[,1]==17,4]=="BRCA1")#
+brca2 = which(bed.file[bed.file[,1]==13,4]=="BRCA2")#
+for(i in 1:5){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+ 	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples <- sample.names[-i]			                                  #uses all other samples as the reference set#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca1 |all.exons@CNV.calls$end.p%in%brca1) & all.exons@CNV.calls$chr==17 , ]	#
+	if(nrow(b1)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1))}	#
+	b2=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca2 |all.exons@CNV.calls$end.p%in%brca2) & all.exons@CNV.calls$chr==13 , ]	#
+	if(nrow(b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b2))}	#
+}
+detach(2)
+CNVCalls=NULL#
+B1B2Calls=NULL#
+brca1 = which(bed.file[bed.file[,1]==17,4]=="BRCA1")#
+brca2 = which(bed.file[bed.file[,1]==13,4]=="BRCA2")#
+for(i in 1:5){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+ 	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples <- sample.names[-i]			                                  #uses all other samples as the reference set#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca1 |all.exons@CNV.calls$end.p%in%brca1) & all.exons@CNV.calls$chr==17 , ]	#
+	if(nrow(b1)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1))}	#
+	b2=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca2 |all.exons@CNV.calls$end.p%in%brca2) & all.exons@CNV.calls$chr==13 , ]	#
+	if(nrow(b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b2))}	#
+}
+library(ExomeDepth)
+sessionInfo()
+CNVCalls=NULL#
+B1B2Calls=NULL#
+brca1 = which(bed.file[bed.file[,1]==17,4]=="BRCA1")#
+brca2 = which(bed.file[bed.file[,1]==13,4]=="BRCA2")#
+for(i in 1:5){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+ 	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples <- sample.names[-i]			                                  #uses all other samples as the reference set#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca1 |all.exons@CNV.calls$end.p%in%brca1) & all.exons@CNV.calls$chr==17 , ]	#
+	if(nrow(b1)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1))}	#
+	b2=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca2 |all.exons@CNV.calls$end.p%in%brca2) & all.exons@CNV.calls$chr==13 , ]	#
+	if(nrow(b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b2))}	#
+}
+detach(2)
+library(ExomeDepth)
+CNVCalls=NULL#
+B1B2Calls=NULL#
+brca1 = which(bed.file[bed.file[,1]==17,4]=="BRCA1")#
+brca2 = which(bed.file[bed.file[,1]==13,4]=="BRCA2")#
+for(i in 1:5){#
+	print(paste("Processing sample: ",sample.names[i]," ", i,"/",length(sample.names),sep=""))#
+ 	my.test <- ExomeCount[,sample.names[i]]                                 #extracts the sample to be tested#
+	my.ref.samples <- sample.names[-i]			                                  #uses all other samples as the reference set#
+	my.reference.set <- as.matrix(ExomeCount[,my.ref.samples])              #places coverage info for all samples in the reference set into a matrix#
+#
+	my.choice <- select.reference.set (test.counts = my.test,reference.counts = my.reference.set,bin.length = (ExomeCount$end - ExomeCount$start)/1000,n.bins.reduced = 10000)#
+                                                                            #from the reference set, selects correlated samples to be used.#
+	my.matrix <- as.matrix( ExomeCount[, my.choice$reference.choice, drop = FALSE])#
+                                                                            #places selected, correlated samples into a matrix#
+    my.reference.selected <- apply(X = my.matrix,MAR = 1,FUN = sum)         #sums the selected samples across each exon#
+#
+	all.exons <- new('ExomeDepth', test = my.test, reference = my.reference.selected, formula = 'cbind(test, reference) ~ 1')#
+                                                                            #creates ExomeDepth object containing test data, reference data, and linear relationship between them. Automatically calculates likelihoods#
+#
+	all.exons <- CallCNVs(x = all.exons, transition.probability = trans_prob, chromosome = ExomeCount$space, start = ExomeCount$start, end = ExomeCount$end, name = ExomeCount$names)#
+	if(nrow(all.exons@CNV.calls)>0){CNVCalls = rbind(CNVCalls,cbind(sample.names[i],all.exons@CNV.calls))}#
+	b1=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca1 |all.exons@CNV.calls$end.p%in%brca1) & all.exons@CNV.calls$chr==17 , ]	#
+	if(nrow(b1)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b1))}	#
+	b2=all.exons@CNV.calls[(all.exons@CNV.calls$start.p%in%brca2 |all.exons@CNV.calls$end.p%in%brca2) & all.exons@CNV.calls$chr==13 , ]	#
+	if(nrow(b2)>0){B1B2Calls = rbind(B1B2Calls,cbind(sample.names[i],b2))}	#
+}

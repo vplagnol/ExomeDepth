@@ -10,19 +10,25 @@
 using namespace std;
 
 extern "C" {
-  SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const SEXP probabilities, const SEXP positions);
+  SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const SEXP probabilities, const SEXP positions, const SEXP expectedLength);
 }
 
 
 
-SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const SEXP probabilities, const SEXP positions) {
+SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const SEXP probabilities, const SEXP positions, const SEXP expectedLength) {
 
 
   const int nstates_c = *INTEGER (nstates);
   const int nobs_c = *INTEGER (nobs);
   const double * trans_c = REAL(transitions);  //reads first column first
   const double * proba_c = REAL(probabilities);
-  
+	const int *locations = INTEGER (positions);
+	const double Expected = *REAL(expectedLength);
+	
+	double trans[3];
+	double dist, dist_effect;
+	
+
   Rprintf("Number of hidden states: %d\n",nstates_c);
   Rprintf("Number of data points: %d\n", nobs_c);
 
@@ -47,19 +53,34 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
   for (int i = 1; i != nobs_c; i++) {     
     viterbi_prob.push_back(temp);
     from_where.push_back( temp_i);
-
+	  
+	  if (locations[i] == locations[i-1]){
+		  dist = double(locations[1*nobs_c +i]) - double(locations[2*nobs_c +i  -1]);
+	  }else{
+		  dist = HUGE_VAL;
+	  }
+	  
+	  dist_effect = exp(-dist/Expected);
+	 
     for (int j = 0; j != nstates_c; j++) {         //for each state
       viterbi_prob[i][j] = - HUGE_VAL;
+		
 
+		trans[0] = trans_c[j*nstates_c];
+		trans[1] = dist_effect*trans_c[j*nstates_c +1] + (1.0 - dist_effect)*trans_c[j*nstates_c];
+		trans[2] = dist_effect*trans_c[j*nstates_c +2] + (1.0 - dist_effect)*trans_c[j*nstates_c];
+		
+		
       for (int k = 0; k != nstates_c; k++) {   //state one is coming from
 	//double newp = loglikelihood[i][j] + viterbi_prob[i - 1][k] + log(trans_matrix[k][j]);
-	double newp = proba_c[j*nobs_c + i] + viterbi_prob[i - 1][k] + log(trans_c[j*nstates_c + k]);
+	double newp = proba_c[j*nobs_c + i] + viterbi_prob[i - 1][k] + log(trans[k]);
 	
 	if (newp >  viterbi_prob[i][j] ) {
 	  viterbi_prob[i][j] = newp;
 	  from_where[i][j] = k;
 	}
       }
+
       
       if (proba_c[j*nobs_c + i] == -HUGE_VAL) {from_where[i][j] = 0;}  //weak stuff, but it deals with me setting some likelihoods to -Inf
     

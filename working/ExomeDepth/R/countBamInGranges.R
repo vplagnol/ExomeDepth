@@ -210,7 +210,7 @@ count.everted.reads <- function(bed.frame = NULL,
                                                   min.mapq = min.mapq)
   }
 
-  rdata <- as.data.frame(rdata)
-  names(rdata)[[1]] <- 'chromosome'
+  #rdata <- as.data.frame(rdata)
+  #names(rdata)[[1]] <- 'chromosome'
   return (rdata)
 }

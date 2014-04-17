@@ -123,10 +123,10 @@ setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
 
 
 
-setGeneric("CallCNVs", def = function(x, chromosome, start, end, name, transition.probability = 0.0001) standardGeneric('CallCNVs'))
+setGeneric("CallCNVs", def = function(x, chromosome, start, end, name, transition.probability = 0.0001, expected.length = 10000) standardGeneric('CallCNVs'))
 
 
-setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, transition.probability) {
+setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, transition.probability,expected.length) {
 
   if ( length(start) != length(chromosome) || length(end) != length(chromosome) || length(name) != length(chromosome) ) stop('Chromosome, start and end vector must have the same lengths.\n')
   if (nrow(x@likelihood) != length(chromosome) ) stop('The annotation vectors must have the same length as the data in the ExomeDepth x')
@@ -161,8 +161,11 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
   my.breaks <- which(diff(as.numeric(x@annotations$chromosome)) != 0) + 1
   x@likelihood[ my.breaks,1 ] <- - Inf
   x@likelihood[ my.breaks,3  ] <- - Inf
-  
-  my.calls <- viterbi.hmm (transitions, loglikelihood = x@likelihood[, c(2, 1, 3)], positions = NA)
+ positions = x@annotations[,2:4]
+ levels(positions[,1]) = c(levels(positions[,1]),"23")
+ positions[,1][positions[,1]=="X"]="23"
+ positions = apply(positions,c(1,2),as.integer)
+ my.calls <- viterbi.hmm (transitions, loglikelihood = x@likelihood[, c(2, 1, 3)], positions = positions, expected.length = expected.length)
 
   ################################ Now make it look better, add relevant info
   if (nrow(my.calls$calls) > 0) {
@@ -214,6 +217,7 @@ somatic.CNV.call <- function(normal, tumor, prop.tumor = 1, chromosome, start, e
   message('Now calling the CNVs')
   myTest <- CallCNVs(x = myTest,
                      transition.probability = 10^-4,
+					 expected.length = 10000,
                      chromosome = chromosome,
                      start = start,
                      end = end,

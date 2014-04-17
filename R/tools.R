@@ -2,7 +2,6 @@
 
 
 qbetabinom <- function(p, size, phi, prob) {  ##parameterize with phi, prob instead of a,b
-  print("Anna fowler: working version")
   a <- prob*(1-phi)/phi
   b <- (1-prob)*(1-phi)/phi
   return( qbetabinom.ab (p = p, size = size, shape1 = a, shape2 = b)  )
@@ -24,12 +23,12 @@ qbetabinom.ab <- function (p, size, shape1, shape2)  {
 
 
 
-viterbi.hmm <- function(transitions, loglikelihood, positions) {
+viterbi.hmm <- function(transitions, loglikelihood, positions, expected.length) {
   if ( nrow(transitions) != ncol(transitions) ) stop("Transition matrix is not square")
   nstates <- nrow(transitions)
   nobs <- nrow(loglikelihood)
 
-  res <- .Call("C_hmm", nstates, nobs, transitions, loglikelihood, positions, PACKAGE = 'ExomeDepth')
+  res <- .Call("C_hmm", nstates, nobs, transitions, loglikelihood, positions, as.double(expected.length), PACKAGE = 'ExomeDepth')
   dimnames(res[[2]])[[2]] <- c('start.p', 'end.p', 'type', 'nexons')
   res[[2]] <- as.data.frame(res[[2]])
   names(res) <- c('Viterbi.path', 'calls')
