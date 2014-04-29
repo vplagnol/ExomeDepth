@@ -127,10 +127,10 @@ setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
 
 
 
-setGeneric("CallCNVs", def = function(x, chromosome, start, end, name, transition.probability = 0.0001) standardGeneric('CallCNVs'))
+setGeneric("CallCNVs", def = function(x, chromosome, start, end, name, transition.probability = 0.0001, expected.CNV.length = 50000) standardGeneric('CallCNVs'))
 
 
-setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, transition.probability) {
+setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, transition.probability, expected.CNV.length) {
 
   if (length(x@phi) == 0) {
     message('The vector phi does not seem initialized. This may be because the read count is too low and the test vector cannot be processed. No calling will happen')
@@ -182,7 +182,7 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
     positions <- as.integer(loc.annotations$start)
     
     loc.likelihood <-  rbind(c(- Inf, 0, -Inf), x@likelihood[good.pos, c(2, 1, 3)]) ##add a dummy exon so that we start at cn = 2 (normal)
-    my.calls <- viterbi.hmm (transitions, loglikelihood = loc.likelihood, positions = positions, expected.length = expected.length)
+    my.calls <- viterbi.hmm (transitions, loglikelihood = loc.likelihood, positions = positions, expected.CNV.length = expected.CNV.length)
 
     my.calls$calls$start.p <- my.calls$calls$start.p -1  ##remove the dummy exon, which has now served its purpose
     my.calls$calls$end.p <- my.calls$calls$end.p -1  ##remove the dummy exon, which has now served its purpose
