@@ -5,7 +5,7 @@ correct.counts.using.PCA <- function( count.data, nPCs = 3 ) {
   nsamples <- ncol(count.data)
   nexons <- nrow(count.data)
 
-  message('Now applying the PCA, you provided a matrix with', nexons, ' exons and', nsamples, 'samples')
+  message('Now applying the PCA, you provided a matrix with ', nexons, ' exons and ', nsamples, ' samples')
   
   norm.count <- count.data
   my.rsums <- rowSums(count.data)/1000
