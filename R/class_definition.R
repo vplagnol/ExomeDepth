@@ -221,11 +221,12 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
       #### shift the numbering properly
       my.calls$calls$start.p <- my.calls$calls$start.p + shift
       my.calls$calls$end.p <- my.calls$calls$end.p + shift
-      shift <- shift + length(good.pos)
-      
+
       if (nrow(final) == 0) {final <- my.calls$calls} else {final <- rbind.data.frame(final, my.calls$calls)}
       message('Number of calls for chromosome ', chrom, ' : ', nrow(my.calls$calls))
     }
+    shift <- shift + length(good.pos)
+
   }
   x@CNV.calls <- final
   return (x)
