@@ -1,11 +1,11 @@
 
-correct.count.using.PCA <- function( count.data, nPCs = 3 ) {
+correct.counts.using.PCA <- function( count.data, nPCs = 3 ) {
   
   if (class(count.data) != 'matrix') {stop("The input to the PCA correction must be a matrix")}
   nsamples <- ncol(count.data)
   nexons <- nrow(count.data)
 
-  message('Now applying the PCA, you provided a matrix with', nexons ' exons and', nsamples, 'samples')
+  message('Now applying the PCA, you provided a matrix with', nexons, ' exons and', nsamples, 'samples')
   
   norm.count <- count.data
   my.rsums <- rowSums(count.data)/1000
