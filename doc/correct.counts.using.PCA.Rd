@@ -1,8 +1,8 @@
-\name{correct.count.using.PCA}
-\alias{correct.count.using.PCA}
+\name{correct.counts.using.PCA}
+\alias{correct.counts.using.PCA}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-  Correct count data using a PCA correction
+  Correct read count data using a PCA correction
 }
 \description{
   Applies a PCA correction to the matrix of read count to remove batch
