@@ -11,11 +11,8 @@ OPT = -O
 
 CFLAGS= -L/usr/local/lib -pthread -fPIC -Wall $(OPT) $(PROF) $(DEB) $(INCLUDES) -lgsl -lblas -static
 
-overlap.so: overlap.cpp
-	R CMD SHLIB overlap.cpp -o overlap.so 
-
 CNV_estimate.so: CNV_estimate.cpp
-	R CMD SHLIB fdiv.c stream.c hypot.c error.c ldfrexp.c VP_infnan.c elementary.c invhyp.c log1p.c VP_log.c exp.c math.c VP_zeta.c VP_trig.c VP_psi.c VP_gamma.c beta.c CNV_estimate.cpp -o ExomeDepth.so 
+	R CMD SHLIB hmm.cpp fdiv.c stream.c hypot.c error.c ldfrexp.c VP_infnan.c elementary.c invhyp.c log1p.c VP_log.c exp.c math.c VP_zeta.c VP_trig.c VP_psi.c VP_gamma.c beta.c CNV_estimate.cpp -o ExomeDepth.so 
 
 clean:
 	rm *.o ExomeDepth.so

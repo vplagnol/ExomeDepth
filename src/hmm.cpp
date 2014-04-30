@@ -10,12 +10,12 @@
 using namespace std;
 
 extern "C" {
-  SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const SEXP probabilities, const SEXP positions);
+  SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const SEXP probabilities, const SEXP positions, const SEXP expectedLength);
 }
 
 
 
-SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const SEXP probabilities, const SEXP positions) {
+SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const SEXP probabilities, const SEXP positions, const SEXP expectedLength) {
 
 
   const int nstates_c = *INTEGER (nstates);
@@ -23,6 +23,12 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
   const double * trans_c = REAL(transitions);  //reads first column first
   const double * proba_c = REAL(probabilities);
   
+  const int *locations = INTEGER (positions);
+  const double Expected = *REAL(expectedLength);
+
+  vector<double> trans (3, 0.);
+  double dist, dist_effect;
+
   //Rprintf("Number of hidden states: %d\n",nstates_c);
   //Rprintf("Number of data points: %d\n", nobs_c);
 
@@ -48,12 +54,20 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
     viterbi_prob.push_back(temp);
     from_where.push_back( temp_i);
 
+    dist = double(locations[ i ]) - double(locations[ i - 1 ]);
+    dist_effect = exp(-dist/Expected);
+
     for (int j = 0; j != nstates_c; j++) {         //for each state
       viterbi_prob[i][j] = - HUGE_VAL;
 
+      trans[0] = trans_c[j*nstates_c];
+      trans[1] = dist_effect*trans_c[j*nstates_c + 1 ] + (1.0 - dist_effect)*trans_c[j*nstates_c];
+      trans[2] = dist_effect*trans_c[j*nstates_c + 2 ] + (1.0 - dist_effect)*trans_c[j*nstates_c];
+      
       for (int k = 0; k != nstates_c; k++) {   //state one is coming from
 	//double newp = loglikelihood[i][j] + viterbi_prob[i - 1][k] + log(trans_matrix[k][j]);
-	double newp = proba_c[j*nobs_c + i] + viterbi_prob[i - 1][k] + log(trans_c[j*nstates_c + k]);
+	//double newp = proba_c[j*nobs_c + i] + viterbi_prob[i - 1][k] + log(trans_c[j*nstates_c + k]);
+	double newp = proba_c[j*nobs_c + i] + viterbi_prob[i - 1][k] + log(trans[ k ]);
 	
 	if (newp >  viterbi_prob[i][j] ) {
 	  viterbi_prob[i][j] = newp;
