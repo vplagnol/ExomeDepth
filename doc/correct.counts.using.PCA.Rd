@@ -38,15 +38,15 @@ correct.count.using.PCA(count.data, nPCs = 3, mask.exons = NULL)
   the sample covariance matrix, computing the first principal components
   and taking the residuals of the count data after having fitted these
   first few components.
-  This function is relatively experimental so far, and is only likely to
-  work if the number of sample is relatively large ( > 20, typically,
+  This function is relatively experimental so far, and is likely to
+  work only if the number of sample is relatively large ( > 20, typically,
   even though the appropriate number is not clear). Performances on
   exome datasets have not yet been tested thoroughly but it is best
   suited for targeted sequencing experiments (i.e. smaller gene panels)
   for which the sample size is likely to be larger and there should be
   no performance issue associcated with the computation of the
   covariance matrix.
-  The \texttt{mask.exons} argument allows to mask exons for which one
+  The \emph{mask.exons} argument allows to mask exons for which one
   expects recurrent CNVs to be present. The rationale being that if these
   deletions are common, they may contribute largely to the first few
   principal components and remove the signal. Common CNVs should also
