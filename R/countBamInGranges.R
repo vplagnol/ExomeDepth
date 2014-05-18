@@ -63,7 +63,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
       ############################################################################# read single end 
         rds <- scanBam(bam.file,
                        index = index, 
-                       param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isPaired = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
+                       param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isPaired = FALSE, isNotPrimaryRead = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
         mapq.test <- (rds[[1]]$mapq >= min.mapq) & !is.na(rds[[1]]$pos) 
         
         if (sum(mapq.test) > 0 && !is.na(sum(mapq.test))) {
@@ -77,7 +77,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
       if (force.single.end) {  ##request to deal with reads in a single end manner
         rds <- scanBam(bam.file,
                        index = index,
-                       param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
+                       param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isNotPrimaryRead = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
 
         mapq.test <- (rds[[1]]$mapq >= min.mapq) & !is.na(rds[[1]]$pos)
         if (sum(mapq.test) > 0 && !is.na(sum(mapq.test))) {
