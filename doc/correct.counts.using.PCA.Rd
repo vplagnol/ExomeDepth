@@ -11,20 +11,17 @@
   number of principal components specified by the user.
 }
 \usage{
-correct.count.using.PCA(count.data, nPCs = 3, mask.exons = NULL)
+correct.counts.using.PCA(count.data, nPCs = 3, mask.exons = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{count.data}{
-    A matrix of read count, with samples as columns and exons as rows.
-}
-  \item{nPCs}{
-    Number of PCs that must be applied when computing the residuals of
-    the read count data.
-  }
-  \item{mask.exons}{
-  A logical vector that indicates which exons should be masked when the
-  sample covariance matrix is computed (see details for more information)}
+  \item{count.data}{A matrix of read count, with samples as columns and
+    exons as rows.}
+  \item{nPCs}{Number of PCs that must be applied when computing the
+    residuals of the read count data.}
+  \item{mask.exons}{A logical vector that indicates which exons should
+    be masked when the sample covariance matrix is computed (see details
+    for more information).} 
 }
 \value{
   Returns a matrix of corrected read count data of the same dimension as the input.
