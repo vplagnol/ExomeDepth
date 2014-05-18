@@ -16,6 +16,15 @@
 
 \section{What is new?}
 
+Version 1.0.4:
+\begin{itemize}
+\item The transition from one CNV state to another now takes into account the distance between exons.
+\item In previous versions, the first exon of each chromosome was set to normal copy number to avoid CNVs spanning multiple exons. This has now been fixed, and the Viterbi algorithm run separately for each chromosome (with a dummy exon to start each chromosome that is forced to normal copy number). This should really make a difference for targeted sequencing sets.
+\item Addition of a function that uses a PCA algorithm to remove batch effect from the read count data (\texttt{correct.counts.using.PCA}). This step is experimental for now.
+\item Various small bug fixes, especially to use the \texttt{subset.for.speed} argument when a new ExomeDepth object is created.
+\end{itemize}
+
+
 Version 1.0.0:
 \begin{itemize}
 \item New warning when the correlation between the test and reference samples is low, so that the user knows he should expect unreliable results.
