@@ -366,6 +366,14 @@ for (i in 1:nsamples) {
 
 \section{Additional functions}
 
+\subsection{Matched tumour/normal tissue pair}
+A few users asked me about a typical design in the cancer field of combining sequence data for healthy and tumour tissue.
+A function has been available for this for a long time: \texttt{somatic.CNV.call}.
+It replaces the test sample with the tumour sample, and the reference sample with the healthy tissue.
+It also requires as an input a parameter that specifies the proportion of the tumour sample that is also from the tumour.
+This function is a bit experimental but I welcome feedback.
+
+
 \subsection{Principal component correction for batch effects}
 The function \texttt{correct.counts.using.PCA} is so far an experimental function meant to remove batche effects using a principal component analysis strategy.
 Look at the manual page for this function for more details, but so far the intended use are gene panel experiments (typically with a smaller number of targeted genes) with a relatively large sample size (greater than 20 seems appropriate but this number is not set in stone).
