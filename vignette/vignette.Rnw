@@ -18,9 +18,9 @@
 
 Version 1.0.4:
 \begin{itemize}
-\item The transition from one CNV state to another now takes into account the distance between exons.
-\item In previous versions, the first exon of each chromosome was set to normal copy number to avoid CNVs spanning multiple exons. This has now been fixed, and the Viterbi algorithm run separately for each chromosome (with a dummy exon to start each chromosome that is forced to normal copy number). This should really make a difference for targeted sequencing sets.
-\item Addition of a function that uses a PCA algorithm to remove batch effect from the read count data (\texttt{correct.counts.using.PCA}). This step is experimental for now.
+\item The transition from one CNV state to another now takes into account the distance between exons (contribution from Anna Fowler and Gerton Lunter).
+\item In previous versions, the first exon of each chromosome was set to normal copy number to avoid CNVs spanning multiple exons. This has now been fixed, and the Viterbi algorithm now runs separately for each chromosome (with a dummy exon to start each chromosome that is forced to normal copy number). This should really make a difference for targeted sequencing sets (thank you again to Anna Fowler and Gerton Lunter for suggesting this fix).
+\item Addition of a function that uses a PCA algorithm to remove batch effect from the read count data (\texttt{correct.counts.using.PCA}). This step is experimental for now but is probably useful for gene panel experiments with a significant sample size.
 \item Various small bug fixes, especially to use the \texttt{subset.for.speed} argument when a new ExomeDepth object is created.
 \end{itemize}
 
@@ -362,7 +362,14 @@ for (i in 1:nsamples) {
 
 @
 
-\section{Counting everted reads}
+
+\section{Additional functions}
+
+\subsection{Principal component correction for batch effects}
+The function \texttt{correct.counts.using.PCA} is so far an experimental function meant to remove batche effects using a principal component analysis strategy.
+Look at the manual page for this function for more details, but so far the intended use are gene panel experiments (typically with a smaller number of targeted genes) with a relatively large sample size (greater than 20 seems appropriate but this number is not set in stone).
+
+\subsection{Counting everted reads}
 
 This issue of everted reads (read pairs pointing outward instead of inward) is a side story that has nothing to do with read depth.
 It is based on a ``read pair'' analysis but it was practical for me (and I hope for others) to write simple functions to find such a pattern in my exome data.
