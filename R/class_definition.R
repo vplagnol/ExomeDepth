@@ -22,7 +22,8 @@ setMethod("initialize", "ExomeDepth", function(.Object,
                                                formula = 'cbind(test, reference) ~ 1',
                                                phi.bins = 1,
                                                prop.tumor = 1,
-                                               subset.for.speed = NULL) {
+                                               subset.for.speed = NULL,
+                                               verbose = TRUE) {
   if (length(test) != length(reference)) stop("Length of test and numeric must match")
 
   if (sum(test > 5) < 5) {
@@ -30,20 +31,26 @@ setMethod("initialize", "ExomeDepth", function(.Object,
     return(.Object)
   }
   
-
+  n.data.points <- length(test)
   if (is.null(data)) data <- data.frame(intercept = rep(1, length(test)))
 
+  ### the stuff below will be used for the estimation of phi
+  data$test <- test
+  data$reference <- reference
+
   if (!is.null(subset.for.speed)) {
+
+    if ( (class(subset.for.speed) == 'numeric') && (length(subset.for.speed) == 1)) {subset.for.speed <- seq(from = 1, to = nrow(data), by = floor( nrow(data) / subset.for.speed ) )}  ###deals with unexpected use of subset.for.speed
     subset.for.speed <- subset.for.speed[ subset.for.speed %in% 1:nrow(data) ] ##make sure we do not select non-existing rows
-    test <- test[ subset.for.speed ]
-    reference <- reference[ subset.for.speed ]
-    data <- data[ subset.for.speed, , drop = FALSE]
+    data.for.fit <- data[ subset.for.speed, , drop = FALSE]
+  } else {
+    data.for.fit <- data
   }
 
-  message('Now fitting the beta-binomial model: this step can take a few minutes.')
+  if (verbose) message('Now fitting the beta-binomial model on a data frame with ', nrow(data.for.fit), ' rows : this step can take a few minutes.')
     if (phi.bins == 1) {
-      mod <- aod::betabin( data = data, formula = as.formula(formula), random = ~ 1, link = 'logit', warnings = FALSE)
-      .Object@phi <- rep(mod@param[[ 'phi.(Intercept)']], nrow(data))
+      mod <- aod::betabin( data = data.for.fit, formula = as.formula(formula), random = ~ 1, link = 'logit', warnings = FALSE)
+      .Object@phi <- rep(mod@param[[ 'phi.(Intercept)']], n.data.points)
     } else {
       ceiling.bin <- quantile(reference, probs = c( 0.85, 1) )
       bottom.bins <- seq(from = 0, to =  ceiling.bin[1], by =  ceiling.bin[1]/(phi.bins-1))
@@ -56,7 +63,7 @@ setMethod("initialize", "ExomeDepth", function(.Object,
         stop('Binning did not happen properly')
       }
       
-      mod <- betabin (data = data, formula = as.formula(formula), random = as.formula('~ depth.quant'),  link = 'logit', warnings = FALSE)
+      mod <- betabin (data = data.for.fit, formula = as.formula(formula), random = as.formula('~ depth.quant'),  link = 'logit', warnings = FALSE)
       phi.estimates <-  as.numeric(mod@random.param)
       data$phi <-  phi.estimates[  data$depth.quant ]
   
@@ -72,12 +79,25 @@ setMethod("initialize", "ExomeDepth", function(.Object,
   .Object@formula <- formula
   .Object@test <- test
   .Object@reference <- reference
-  .Object@expected <- aod::fitted(mod)
+  my.coeffs <- mod@fixed.param
+
   
+  if (is.null(subset.for.speed)) {
+    .Object@expected <- aod::fitted(mod)
+  } else {
+    intercept <- my.coeffs[[ '(Intercept)' ]]    
+    .Object@expected <- rep(intercept, times = nrow(data))
+    if (length(my.coeffs) > 1) {
+      for (na in names(my.coeffs)[ -1 ]) {
+        .Object@expected = .Object@expected + my.coeffs [[ na ]]*data[, na]
+      }
+    }
+    .Object@expected <- exp(.Object@expected)/ (1 + exp(.Object@expected))
+  }
   
   .Object@annotations <- data.frame()
   
-  message('Now computing the likelihood for the different copy number states')
+  if (verbose) message('Now computing the likelihood for the different copy number states')
   if (prop.tumor < 1) message('Proportion of tumor DNA is ', prop.tumor)
   .Object@likelihood <- .Call("get_loglike_matrix",
                               phi = .Object@phi,
