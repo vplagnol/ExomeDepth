@@ -14,7 +14,7 @@ correct.counts.using.PCA <- function( count.data, nPCs = 3, mask.exons = NULL ) 
   
 ############# Now prepare PCA
   centers <-  colMeans(norm.count)
-  good.depth <- apply(MAR = 2, norm.counts, FUN = sd) > 2  ##here I want to remove exons that do not have any variability (all 0s usually)
+  good.depth <- apply(MAR = 2, norm.count, FUN = sd) > 2  ##here I want to remove exons that do not have any variability (all 0s usually)
   
   for (i in 1:nexons) norm.count[,i] <- norm.count[,i] - centers[ i ]
   if (!is.null(mask.exons)) {
