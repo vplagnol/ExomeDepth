@@ -1,5 +1,5 @@
 
-correct.counts.using.PCA <- function( count.data, nPCs = 3 ) {
+correct.counts.using.PCA <- function( count.data, nPCs = 3, mask.exons = NULL ) {
   
   if (class(count.data) != 'matrix') {stop("The input to the PCA correction must be a matrix")}
   nsamples <- ncol(count.data)
@@ -14,8 +14,17 @@ correct.counts.using.PCA <- function( count.data, nPCs = 3 ) {
   
 ############# Now prepare PCA
   centers <-  colMeans(norm.count)
+  good.depth <- apply(MAR = 2, norm.counts, FUN = sd) > 2  ##here I want to remove exons that do not have any variability (all 0s usually)
+  
   for (i in 1:nexons) norm.count[,i] <- norm.count[,i] - centers[ i ]
-  my.pca <- prcomp(norm.count)
+  if (!is.null(mask.exons)) {
+    if (class(mask.exons) != 'logical') stop('The mask exons argument must be a logical vector')
+    if (length(mask.exons) != nexons) stop('The length of the mask exons argument does not match the number of exons')
+    message('You are masking ', sum(mask.exons), ' exons in the PCA computation step')
+    my.pca <- prcomp(norm.count[, !mask.exons & good.depth])
+  } else {
+    my.pca <- prcomp(norm.count[, good.depth ])
+  }
   
   PCA.mat <- my.pca$x[,1:nPCs]
   
