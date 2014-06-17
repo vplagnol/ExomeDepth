@@ -115,7 +115,13 @@ getBamCounts <- function(bed.frame = NULL, bed.file = NULL, bam.files, index.fil
   names(bed.frame)[2] <- 'start'
   names(bed.frame)[3] <- 'end'
 
-  if (include.chr) bed.frame$seqnames <- paste('chr', bed.frame$seqnames, sep = '')
+  if (include.chr) {
+    if (sum(grepl(pattern = '^chr', bed.frame$seqnames) > 0)) {
+      warning('The option include.chr == TRUE adds the chr prefix to the chromosome name but it looks like the chromosome names already have a chr prefix. The argument to getBamCounts is probably an error.')
+    }
+    bed.frame$seqnames <- paste('chr', bed.frame$seqnames, sep = '')
+  }
+  
   chr.names.used <- unique(as.character(bed.frame$seqnames))
   chr.levels <- c(as.character(seq(1, 22)), subset( chr.names.used, ! chr.names.used %in% as.character(seq(1, 22))))
 

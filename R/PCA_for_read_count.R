@@ -8,8 +8,8 @@ correct.counts.using.PCA <- function( count.data, nPCs = 3, mask.exons = NULL ) 
   message('Now applying the PCA, you provided a matrix with ', nexons, ' exons and ', nsamples, ' samples')
   
   norm.count <- count.data
-  my.rsums <- rowSums(count.data)/1000
-  for (i in 1:nsamples) norm.count[,i] <- norm.count[,i] / my.rsums[ i ]
+  my.rsums <- rowSums(count.data)/1000  ##this is used to normalize for the read depth, and I normalize it by 1,000 reads
+  for (i in 1:nsamples) norm.count[,i] <- norm.count[,i] / max(1, my.rsums[ i ])
   norm.count <- t(as.matrix(norm.count))
   
 ############# Now prepare PCA
