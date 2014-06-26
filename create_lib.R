@@ -3,7 +3,7 @@
 base <- 'working'
 system(paste('rm ', base, '/ExomeDepth/R/*', sep = ''))
 package.skeleton(name="ExomeDepth",
-                 code_files = c('R/class_definition.R', 'R/optimize_reference_set.R', 'R/tools.R', 'R/countBamInGranges.R', 'R/plot_CNVs_method.R', 'R/PCA_for_read_count.R'),
+                 code_files = c('R/class_definition.R', 'R/optimize_reference_set.R', 'R/tools.R', 'R/countBamInGranges.R', 'R/plot_CNVs_method.R'),
                  path= base,
                  force=TRUE)
 
@@ -51,8 +51,6 @@ file.copy(from = 'doc/AnnotateExtra-methods.Rd', to= paste(base, '/ExomeDepth/ma
 file.copy(from = 'doc/AnnotateExtra.Rd', to= paste(base, '/ExomeDepth/man/AnnotateExtra.Rd', sep = ''), overwrite = TRUE)
 file.copy(from = 'doc/count.everted.reads.Rd', to= paste(base, '/ExomeDepth/man/count.everted.reads.Rd', sep = ''), overwrite = TRUE)
 file.copy(from = 'doc/countBam.everted.Rd', to= paste(base, '/ExomeDepth/man/countBam.everted.Rd', sep = ''), overwrite = TRUE)
-file.copy(from = 'doc/correct.counts.using.PCA.Rd', to= paste(base, '/ExomeDepth/man/correct.counts.using.PCA.Rd', sep = ''), overwrite = TRUE)
-
 
 file.copy(from = 'doc/genes.hg19.Rd', to= paste(base, '/ExomeDepth/man/genes.hg19.Rd', sep = ''), overwrite = TRUE)
 file.copy(from = 'doc/exons.hg19.Rd', to= paste(base, '/ExomeDepth/man/exons.hg19.Rd', sep = ''), overwrite = TRUE)

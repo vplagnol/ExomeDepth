@@ -20,7 +20,6 @@ Version 1.0.5:
 \begin{itemize}
 \item The transition from one CNV state to another now takes into account the distance between exons (contribution from Anna Fowler and Gerton Lunter, Oxford, UK).
 \item In previous versions, the first exon of each chromosome was set to normal copy number to avoid CNVs spanning multiple exons. This has now been fixed, and the Viterbi algorithm now runs separately for each chromosome (with a dummy exon to start each chromosome that is forced to normal copy number). This should really make a difference for targeted sequencing sets (thank you again to Anna Fowler and Gerton Lunter for suggesting this fix).
-\item Addition of a function that uses a PCA algorithm to remove batch effect from the read count data (\texttt{correct.counts.using.PCA}). This step is experimental and should probably not be used unless you have some experience with that sort of correction and accept the potential side effects associated with it.
 \item Various small bug fixes, especially to use the \texttt{subset.for.speed} argument when a new ExomeDepth object is created.
 \item Only include primary alignments in the read count function: thank you to Peng Zhang (John Hopkins) for pointing this out.
 \end{itemize}
@@ -373,10 +372,6 @@ It replaces the test sample with the tumour sample, and the reference sample wit
 It also requires as an input a parameter that specifies the proportion of the tumour sample that is also from the tumour.
 This function is a bit experimental but I welcome feedback.
 
-
-\subsection{Principal component correction for batch effects}
-The function \texttt{correct.counts.using.PCA} is so far an experimental function meant to remove batche effects using a principal component analysis strategy.
-Look at the manual page for this function for more details, but so far the intended use are gene panel experiments (typically with a smaller number of targeted genes) with a relatively large sample size (greater than 20 seems appropriate but this number is not set in stone).
 
 \subsection{Counting everted reads}
 
