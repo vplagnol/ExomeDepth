@@ -13,10 +13,10 @@ call.CNVs(test, reference, prior = 10^(-4), GC, chromosome, start, end, single.e
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{test}{
-%%     ~~Describe \code{test} here~~
+    Count data for the test sample.
 }
-  \item{reference}{
-%%     ~~Describe \code{reference} here~~
+\item{reference}{
+  Count data for the aggregate reference set.
 }
   \item{prior}{
 %%     ~~Describe \code{prior} here~~

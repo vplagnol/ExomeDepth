@@ -11,7 +11,7 @@ countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) 
   
   rds <- scanBam(file = bam.file,
                  index = index, 
-                 param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = FALSE), what = c("rname", "strand", "isize", "mapq", "pos", "isize")))[[1]]
+                 param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = FALSE, isNotPrimaryRead = FALSE), what = c("rname", "strand", "isize", "mapq", "pos", "isize")))[[1]]
 
   mapq.test <- (!is.na(rds$isize)) & (rds$mapq >= min.mapq) & !is.na(rds$pos) & (abs(rds$isize) < 100000) & ( ((rds$strand == "+") & (rds$isize < 0) ) | ((rds$strand == "-") & (rds$isize > 0) ) )
   mapq.test <- mapq.test[  !is.na(mapq.test) ]
@@ -49,7 +49,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
 ############################################################################# read paired end
         rds <- scanBam(file = bam.file,
                        index = index, 
-                       param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = TRUE), what = c("mapq", "pos", "isize"), which = range(granges.subset)))
+                       param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = TRUE, isNotPrimaryRead = FALSE), what = c("mapq", "pos", "isize"), which = range(granges.subset)))
         mapq.test <- (rds[[1]]$mapq >= min.mapq) & !is.na(rds[[1]]$pos) & (abs(rds[[1]]$isize) < 1000) & (rds[[1]]$isize > 0)
                                         #message('----------------- ', seq.name, ' ', length(rds[[1]]$mapq))
         
@@ -63,7 +63,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
       ############################################################################# read single end 
         rds <- scanBam(bam.file,
                        index = index, 
-                       param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isPaired = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
+                       param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isPaired = FALSE, isNotPrimaryRead = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
         mapq.test <- (rds[[1]]$mapq >= min.mapq) & !is.na(rds[[1]]$pos) 
         
         if (sum(mapq.test) > 0 && !is.na(sum(mapq.test))) {
@@ -77,7 +77,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
       if (force.single.end) {  ##request to deal with reads in a single end manner
         rds <- scanBam(bam.file,
                        index = index,
-                       param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
+                       param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isNotPrimaryRead = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
 
         mapq.test <- (rds[[1]]$mapq >= min.mapq) & !is.na(rds[[1]]$pos)
         if (sum(mapq.test) > 0 && !is.na(sum(mapq.test))) {
@@ -115,7 +115,13 @@ getBamCounts <- function(bed.frame = NULL, bed.file = NULL, bam.files, index.fil
   names(bed.frame)[2] <- 'start'
   names(bed.frame)[3] <- 'end'
 
-  if (include.chr) bed.frame$seqnames <- paste('chr', bed.frame$seqnames, sep = '')
+  if (include.chr) {
+    if (sum(grepl(pattern = '^chr', bed.frame$seqnames) > 0)) {
+      warning('The option include.chr == TRUE adds the chr prefix to the chromosome name but it looks like the chromosome names already have a chr prefix. The argument to getBamCounts is probably an error.')
+    }
+    bed.frame$seqnames <- paste('chr', bed.frame$seqnames, sep = '')
+  }
+  
   chr.names.used <- unique(as.character(bed.frame$seqnames))
   chr.levels <- c(as.character(seq(1, 22)), subset( chr.names.used, ! chr.names.used %in% as.character(seq(1, 22))))
 

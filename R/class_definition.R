@@ -52,6 +52,7 @@ setMethod("initialize", "ExomeDepth", function(.Object,
       mod <- aod::betabin( data = data.for.fit, formula = as.formula(formula), random = ~ 1, link = 'logit', warnings = FALSE)
       .Object@phi <- rep(mod@param[[ 'phi.(Intercept)']], n.data.points)
     } else {
+      if (!is.null(subset.for.speed)) {stop('Subset for speed option is not compatible with variable phi. This will be fixed later on but for now please adapt your code.')}
       ceiling.bin <- quantile(reference, probs = c( 0.85, 1) )
       bottom.bins <- seq(from = 0, to =  ceiling.bin[1], by =  ceiling.bin[1]/(phi.bins-1))
       complete.bins <- as.numeric(c(bottom.bins, ceiling.bin[2] + 1))

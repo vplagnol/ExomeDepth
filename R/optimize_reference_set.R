@@ -5,7 +5,7 @@
 
 select.reference.set <- function(test.counts, reference.counts, bin.length = NULL, n.bins.reduced = 0, data = NULL, formula = 'cbind(test, reference) ~ 1', phi.bins = 1) {
 
-  message('Optimization of the choice of aggregate reference set')
+  message('Optimization of the choice of aggregate reference set, this process can take some time')
 
   if (sum(test.counts > 2) < 5) {
     message('It looks like the test samples has only ', sum(test.counts > 2), ' bins with 2 or more reads. The coverage is too small to perform any meaningful inference so no likelihood will be computed.')
@@ -59,16 +59,13 @@ select.reference.set <- function(test.counts, reference.counts, bin.length = NUL
   for (i in 1:n.ref.samples) {
     reference <- reference + reference.counts[,i]
 
-    #print(head(data))
-    #print(length(reference))
-    #print(nrow(data))
-
     my.mod <- new('ExomeDepth',
                   test = test.counts,
                   reference = reference,
                   formula = formula,
                   data = data,
-                  phi.bins = phi.bins)
+                  phi.bins = phi.bins,
+                  verbose = FALSE)
     
     res.data.frame$phi[ i ] <- mean(my.mod@phi)
     res.data.frame$mean.p[ i ] <- mean(my.mod@expected)
