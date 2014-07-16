@@ -24,13 +24,18 @@ select.reference.set <- function(test.counts, reference.counts, bin.length = NUL
 
   ############ select the subset of bins which will be used for the selection of the reference set
   total.counts <- apply(reference.counts, MARGIN = 1, FUN = sum) + test.counts
-  my.quantiles <- quantile(total.counts [ which(total.counts > 30) ], prob = c(0.1, 0.9))
+  my.quantiles <- quantile(total.counts [ which(total.counts > 30) ], prob = c(0.1, 0.9), na.rm = TRUE)
   
-  selected <- which(total.counts > 30 & bin.length > 0 & total.counts < my.quantiles[2])
+  selected <- which(total.counts > 30 &
+                    bin.length >= as.numeric(quantile(bin.length, prob = 0.05, na.rm = TRUE)) & #I remove very small exons here, because they cause instability
+                    bin.length <= as.numeric(quantile(bin.length, prob = 0.95, na.rm = TRUE)) &  # no large exons
+                    total.counts < my.quantiles[2]) 
   if ( (n.bins.reduced < length(selected)) && (n.bins.reduced > 0) ) selected <- selected[ seq(1, length(selected), length(selected) / n.bins.reduced) ]
 
 
   test.counts <- test.counts[ selected ]
+  #print(selected)
+
 
 
   reference.counts <- reference.counts[ selected, , drop = FALSE ]

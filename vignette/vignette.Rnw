@@ -18,6 +18,11 @@
 
 Version 1.0.5:
 \begin{itemize}
+\item Minor bug fix that excludes very small exons from the correlation computation of the aggregate reference optimization routine.
+\end{itemize}
+
+Version 1.0.5:
+\begin{itemize}
 \item The transition from one CNV state to another now takes into account the distance between exons (contribution from Anna Fowler and Gerton Lunter, Oxford, UK).
 \item In previous versions, the first exon of each chromosome was set to normal copy number to avoid CNVs spanning multiple exons. This has now been fixed, and the Viterbi algorithm now runs separately for each chromosome (with a dummy exon to start each chromosome that is forced to normal copy number). This should really make a difference for targeted sequencing sets (thank you again to Anna Fowler and Gerton Lunter for suggesting this fix).
 \item Various small bug fixes, especially to use the \texttt{subset.for.speed} argument when a new ExomeDepth object is created.
