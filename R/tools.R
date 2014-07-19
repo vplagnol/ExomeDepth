@@ -28,10 +28,9 @@ viterbi.hmm <- function(transitions, loglikelihood, positions, expected.CNV.leng
   if ( length(positions) != nrow(loglikelihood) ) {
     stop("The number of positions are not matching the number of rows of the likelihood matrix", length(positions), " and ", nrow(loglikelihood))
   }
+
   nstates <- nrow(transitions)
   nobs <- nrow(loglikelihood)
-
-  
   
   res <- .Call("C_hmm", nstates, nobs, transitions, loglikelihood, positions, as.double(expected.CNV.length), PACKAGE = 'ExomeDepth')
   dimnames(res[[2]])[[2]] <- c('start.p', 'end.p', 'type', 'nexons')

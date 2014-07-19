@@ -72,16 +72,16 @@ file.copy(from = "vignette/vignette.Rnw", to = paste(base, '/ExomeDepth/vignette
 complete <- TRUE
 
 if (complete) {
-  system(paste("/share/apps/R-3.0.2/bin/R CMD build --resave-data ", base, "/ExomeDepth", sep = ''))
-  system("/share/apps/R-3.0.2/bin/R CMD INSTALL  ExomeDepth_1.0.6.tar.gz")
+  system(paste("/share/apps/R-3.1.0/bin/R CMD build --resave-data ", base, "/ExomeDepth", sep = ''))
+  system("/share/apps/R-3.1.0/bin/R CMD INSTALL  ExomeDepth_1.0.7.tar.gz")
   system(paste('cp /home/ucbtvyp/vyp/vincent/libraries/R/installed/ExomeDepth/doc/ExomeDepth-vignette.pdf .'))
 
 }
 
 if (!complete) {
-  system(paste("/share/apps/R-3.0.2/bin/R CMD build --no-vignettes ", base, "/ExomeDepth", sep = ''))
+  system(paste("/share/apps/R-3.1.0/bin/R CMD build --no-vignettes ", base, "/ExomeDepth", sep = ''))
 
-  system("/share/apps/R-3.0.2/bin/R CMD INSTALL  ExomeDepth_1.0.6.tar.gz")
+  system("/share/apps/R-3.1.0/bin/R CMD INSTALL  ExomeDepth_1.0.7.tar.gz")
 }
 
 
