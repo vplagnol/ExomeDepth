@@ -10,19 +10,6 @@ dyn.load('src/ExomeDepth.so')
 
 
 
-viterbi.hmm <- function(transitions, loglikelihood, positions) {
-    if ( nrow(transitions) != ncol(transitions) ) stop("Transition matrix is not square")
-      nstates <- nrow(transitions)
-      nobs <- nrow(loglikelihood)
-
-      res <- .Call("C_hmm", nstates, nobs, transitions, loglikelihood, positions)
-      dimnames(res[[2]])[[2]] <- c('start.p', 'end.p', 'type', 'nexons')
-      res[[2]] <- as.data.frame(res[[2]])
-      names(res) <- c('Viterbi.path', 'calls')
-
-      return(res)
-  }
-
 
 load('data/ExomeCount.RData')
 data <- as(ExomeCount, 'data.frame')

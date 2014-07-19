@@ -200,10 +200,12 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
     loc.expected <- x@expected[ good.pos ]
     loc.test <- x@test[ good.pos ]
     loc.total <- total[ good.pos ]
-    positions <- as.integer(loc.annotations$start)
+    positions <- loc.annotations$start
     
     loc.likelihood <-  rbind(c(- Inf, 0, -Inf), x@likelihood[good.pos, c(2, 1, 3)]) ##add a dummy exon so that we start at cn = 2 (normal)
-    my.calls <- viterbi.hmm (transitions, loglikelihood = loc.likelihood, positions = positions, expected.CNV.length = expected.CNV.length)
+    my.calls <- viterbi.hmm (transitions, loglikelihood = loc.likelihood,
+                             positions = as.integer(c(positions[1] - 2*expected.CNV.length, positions)),
+                             expected.CNV.length = expected.CNV.length)
 
     my.calls$calls$start.p <- my.calls$calls$start.p -1  ##remove the dummy exon, which has now served its purpose
     my.calls$calls$end.p <- my.calls$calls$end.p -1  ##remove the dummy exon, which has now served its purpose

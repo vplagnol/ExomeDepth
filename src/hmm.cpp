@@ -49,13 +49,16 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
 
   //-----------------------------------------------------------------------------
   //now run the HMM
-
+  
+  //suppose 10 observations, then nobs_c = 10, i goes to 9, we should be fine
   for (int i = 1; i != nobs_c; i++) {     
     viterbi_prob.push_back(temp);
     from_where.push_back( temp_i);
 
     dist = double(locations[ i ]) - double(locations[ i - 1 ]);
+    //cout<<locations[i]<<"\t"<<locations[ i -1 ]<<"   ----   "<<dist<<"   ------------ "<<Expected<<endl;
     dist_effect = exp(-dist/Expected);
+
 
     for (int j = 0; j != nstates_c; j++) {         //for each state
       viterbi_prob[i][j] = - HUGE_VAL;
