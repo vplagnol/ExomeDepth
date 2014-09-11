@@ -86,8 +86,6 @@ SEXP get_loglike_matrix (const SEXP phi_a, const SEXP expected_a, const SEXP tot
 
 
 SEXP CNV_estimate (const SEXP expected_a, const SEXP total_a, const SEXP observed_a) {
-
-
   
   const double * expected = REAL( expected_a );
   const int * total = INTEGER( total_a );

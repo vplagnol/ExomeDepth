@@ -16,7 +16,7 @@ countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) 
   mapq.test <- (!is.na(rds$isize)) & (rds$mapq >= min.mapq) & !is.na(rds$pos) & (abs(rds$isize) < 100000) & ( ((rds$strand == "+") & (rds$isize < 0) ) | ((rds$strand == "-") & (rds$isize > 0) ) )
   mapq.test <- mapq.test[  !is.na(mapq.test) ]
 
-  if (sum(mapq.test) > 0) {
+  if (sum(mapq.test, na.rm = TRUE) > 0) {
     empty <- FALSE
     
     reads.ranges <- GRanges ( seqnames = rds$rname[ mapq.test],
@@ -53,7 +53,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
         mapq.test <- (rds[[1]]$mapq >= min.mapq) & !is.na(rds[[1]]$pos) & (abs(rds[[1]]$isize) < 1000) & (rds[[1]]$isize > 0)
                                         #message('----------------- ', seq.name, ' ', length(rds[[1]]$mapq))
         
-        if (sum(mapq.test) > 0 && !is.na(sum(mapq.test) )) {
+        if (sum(mapq.test, na.rm = TRUE) > 0 && !is.na(sum(mapq.test, na.rm = TRUE) )) {
           empty <- FALSE
           rds.ranges <- GRanges(seq.name, IRanges(start = rds[[1]]$pos[mapq.test], width  = rds[[1]]$isize[mapq.test]))
           rds.counts.seq.name <- countOverlaps(granges.subset, rds.ranges)
@@ -66,7 +66,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
                        param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isPaired = FALSE, isNotPrimaryRead = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
         mapq.test <- (rds[[1]]$mapq >= min.mapq) & !is.na(rds[[1]]$pos) 
         
-        if (sum(mapq.test) > 0 && !is.na(sum(mapq.test))) {
+        if (sum(mapq.test, na.rm = TRUE) > 0 && !is.na(sum(mapq.test, na.rm = TRUE))) {
           empty <- FALSE
           rds.ranges <- GRanges(seq.name, IRanges(start = rds[[1]]$pos[mapq.test] - 0.5*read.width + 0.5*rds[[1]]$qwidth[ mapq.test ], width = read.width))
           rds.counts.seq.name <- countOverlaps(granges.subset, rds.ranges)
@@ -80,7 +80,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
                        param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isNotPrimaryRead = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
 
         mapq.test <- (rds[[1]]$mapq >= min.mapq) & !is.na(rds[[1]]$pos)
-        if (sum(mapq.test) > 0 && !is.na(sum(mapq.test))) {
+        if (sum(mapq.test, na.rm = TRUE) > 0 && !is.na(sum(mapq.test, na.rm = TRUE))) {
           empty <- FALSE
           rds.ranges <- GRanges(seq.name, IRanges(start = rds[[1]]$pos[mapq.test] - 0.5*read.width + 0.5*rds[[1]]$qwidth[ mapq.test ], width = read.width))
           rds.counts.seq.name <- countOverlaps(granges.subset, rds.ranges)

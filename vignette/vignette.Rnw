@@ -16,7 +16,12 @@
 
 \section{What is new?}
 
-Version 1.0.5:
+Version 1.0.9:
+\begin{itemize}
+\item Bug fix in the read count routine (many thanks to Douglas Ruderfer for picking this up).
+\end{itemize}
+
+Version 1.0.7:
 \begin{itemize}
 \item Minor bug fix that excludes very small exons from the correlation computation of the aggregate reference optimization routine.
 \end{itemize}
