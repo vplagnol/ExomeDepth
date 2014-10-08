@@ -22,25 +22,37 @@ setMethod("initialize", "ExomeDepth", function(.Object,
                                                formula = 'cbind(test, reference) ~ 1',
                                                phi.bins = 1,
                                                prop.tumor = 1,
-                                               subset.for.speed = NULL) {
+                                               subset.for.speed = NULL,
+                                               verbose = TRUE) {
   if (length(test) != length(reference)) stop("Length of test and numeric must match")
 
+  if (sum(test > 5) < 5) {
+    message('It looks like the test samples has only ', sum(test > 5), ' bins with more than 5 reads. The coverage is too small to perform any meaningful inference so no likelihood will be computed.')
+    return(.Object)
+  }
   
-
+  n.data.points <- length(test)
   if (is.null(data)) data <- data.frame(intercept = rep(1, length(test)))
 
+  ### the stuff below will be used for the estimation of phi
+  data$test <- test
+  data$reference <- reference
+
   if (!is.null(subset.for.speed)) {
+
+    if ( (class(subset.for.speed) == 'numeric') && (length(subset.for.speed) == 1)) {subset.for.speed <- seq(from = 1, to = nrow(data), by = floor( nrow(data) / subset.for.speed ) )}  ###deals with unexpected use of subset.for.speed
     subset.for.speed <- subset.for.speed[ subset.for.speed %in% 1:nrow(data) ] ##make sure we do not select non-existing rows
-    test <- test[ subset.for.speed ]
-    reference <- reference[ subset.for.speed ]
-    data <- data[ subset.for.speed, , drop = FALSE]
+    data.for.fit <- data[ subset.for.speed, , drop = FALSE]
+  } else {
+    data.for.fit <- data
   }
 
-  message('Now fitting the beta-binomial model: this step can take a few minutes.')
+  if (verbose) message('Now fitting the beta-binomial model on a data frame with ', nrow(data.for.fit), ' rows : this step can take a few minutes.')
     if (phi.bins == 1) {
-      mod <- aod::betabin( data = data, formula = as.formula(formula), random = ~ 1, link = 'logit')
-      .Object@phi <- rep(mod@param[[ 'phi.(Intercept)']], nrow(data))
+      mod <- aod::betabin( data = data.for.fit, formula = as.formula(formula), random = ~ 1, link = 'logit', warnings = FALSE)
+      .Object@phi <- rep(mod@param[[ 'phi.(Intercept)']], n.data.points)
     } else {
+      if (!is.null(subset.for.speed)) {stop('Subset for speed option is not compatible with variable phi. This will be fixed later on but for now please adapt your code.')}
       ceiling.bin <- quantile(reference, probs = c( 0.85, 1) )
       bottom.bins <- seq(from = 0, to =  ceiling.bin[1], by =  ceiling.bin[1]/(phi.bins-1))
       complete.bins <- as.numeric(c(bottom.bins, ceiling.bin[2] + 1))
@@ -49,11 +61,10 @@ setMethod("initialize", "ExomeDepth", function(.Object,
 ############# a check
       my.tab <-  table(data$depth.quant)
       if (length(my.tab) != phi.bins) {
-        print(my.tab)
         stop('Binning did not happen properly')
       }
       
-      mod <- betabin (data = data, formula = as.formula(formula), random = as.formula('~ depth.quant'),  link = 'logit')
+      mod <- betabin (data = data.for.fit, formula = as.formula(formula), random = as.formula('~ depth.quant'),  link = 'logit', warnings = FALSE)
       phi.estimates <-  as.numeric(mod@random.param)
       data$phi <-  phi.estimates[  data$depth.quant ]
   
@@ -64,16 +75,30 @@ setMethod("initialize", "ExomeDepth", function(.Object,
       .Object@phi <- data$phi.linear
     }
 
+
   
   .Object@formula <- formula
   .Object@test <- test
   .Object@reference <- reference
-  .Object@expected <- aod::fitted(mod)
+  my.coeffs <- mod@fixed.param
 
+  
+  if (is.null(subset.for.speed)) {
+    .Object@expected <- aod::fitted(mod)
+  } else {
+    intercept <- my.coeffs[[ '(Intercept)' ]]    
+    .Object@expected <- rep(intercept, times = nrow(data))
+    if (length(my.coeffs) > 1) {
+      for (na in names(my.coeffs)[ -1 ]) {
+        .Object@expected = .Object@expected + my.coeffs [[ na ]]*data[, na]
+      }
+    }
+    .Object@expected <- exp(.Object@expected)/ (1 + exp(.Object@expected))
+  }
   
   .Object@annotations <- data.frame()
   
-  message('Now computing the likelihood for the different copy number states')
+  if (verbose) message('Now computing the likelihood for the different copy number states')
   if (prop.tumor < 1) message('Proportion of tumor DNA is ', prop.tumor)
   .Object@likelihood <- .Call("get_loglike_matrix",
                               phi = .Object@phi,
@@ -123,11 +148,17 @@ setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
 
 
 
-setGeneric("CallCNVs", def = function(x, chromosome, start, end, name, transition.probability = 0.0001, expected.length = 10000) standardGeneric('CallCNVs'))
+setGeneric("CallCNVs", def = function(x, chromosome, start, end, name, transition.probability = 0.0001, expected.CNV.length = 50000) standardGeneric('CallCNVs'))
 
 
-setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, transition.probability,expected.length) {
+setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, transition.probability, expected.CNV.length) {
 
+  if (length(x@phi) == 0) {
+    message('The vector phi does not seem initialized. This may be because the read count is too low and the test vector cannot be processed. No calling will happen')
+    x@CNV.calls <- data.frame()
+    return(x)
+  }
+  
   if ( length(start) != length(chromosome) || length(end) != length(chromosome) || length(name) != length(chromosome) ) stop('Chromosome, start and end vector must have the same lengths.\n')
   if (nrow(x@likelihood) != length(chromosome) ) stop('The annotation vectors must have the same length as the data in the ExomeDepth x')
 
@@ -157,46 +188,28 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
                           0.5, 0.5, 0.,
                           0.5, 0, 0.5),
                         byrow = TRUE)
-<<<<<<< HEAD
-  
-  my.breaks <- which(diff(as.numeric(x@annotations$chromosome)) != 0) + 1
-  x@likelihood[ my.breaks,1 ] <- - Inf
-  x@likelihood[ my.breaks,3  ] <- - Inf
- positions = x@annotations[,2:4]
- levels(positions[,1]) = c(levels(positions[,1]),"23")
- positions[,1][positions[,1]=="X"]="23"
- positions = apply(positions,c(1,2),as.integer)
- my.calls <- viterbi.hmm (transitions, loglikelihood = x@likelihood[, c(2, 1, 3)], positions = positions, expected.length = expected.length)
-=======
->>>>>>> upstream/master
 
   my.chromosomes <- unique(x@annotations$chromosome)
 
   final <- data.frame()
-  
+
+  shift <- 0
   for (chrom in my.chromosomes)  {  ##run Viterbi separately for each chromosome
     good.pos <- which (x@annotations$chromosome == chrom)
     loc.annotations <- x@annotations[  good.pos , ]
     loc.expected <- x@expected[ good.pos ]
-    loc.test <- x@expected[ good.pos ]
+    loc.test <- x@test[ good.pos ]
     loc.total <- total[ good.pos ]
+    positions <- loc.annotations$start
     
     loc.likelihood <-  rbind(c(- Inf, 0, -Inf), x@likelihood[good.pos, c(2, 1, 3)]) ##add a dummy exon so that we start at cn = 2 (normal)
-    my.calls <- viterbi.hmm (transitions, loglikelihood = loc.likelihood, positions = NA)
-
-    #print(head(my.calls$calls))
+    my.calls <- viterbi.hmm (transitions, loglikelihood = loc.likelihood,
+                             positions = as.integer(c(positions[1] - 2*expected.CNV.length, positions)),
+                             expected.CNV.length = expected.CNV.length)
 
     my.calls$calls$start.p <- my.calls$calls$start.p -1  ##remove the dummy exon, which has now served its purpose
     my.calls$calls$end.p <- my.calls$calls$end.p -1  ##remove the dummy exon, which has now served its purpose
-    loc.likelihood <- loc.likelihood[-1, ]  ##remove the dummy exon, which has now served its purpose
-
-    
-                                        #my.breaks <- which(diff(as.numeric(x@annotations$chromosome)) != 0) + 1
-                                        #x@likelihood[ my.breaks,1 ] <- - Inf
-                                        #x@likelihood[ my.breaks,3  ] <- - Inf
-    
-                                        #my.calls <- viterbi.hmm (transitions, loglikelihood = x@likelihood[, c(2, 1, 3)], positions = NA)
-
+    loc.likelihood <- loc.likelihood[ -1, c(2,1, 3) ]  ##remove the dummy exon, which has now served its purpose
 
   ################################ Now make it look better, add relevant info
     if (nrow(my.calls$calls) > 0) {
@@ -227,10 +240,16 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
       my.calls$calls$reads.expected <- as.integer( my.calls$calls$reads.expected)
       my.calls$calls$reads.ratio <-  signif(my.calls$calls$reads.observed / my.calls$calls$reads.expected, 3)
       my.calls$calls$BF <- signif( log10(exp(1))*my.calls$calls$BF, 3)
-      
+
+      #### shift the numbering properly
+      my.calls$calls$start.p <- my.calls$calls$start.p + shift
+      my.calls$calls$end.p <- my.calls$calls$end.p + shift
+
       if (nrow(final) == 0) {final <- my.calls$calls} else {final <- rbind.data.frame(final, my.calls$calls)}
       message('Number of calls for chromosome ', chrom, ' : ', nrow(my.calls$calls))
     }
+    shift <- shift + length(good.pos)
+
   }
   x@CNV.calls <- final
   return (x)

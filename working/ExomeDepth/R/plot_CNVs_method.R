@@ -1,15 +1,20 @@
 
 setMethod("plot", "ExomeDepth", function(x, sequence, xlim, ylim = NULL, count.threshold = 10, ylab = 'Observed by expected read ratio', xlab = '', type = 'b', pch = '+', with.gene = FALSE, annotations = NULL, col = 'red', ...) {
 
-  if (with.gene) {  ##if we want the gene information we add this extra bit
-    layout(mat = matrix(data = 1:2, nrow = 2, ncol = 1), widths = c(1, 1), heights = c(2, 1) )
-    par(mar = c(0, 4, 2, 2))
-  }
+
 
   anno <- x@annotations
   selected <-  which(anno$chromosome == sequence & anno$start >= xlim[1] & anno$end <= xlim[2] & (x@test + x@reference)*x@expected > count.threshold)
+
+  if (length(selected) == 0) {
+    warning('No exon seem to be located in the requested region. It could also be that the read count is too low for these exons? In any case no graph will be plotted.')
+    return(NULL)
+  }
+
+
+### From now on we can assume the selection is not empty
   anno <- anno[selected,]
-                 
+  
   anno$expected <- x@expected[ selected ]
   anno$freq <- x@test[ selected ]/ (x@reference[selected ] + x@test[selected])
   anno$middle <- 0.5*(anno$start + anno$end)
@@ -18,17 +23,25 @@ setMethod("plot", "ExomeDepth", function(x, sequence, xlim, ylim = NULL, count.t
   anno$reference <- x@reference[ selected ]
   anno$total.counts <- anno$test + anno$reference
   if (length( x@phi ) == 1) anno$phi <- x@phi else anno$phi <-  x@phi [ selected ]
-  
+
+  #browser()
   for (i in 1:nrow(anno)) {
     anno$my.min.norm[ i ] <- qbetabinom (p = 0.025, size =  anno$total.counts[ i ], phi = anno$phi[ i ], prob =  anno$expected[ i ])
     anno$my.max.norm[ i ] <- qbetabinom (p = 0.975, size =  anno$total.counts[ i ], phi = anno$phi[ i ], prob =  anno$expected[ i ])
   }
-  
+
   #anno$my.min.norm.prop <-   anno$my.min.norm / (anno$my.min.norm + anno$reference)
   #anno$my.max.norm.prop <-   anno$my.max.norm / (anno$my.max.norm + anno$reference)
 
   anno$my.min.norm.prop <-   anno$my.min.norm /  anno$total.counts
   anno$my.max.norm.prop <-   anno$my.max.norm /  anno$total.counts
+
+
+######### Now we plot
+  if (with.gene) {  ##if we want the gene information we add this extra bit
+    layout(mat = matrix(data = 1:2, nrow = 2, ncol = 1), widths = c(1, 1), heights = c(2, 1) )
+    par(mar = c(0, 4, 2, 2))
+  }
 
   if (is.null(xlim)) xlim <- range(anno$middle)
   if (is.null(ylim)) ylim <- c( 0, max( anno$ratio, 1.25*max( anno$my.max.norm.prop/anno$expected, na.rm = TRUE )))

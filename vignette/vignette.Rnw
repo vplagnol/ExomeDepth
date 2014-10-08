@@ -16,6 +16,25 @@
 
 \section{What is new?}
 
+Version 1.0.9:
+\begin{itemize}
+\item Bug fix in the read count routine (many thanks to Douglas Ruderfer for picking this up).
+\end{itemize}
+
+Version 1.0.7:
+\begin{itemize}
+\item Minor bug fix that excludes very small exons from the correlation computation of the aggregate reference optimization routine.
+\end{itemize}
+
+Version 1.0.5:
+\begin{itemize}
+\item The transition from one CNV state to another now takes into account the distance between exons (contribution from Anna Fowler and Gerton Lunter, Oxford, UK).
+\item In previous versions, the first exon of each chromosome was set to normal copy number to avoid CNVs spanning multiple exons. This has now been fixed, and the Viterbi algorithm now runs separately for each chromosome (with a dummy exon to start each chromosome that is forced to normal copy number). This should really make a difference for targeted sequencing sets (thank you again to Anna Fowler and Gerton Lunter for suggesting this fix).
+\item Various small bug fixes, especially to use the \texttt{subset.for.speed} argument when a new ExomeDepth object is created.
+\item Only include primary alignments in the read count function: thank you to Peng Zhang (John Hopkins) for pointing this out.
+\end{itemize}
+
+
 Version 1.0.0:
 \begin{itemize}
 \item New warning when the correlation between the test and reference samples is low, so that the user knows he should expect unreliable results.
@@ -353,7 +372,18 @@ for (i in 1:nsamples) {
 
 @
 
-\section{Counting everted reads}
+
+\section{Additional functions}
+
+\subsection{Matched tumour/normal tissue pair}
+A few users asked me about a typical design in the cancer field of combining sequence data for healthy and tumour tissue.
+A function has been available for this for a long time: \texttt{somatic.CNV.call}.
+It replaces the test sample with the tumour sample, and the reference sample with the healthy tissue.
+It also requires as an input a parameter that specifies the proportion of the tumour sample that is also from the tumour.
+This function is a bit experimental but I welcome feedback.
+
+
+\subsection{Counting everted reads}
 
 This issue of everted reads (read pairs pointing outward instead of inward) is a side story that has nothing to do with read depth.
 It is based on a ``read pair'' analysis but it was practical for me (and I hope for others) to write simple functions to find such a pattern in my exome data.

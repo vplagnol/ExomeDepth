@@ -8,7 +8,7 @@ package.skeleton(name="ExomeDepth",
                  force=TRUE)
 
 
-for (folder in c('data', 'src', 'vignette')) {
+for (folder in c('data', 'src', 'vignettes')) {
   my.folder <- paste(base, '/ExomeDepth/', folder, sep = '')
   if (!file.exists(my.folder)) dir.create(path = my.folder)
 }
@@ -52,7 +52,6 @@ file.copy(from = 'doc/AnnotateExtra.Rd', to= paste(base, '/ExomeDepth/man/Annota
 file.copy(from = 'doc/count.everted.reads.Rd', to= paste(base, '/ExomeDepth/man/count.everted.reads.Rd', sep = ''), overwrite = TRUE)
 file.copy(from = 'doc/countBam.everted.Rd', to= paste(base, '/ExomeDepth/man/countBam.everted.Rd', sep = ''), overwrite = TRUE)
 
-
 file.copy(from = 'doc/genes.hg19.Rd', to= paste(base, '/ExomeDepth/man/genes.hg19.Rd', sep = ''), overwrite = TRUE)
 file.copy(from = 'doc/exons.hg19.Rd', to= paste(base, '/ExomeDepth/man/exons.hg19.Rd', sep = ''), overwrite = TRUE)
 
@@ -73,26 +72,16 @@ file.copy(from = "vignette/vignette.Rnw", to = paste(base, '/ExomeDepth/vignette
 complete <- TRUE
 
 if (complete) {
-<<<<<<< HEAD
-  system(paste("/usr/bin/R CMD build --resave-data ", base, "/ExomeDepth", sep = ''))
-  system("/usr/bin/R CMD INSTALL  ExomeDepth_12.0.tar.gz")
-  #system(paste('cp /home/ucbtvyp/vyp/vincent/libraries/R/installed/ExomeDepth/doc/ExomeDepth-vignette.pdf .'))
-=======
-  system(paste("/share/apps/R-3.0.2/bin/R CMD build --resave-data ", base, "/ExomeDepth", sep = ''))
-  system("/share/apps/R-3.0.2/bin/R CMD INSTALL  ExomeDepth_1.0.1.tar.gz")
-  system(paste('cp /home/ucbtvyp/vyp/vincent/libraries/R/installed/ExomeDepth/doc/ExomeDepth-vignette.pdf .'))
->>>>>>> upstream/master
+    system(paste("/share/apps/R-3.1.0/bin/R CMD build --resave-data ", base, "/ExomeDepth", sep = ''))
+    system("/share/apps/R-3.1.0/bin/R CMD INSTALL ExomeDepth_1.0.9.tar.gz")
+    system(paste('cp /home/ucbtvyp/vyp/vincent/libraries/R/installed/ExomeDepth/doc/ExomeDepth-vignette.pdf .'))
 
 }
 
 if (!complete) {
-  system(paste("/usr/bin/R CMD build --no-vignettes ", base, "/ExomeDepth", sep = ''))
+  system(paste("/share/apps/R-3.1.0/bin/R CMD build --no-vignettes ", base, "/ExomeDepth", sep = ''))
 
-<<<<<<< HEAD
-  system("/usr/bin/R CMD INSTALL  ExomeDepth_12.0.tar.gz")
-=======
-  system("/share/apps/R-3.0.2/bin/R CMD INSTALL  ExomeDepth_1.0.1.tar.gz")
->>>>>>> upstream/master
+  system("/share/apps/R-3.1.0/bin/R CMD INSTALL  ExomeDepth_1.0.9.tar.gz")
 }
 
 

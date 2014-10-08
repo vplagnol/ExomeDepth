@@ -9,13 +9,15 @@ Computes the Viterbi path for a hidden markov model
   maximum likelihood Viterbi algorithm.
 }
 \usage{
-viterbi.hmm(transitions, loglikelihood, positions)
+viterbi.hmm(transitions, loglikelihood, positions, expected.CNV.length)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{transitions}{Transition matrix}
   \item{loglikelihood}{numeric matrix containing the loglikelihood of the data under the possible states}
   \item{positions}{Positions of the exons}
+  \item{expected.CNV.length}{Expected length of CNV calls, which has an
+    impact on the transition matrix between CNV states.}
 }
 \details{
   Standard forward-backward Viterbi algorithm using a precomputed matrix
