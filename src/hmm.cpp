@@ -22,6 +22,7 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
   const int nobs_c = *INTEGER (nobs);
   const double * trans_c = REAL(transitions);  //reads first column first
   const double * proba_c = REAL(probabilities);
+<<<<<<< HEAD
 	const int *locations = INTEGER (positions);
 	const double Expected = *REAL(expectedLength);
 	
@@ -31,6 +32,11 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
 
   Rprintf("Number of hidden states: %d\n",nstates_c);
   Rprintf("Number of data points: %d\n", nobs_c);
+=======
+  
+  //Rprintf("Number of hidden states: %d\n",nstates_c);
+  //Rprintf("Number of data points: %d\n", nobs_c);
+>>>>>>> upstream/master
 
   SEXP myList, final, calls_R;  //output variables
   
@@ -38,7 +44,7 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
   vector<vector< int> > from_where;
   
   //---------------- starting point in 0 state
-  Rprintf("Initializing the HMM\n");
+  //Rprintf("Initializing the HMM\n");
   vector<int> temp_i(nstates_c,-1);
   from_where.push_back( temp_i );
 
@@ -98,7 +104,7 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
     }
   }
 
-  Rprintf("Done with the first step of the HMM, now running the trace back\n");
+  //Rprintf("Done with the first step of the HMM, now running the trace back\n");
 
   //-------------------------------------------- trace back
   vector<int> trace_back ( nobs_c, 0);
@@ -135,7 +141,7 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
   }
 
   int ncalls = summary.size();
-  Rprintf("Total number of calls: %d\n", ncalls);
+  //Rprintf("Total number of calls: %d\n", ncalls);
 
 
   //-----------------------------------------------------------------------------

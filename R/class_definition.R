@@ -25,6 +25,10 @@ setMethod("initialize", "ExomeDepth", function(.Object,
                                                subset.for.speed = NULL) {
   if (length(test) != length(reference)) stop("Length of test and numeric must match")
 
+  if (sum(test > 2) < 5) {
+    message('It looks like the test samples has only ', sum(test > 2), ' bins with 2 or more reads. The coverage is too small to perform any meaningful inference so no likelihood will be computed.')
+    return(.Object)
+  }
   
 
   if (is.null(data)) data <- data.frame(intercept = rep(1, length(test)))
@@ -64,12 +68,13 @@ setMethod("initialize", "ExomeDepth", function(.Object,
       .Object@phi <- data$phi.linear
     }
 
+
   
   .Object@formula <- formula
   .Object@test <- test
   .Object@reference <- reference
   .Object@expected <- aod::fitted(mod)
-
+  
   
   .Object@annotations <- data.frame()
   
@@ -128,6 +133,12 @@ setGeneric("CallCNVs", def = function(x, chromosome, start, end, name, transitio
 
 setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, transition.probability,expected.length) {
 
+  if (length(x@phi) == 0) {
+    message('The vector phi does not seem initialized. This may be because the read count is too low and the test vector cannot be processed. No calling will happen')
+    x@CNV.calls <- data.frame()
+    return(x)
+  }
+  
   if ( length(start) != length(chromosome) || length(end) != length(chromosome) || length(name) != length(chromosome) ) stop('Chromosome, start and end vector must have the same lengths.\n')
   if (nrow(x@likelihood) != length(chromosome) ) stop('The annotation vectors must have the same length as the data in the ExomeDepth x')
 
@@ -158,49 +169,72 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
                           0.5, 0, 0.5),
                         byrow = TRUE)
   
-  my.breaks <- which(diff(as.numeric(x@annotations$chromosome)) != 0) + 1
-  x@likelihood[ my.breaks,1 ] <- - Inf
-  x@likelihood[ my.breaks,3  ] <- - Inf
- positions = x@annotations[,2:4]
- levels(positions[,1]) = c(levels(positions[,1]),"23")
- positions[,1][positions[,1]=="X"]="23"
- positions = apply(positions,c(1,2),as.integer)
- my.calls <- viterbi.hmm (transitions, loglikelihood = x@likelihood[, c(2, 1, 3)], positions = positions, expected.length = expected.length)
+# The following lines, need to be changed ... 
+# my.breaks <- which(diff(as.numeric(x@annotations$chromosome)) != 0) + 1
+#  x@likelihood[ my.breaks,1 ] <- - Inf
+#  x@likelihood[ my.breaks,3  ] <- - Inf
+# positions = x@annotations[,2:4]
+# levels(positions[,1]) = c(levels(positions[,1]),"23")
+# positions[,1][positions[,1]=="X"]="23"
+# positions = apply(positions,c(1,2),as.integer)
+# my.calls <- viterbi.hmm (transitions, loglikelihood = x@likelihood[, c(2, 1, 3)], positions = positions, expected.length = expected.length)
+
+  my.chromosomes <- unique(x@annotations$chromosome)
+
+  final <- data.frame()
+  
+  for (chrom in my.chromosomes)  {  ##run Viterbi separately for each chromosome
+    good.pos <- which (x@annotations$chromosome == chrom)
+    loc.annotations <- x@annotations[  good.pos , ]
+    loc.expected <- x@expected[ good.pos ]
+    loc.test <- x@test[ good.pos ]
+    loc.total <- total[ good.pos ]
+    
+    loc.likelihood <-  rbind(c(- Inf, 0, -Inf), x@likelihood[good.pos, c(2, 1, 3)]) ##add a dummy exon so that we start at cn = 2 (normal)
+    my.calls <- viterbi.hmm (transitions, loglikelihood = loc.likelihood, positions = NA)
+
+    #print(head(my.calls$calls))
+
+    my.calls$calls$start.p <- my.calls$calls$start.p -1  ##remove the dummy exon, which has now served its purpose
+    my.calls$calls$end.p <- my.calls$calls$end.p -1  ##remove the dummy exon, which has now served its purpose
+    loc.likelihood <- loc.likelihood[ -1, c(2,1, 3) ]  ##remove the dummy exon, which has now served its purpose
 
   ################################ Now make it look better, add relevant info
-  if (nrow(my.calls$calls) > 0) {
+    if (nrow(my.calls$calls) > 0) {
 
-    my.calls$calls$start <- x@annotations$start[ my.calls$calls$start.p ]
-    my.calls$calls$end <- x@annotations$end[ my.calls$calls$end.p ]
-    my.calls$calls$chromosome <- as.character(x@annotations$chromosome[ my.calls$calls$start.p ])
-  
-    my.calls$calls$id <- paste('chr', my.calls$calls$chromosome, ':',  my.calls$calls$start, '-',  my.calls$calls$end, sep = '')
-    my.calls$calls$type <- c('deletion', 'duplication')[ my.calls$calls$type ]
-  
+      my.calls$calls$start <- loc.annotations$start[ my.calls$calls$start.p ]
+      my.calls$calls$end <- loc.annotations$end[ my.calls$calls$end.p ]
+      my.calls$calls$chromosome <- as.character(loc.annotations$chromosome[ my.calls$calls$start.p ])
+      
+      my.calls$calls$id <- paste('chr', my.calls$calls$chromosome, ':',  my.calls$calls$start, '-',  my.calls$calls$end, sep = '')
+      my.calls$calls$type <- c('deletion', 'duplication')[ my.calls$calls$type ]
+      
 ########## make things pretty
-    my.calls$calls$BF <- NA
-    my.calls$calls$reads.expected <- NA
-    my.calls$calls$reads.observed <- NA
-
-
-    for (ir in 1:nrow(my.calls$calls)) {
+      my.calls$calls$BF <- NA
+      my.calls$calls$reads.expected <- NA
+      my.calls$calls$reads.observed <- NA
       
-      if (my.calls$calls$type[ir] == 'duplication') my.calls$calls$BF[ir] <-  sum(x@likelihood [ my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir],3 ] - x@likelihood [ my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir],2 ])
       
-      if (my.calls$calls$type[ir] == 'deletion') my.calls$calls$BF[ir] <-  sum(x@likelihood [ my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir], 1 ] - x@likelihood [ my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir],2  ])
+      for (ir in 1:nrow(my.calls$calls)) {
+        
+        if (my.calls$calls$type[ir] == 'duplication') my.calls$calls$BF[ir] <-  sum(loc.likelihood [ my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir],3 ] - loc.likelihood [ my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir],2 ])
+        
+        if (my.calls$calls$type[ir] == 'deletion') my.calls$calls$BF[ir] <-  sum(loc.likelihood [ my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir], 1 ] - loc.likelihood [ my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir],2  ])
+        
+        my.calls$calls$reads.expected[ ir ] <-  sum( loc.total [my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir] ] * loc.expected [my.calls$calls$start.p[ir] : my.calls$calls$end.p[ ir ] ])
+        my.calls$calls$reads.observed[ ir ] <-  sum( loc.test [my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir] ] )      
+      }
       
-      my.calls$calls$reads.expected[ ir ] <-  sum( total [my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir] ] * x@expected [my.calls$calls$start.p[ir] : my.calls$calls$end.p[ ir ] ])
-      my.calls$calls$reads.observed[ ir ] <-  sum( x@test [my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir] ] )      
+      my.calls$calls$reads.expected <- as.integer( my.calls$calls$reads.expected)
+      my.calls$calls$reads.ratio <-  signif(my.calls$calls$reads.observed / my.calls$calls$reads.expected, 3)
+      my.calls$calls$BF <- signif( log10(exp(1))*my.calls$calls$BF, 3)
+      
+      if (nrow(final) == 0) {final <- my.calls$calls} else {final <- rbind.data.frame(final, my.calls$calls)}
+      message('Number of calls for chromosome ', chrom, ' : ', nrow(my.calls$calls))
     }
-    
-    my.calls$calls$reads.expected <- as.integer( my.calls$calls$reads.expected)
-    my.calls$calls$reads.ratio <-  signif(my.calls$calls$reads.observed / my.calls$calls$reads.expected, 3)
-    my.calls$calls$BF <- signif( log10(exp(1))*my.calls$calls$BF, 3)
   }
-  
-  x@CNV.calls <- my.calls$calls
+  x@CNV.calls <- final
   return (x)
-
 })
 
 

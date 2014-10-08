@@ -1,4 +1,0 @@
-exportPattern("^[[:alpha:]]+")
-exportClasses("ExomeDepth")
-exportMethods("TestCNV", "CallCNVs")
-useDynLib(ExomeDepth, .registration=TRUE)
