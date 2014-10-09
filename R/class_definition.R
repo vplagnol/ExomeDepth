@@ -189,16 +189,6 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
                           0.5, 0, 0.5),
                         byrow = TRUE)
   
-# The following lines, need to be changed ... 
-# my.breaks <- which(diff(as.numeric(x@annotations$chromosome)) != 0) + 1
-#  x@likelihood[ my.breaks,1 ] <- - Inf
-#  x@likelihood[ my.breaks,3  ] <- - Inf
-# positions = x@annotations[,2:4]
-# levels(positions[,1]) = c(levels(positions[,1]),"23")
-# positions[,1][positions[,1]=="X"]="23"
-# positions = apply(positions,c(1,2),as.integer)
-# my.calls <- viterbi.hmm (transitions, loglikelihood = x@likelihood[, c(2, 1, 3)], positions = positions, expected.length = expected.length)
-
   my.chromosomes <- unique(x@annotations$chromosome)
 
   final <- data.frame()
@@ -211,15 +201,14 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
     loc.test <- x@test[ good.pos ]
     loc.total <- total[ good.pos ]
     positions <- loc.annotations$start
-    
-    loc.likelihood <-  rbind(c(- Inf, 0, -Inf), x@likelihood[good.pos, c(2, 1, 3)]) ##add a dummy exon so that we start at cn = 2 (normal)
+    loc.likelihood <-  rbind(c(- Inf, 0, -Inf), x@likelihood[good.pos, c(2, 1, 3)],c(-Inf,0,-Inf)) ##add a dummy exon so that we start at cn = 2 (normal)
     my.calls <- viterbi.hmm (transitions, loglikelihood = loc.likelihood,
                              positions = as.integer(c(positions[1] - 2*expected.CNV.length, positions)),
                              expected.CNV.length = expected.CNV.length)
 
     my.calls$calls$start.p <- my.calls$calls$start.p -1  ##remove the dummy exon, which has now served its purpose
     my.calls$calls$end.p <- my.calls$calls$end.p -1  ##remove the dummy exon, which has now served its purpose
-    loc.likelihood <- loc.likelihood[ -1, c(2,1, 3) ]  ##remove the dummy exon, which has now served its purpose
+    loc.likelihood <- loc.likelihood[ -c(1,nrow(loc.likelihood)), c(2,1, 3) ]  ##remove the dummy exon, which has now served its purpose
 
   ################################ Now make it look better, add relevant info
     if (nrow(my.calls$calls) > 0) {
