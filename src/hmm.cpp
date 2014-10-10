@@ -62,6 +62,7 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
 
     for (int j = 0; j != nstates_c; j++) {         //for each state
       viterbi_prob[i][j] = - HUGE_VAL;
+		
 
       trans[0] = trans_c[j*nstates_c];
       trans[1] = dist_effect*trans_c[j*nstates_c + 1 ] + (1.0 - dist_effect)*trans_c[j*nstates_c];
@@ -77,6 +78,7 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
 	  from_where[i][j] = k;
 	}
       }
+
       
       if (proba_c[j*nobs_c + i] == -HUGE_VAL) {from_where[i][j] = 0;}  //weak stuff, but it deals with me setting some likelihoods to -Inf
     
