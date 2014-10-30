@@ -1,9 +1,11 @@
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Using ExomeDepth}
+
 \documentclass[10pt]{article}
 \usepackage{amsmath, amsfonts, amssymb, amsthm}
 \usepackage{graphicx}
 \usepackage[margin=2cm]{geometry}
 
-%\VignetteIndexEntry{Using ExomeDepth}
 
 \title{ExomeDepth}
 \author{Vincent Plagnol}
@@ -15,6 +17,12 @@
 \tableofcontents
 
 \section{What is new?}
+
+Version 1.0.9:
+\begin{itemize}
+\item Bug fix to deal properly with CNV affecting last exon of a gene (thank you to Anna Fowler).
+\item Moved the vignette to knitr.
+\end{itemize}
 
 Version 1.0.9:
 \begin{itemize}
