@@ -9,7 +9,7 @@ qbetabinom <- function(p, size, phi, prob) {  ##parameterize with phi, prob inst
 
 
 qbetabinom.ab <- function (p, size, shape1, shape2)  {
-  my.p <- dbetabinom.ab(x = 0:size, , size = size, shape1 = shape1, shape2 = shape2)
+  my.p <- VGAM::dbetabinom.ab(x = 0:size, , size = size, shape1 = shape1, shape2 = shape2)
   cs <- cumsum(my.p)
   above <- which(cs > p)[1]
   below <- above - 1
@@ -66,7 +66,7 @@ get.power.betabinom <- function (size, my.phi, my.p, my.alt.p, theory = FALSE, f
     if (limit) { ##### beta approx
 
       #my.sim1 <-  rbeta(n = 2000,  shape1 = my.alt.a, shape2 = my.alt.b)
-      my.sim1 <- rbetabinom.ab( n = 2000, size = size, shape1 = my.alt.a, shape2 = my.alt.b)/size
+      my.sim1 <- VGAM::rbetabinom.ab( n = 2000, size = size, shape1 = my.alt.a, shape2 = my.alt.b)/size
                              
       my.BF <- dbeta(x = my.sim1, shape1 = my.alt.a, shape2 = my.alt.b, log = TRUE) -  dbeta(x = my.sim1, shape1 = my.a, shape2 = my.b, log = TRUE)   
       log10.my.BF <- log10(exp(1)) * my.BF
@@ -74,8 +74,8 @@ get.power.betabinom <- function (size, my.phi, my.p, my.alt.p, theory = FALSE, f
     }
 
     if (!limit) {
-      my.pr <- dbetabinom.ab(x = 0:size, size = size, shape1 = my.alt.a, shape2 = my.alt.b, log = FALSE)
-      my.BF <- dbetabinom.ab(x = 0:size, size = size, shape1 = my.alt.a, shape2 = my.alt.b, log = TRUE) - dbetabinom.ab(x = 0:size, size = size, shape1 = my.a, shape2 = my.b, log = TRUE)
+      my.pr <- VGAM::dbetabinom.ab(x = 0:size, size = size, shape1 = my.alt.a, shape2 = my.alt.b, log = FALSE)
+      my.BF <- VGAM::dbetabinom.ab(x = 0:size, size = size, shape1 = my.alt.a, shape2 = my.alt.b, log = TRUE) - VGAM::dbetabinom.ab(x = 0:size, size = size, shape1 = my.a, shape2 = my.b, log = TRUE)
       log10.my.BF <- log10(exp(1)) * my.BF
       my.res <- sum(my.pr * log10.my.BF)
     }

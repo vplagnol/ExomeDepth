@@ -280,6 +280,7 @@ I have processed the Conrad et al data in the GRanges format.
 Potentially any other reference dataset could be converted as well. See for example the exon information:
 
 << prep.GRanges>>=
+library(GenomicRanges)
 exons.hg19.GRanges <- GRanges(seqnames = exons.hg19$chromosome,
                                 IRanges(start=exons.hg19$start,end=exons.hg19$end),
                                 names = exons.hg19$name)

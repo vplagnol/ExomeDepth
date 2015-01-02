@@ -73,6 +73,7 @@ complete <- TRUE
 
 if (complete) {
   system(paste("/share/apps/R-3.1.0/bin/R CMD build --resave-data ", base, "/ExomeDepth", sep = ''))
+  system("/cluster/project8/vyp/vincent/Software/R-devel/bin/R CMD check ExomeDepth_1.1.0.tar.gz")
   system("/share/apps/R-3.1.0/bin/R CMD INSTALL  ExomeDepth_1.1.0.tar.gz")
   system(paste('cp /home/ucbtvyp/vyp/vincent/libraries/R/installed/ExomeDepth/doc/ExomeDepth-vignette.pdf .'))
 

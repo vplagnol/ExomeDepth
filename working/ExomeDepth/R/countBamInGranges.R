@@ -4,14 +4,14 @@
 countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) {
 
   rds.counts <- numeric(length(granges))
-  seq.names <- seqlevels(granges)
-  seq.names.in.bam <- names(scanBamHeader(bam.file)[[1]]$targets)
+  seq.names <- GenomicRanges::seqlevels(granges)
+  seq.names.in.bam <- names(Rsamtools::scanBamHeader(bam.file)[[1]]$targets)
 
   message('Parsing ', bam.file, ' with index ', index)
   
-  rds <- scanBam(file = bam.file,
+  rds <- Rsamtools::scanBam(file = bam.file,
                  index = index, 
-                 param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = FALSE, isNotPrimaryRead = FALSE), what = c("rname", "strand", "isize", "mapq", "pos", "isize")))[[1]]
+                 param =Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = FALSE, isNotPrimaryRead = FALSE), what = c("rname", "strand", "isize", "mapq", "pos", "isize")))[[1]]
 
   mapq.test <- (!is.na(rds$isize)) & (rds$mapq >= min.mapq) & !is.na(rds$pos) & (abs(rds$isize) < 100000) & ( ((rds$strand == "+") & (rds$isize < 0) ) | ((rds$strand == "-") & (rds$isize > 0) ) )
   mapq.test <- mapq.test[  !is.na(mapq.test) ]
@@ -19,11 +19,11 @@ countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) 
   if (sum(mapq.test, na.rm = TRUE) > 0) {
     empty <- FALSE
     
-    reads.ranges <- GRanges ( seqnames = rds$rname[ mapq.test],
-                            IRanges(start = pmin( rds$pos[ mapq.test ], rds$pos[ mapq.test ] + rds$isize [mapq.test]) , end =  pmax( rds$pos[ mapq.test ], rds$pos[ mapq.test ] + rds$isize [mapq.test])),
+    reads.ranges <- GenomicRanges::GRanges ( seqnames = rds$rname[ mapq.test],
+                            IRanges::IRanges(start = pmin( rds$pos[ mapq.test ], rds$pos[ mapq.test ] + rds$isize [mapq.test]) , end =  pmax( rds$pos[ mapq.test ], rds$pos[ mapq.test ] + rds$isize [mapq.test])),
                             strand = rds$strand[ mapq.test ])
     
-    rds.counts <- countOverlaps(granges, reads.ranges)
+    rds.counts <- GenomicRanges::countOverlaps(granges, reads.ranges)
   }
   rds.counts      
 }
@@ -33,63 +33,63 @@ countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) 
 countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, min.mapq = 1, read.width = 1, force.single.end = FALSE)  {
 
   rds.counts <- numeric(length(granges))
-  seq.names <- seqlevels(granges)
-  seq.names.in.bam <- names(scanBamHeader(bam.file)[[1]]$targets)
+  seq.names <- GenomicRanges::seqlevels(granges)
+  seq.names.in.bam <- names(Rsamtools::scanBamHeader(bam.file)[[1]]$targets)
 
   message('Parsing ', bam.file, ' with index ', index)
 
   for (seq.name in seq.names) {  ##for each chromosome
     if (seq.name %in% seq.names.in.bam) {
-      granges.subset <- granges[seqnames(granges) == seq.name]
-      strand(granges.subset) <- "*"
+      granges.subset <- granges[ GenomicRanges::seqnames(granges) == seq.name]
+      GenomicRanges::strand(granges.subset) <- "*"
 
       empty <- TRUE
       if (!force.single.end) {
       
 ############################################################################# read paired end
-        rds <- scanBam(file = bam.file,
-                       index = index, 
-                       param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = TRUE, isNotPrimaryRead = FALSE), what = c("mapq", "pos", "isize"), which = range(granges.subset)))
+        rds <- Rsamtools::scanBam(file = bam.file,
+                                  index = index, 
+                                  param = Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = TRUE, isNotPrimaryRead = FALSE), what = c("mapq", "pos", "isize"), which = range(granges.subset)))
         mapq.test <- (rds[[1]]$mapq >= min.mapq) & !is.na(rds[[1]]$pos) & (abs(rds[[1]]$isize) < 1000) & (rds[[1]]$isize > 0) & !is.na(rds[[1]]$isize)
                                         #message('----------------- ', seq.name, ' ', length(rds[[1]]$mapq))
         
         if (sum(mapq.test, na.rm = TRUE) > 0) {
           empty <- FALSE
-          rds.ranges <- GRanges(seq.name, IRanges(start = rds[[1]]$pos[mapq.test], width  = rds[[1]]$isize[mapq.test]))
-          rds.counts.seq.name <- countOverlaps(granges.subset, rds.ranges)
-          rds.counts[as.logical(seqnames(granges) == seq.name)] <- rds.counts.seq.name
+          rds.ranges <- GenomicRanges::GRanges(seq.name, IRanges::IRanges(start = rds[[1]]$pos[mapq.test], width  = rds[[1]]$isize[mapq.test]))
+          rds.counts.seq.name <- GenomicRanges::countOverlaps(granges.subset, rds.ranges)
+          rds.counts[as.logical(GenomicRanges::seqnames(granges) == seq.name)] <- rds.counts.seq.name
         }
 
       ############################################################################# read single end 
-        rds <- scanBam(bam.file,
-                       index = index, 
-                       param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isPaired = FALSE, isNotPrimaryRead = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
+        rds <- Rsamtools::scanBam(bam.file,
+                                  index = index, 
+                                  param = Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isPaired = FALSE, isNotPrimaryRead = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
         mapq.test <- (rds[[1]]$mapq >= min.mapq) & !is.na(rds[[1]]$pos) 
         
         if (sum(mapq.test, na.rm = TRUE) > 0) {
           empty <- FALSE
-          rds.ranges <- GRanges(seq.name, IRanges(start = rds[[1]]$pos[mapq.test] - 0.5*read.width + 0.5*rds[[1]]$qwidth[ mapq.test ], width = read.width))
-          rds.counts.seq.name <- countOverlaps(granges.subset, rds.ranges)
-          rds.counts[as.logical(seqnames(granges) == seq.name)] <- rds.counts.seq.name
+          rds.ranges <- GenomicRanges::GRanges(seq.name, IRanges::IRanges(start = rds[[1]]$pos[mapq.test] - 0.5*read.width + 0.5*rds[[1]]$qwidth[ mapq.test ], width = read.width))
+          rds.counts.seq.name <- GenomicRanges::countOverlaps(granges.subset, rds.ranges)
+          rds.counts[as.logical(GenomicRanges::seqnames(granges) == seq.name)] <- rds.counts.seq.name
         }
       }
 
       if (force.single.end) {  ##request to deal with reads in a single end manner
-        rds <- scanBam(bam.file,
+        rds <- Rsamtools::scanBam(bam.file,
                        index = index,
-                       param = ScanBamParam(flag = scanBamFlag(isDuplicate = FALSE, isNotPrimaryRead = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
+                       param = Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isNotPrimaryRead = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
 
         mapq.test <- (rds[[1]]$mapq >= min.mapq) & !is.na(rds[[1]]$pos)
         if (sum(mapq.test, na.rm = TRUE) ) {
           empty <- FALSE
-          rds.ranges <- GRanges(seq.name, IRanges(start = rds[[1]]$pos[mapq.test] - 0.5*read.width + 0.5*rds[[1]]$qwidth[ mapq.test ], width = read.width))
-          rds.counts.seq.name <- countOverlaps(granges.subset, rds.ranges)
-          rds.counts[as.logical(seqnames(granges) == seq.name)] <- rds.counts.seq.name
+          rds.ranges <- GenomicRanges::GRanges(seq.name, IRanges::IRanges(start = rds[[1]]$pos[mapq.test] - 0.5*read.width + 0.5*rds[[1]]$qwidth[ mapq.test ], width = read.width))
+          rds.counts.seq.name <- GenomicRanges::countOverlaps(granges.subset, rds.ranges)
+          rds.counts[as.logical(GenomicRanges::seqnames(granges) == seq.name)] <- rds.counts.seq.name
         }
       }
       
 ######################
-      if (empty) rds.counts[as.logical(seqnames(granges) == seq.name)] <- 0  ## do I need that?
+      if (empty) rds.counts[as.logical(GenomicRanges::seqnames(granges) == seq.name)] <- 0  ## do I need that?
                                         #message('Sequence ', seq.name, ' ',  rds.counts[as.logical(seqnames(granges) == seq.name)], '\n')
     }
   }
@@ -128,11 +128,11 @@ getBamCounts <- function(bed.frame = NULL, bed.file = NULL, bam.files, index.fil
   bed.frame$seqnames <- factor(bed.frame$seqnames, levels = chr.levels)  ####specifying the levels is important here to not mess up the order
   bed.frame <- bed.frame[ order(bed.frame$seqnames, bed.frame$start + bed.frame$end), ]  ##order the data frame by position
 
-  target <- GRanges(seqnames = bed.frame$seqnames,  
-                    IRanges(start=bed.frame$start+1,end=bed.frame$end))
+  target <- GenomicRanges::GRanges(seqnames = bed.frame$seqnames,  
+                    IRanges::IRanges(start=bed.frame$start+1,end=bed.frame$end))
   
-  rdata <- RangedData(space=seqnames(target),
-                      ranges=ranges(target))
+  rdata <- IRanges::RangedData(space= GenomicRanges::seqnames(target),
+                               ranges=GenomicRanges::ranges(target))
   
   if  ((ncol(bed.frame) >= 4) && (class(bed.frame[,4]) %in% c('character', 'factor'))) {    
     row.names(rdata) <- make.unique(as.character(bed.frame[,4]))  ##add exon names if available
@@ -141,11 +141,11 @@ getBamCounts <- function(bed.frame = NULL, bed.file = NULL, bam.files, index.fil
 ############################################################################# add GC content
 if (!is.null(referenceFasta)) {
   message('Reference fasta file provided so exomeDepth will compute the GC content in each window')
-    target.dnastringset <- scanFa(referenceFasta, target)
+    target.dnastringset <- Rsamtools::scanFa(referenceFasta, target)
   
     getGCcontent <- function(x) {
-      GC.count <- letterFrequency(x,"GC")
-      all.count <- letterFrequency(x,"ATGC")
+      GC.count <- Biostrings::letterFrequency(x,"GC")
+      all.count <- Biostrings::letterFrequency(x,"ATGC")
       as.vector(ifelse(all.count==0,NA,GC.count/all.count))
     }
     rdata[["GC"]] <- getGCcontent(target.dnastringset)
@@ -196,10 +196,10 @@ count.everted.reads <- function(bed.frame = NULL,
   
   if (include.chr) bed.frame$seqnames <- paste('chr', bed.frame$seqnames, sep = '')
 
-  target <- GRanges(seqnames = bed.frame$seqnames,  
-                    IRanges(start=bed.frame$start+1,end=bed.frame$end))
-  rdata <- RangedData(space=seqnames(target),
-                      ranges=ranges(target))
+  target <- GenomicRanges::GRanges(seqnames = bed.frame$seqnames,  
+                    IRanges::IRanges(start=bed.frame$start+1,end=bed.frame$end))
+  rdata <- IRanges::RangedData(space=GenomicRanges::seqnames(target),
+                               ranges=GenomicRanges::ranges(target))
   
   if  ((ncol(bed.frame) >= 4) && (class(bed.frame[,4]) %in% c('character', 'factor'))) {    
     row.names(rdata) <- make.unique(as.character(bed.frame[,4]))  ##add exon names if available

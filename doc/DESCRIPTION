@@ -3,7 +3,8 @@ Type: Package
 Title: Calls CNV from exome sequence data
 Version: 1.1.0
 Date: 2014-10-30
-Depends: R (>= 2.15.0), methods, aod, VGAM (>= 0.8.4), GenomicRanges (>= 1.8.10), Rsamtools
+Depends: R (>= 2.15.0)
+Imports: Biostrings, IRanges, Rsamtools, GenomicRanges (>= 1.8.10), aod, VGAM (>= 0.8.4)
 Suggests: knitr
 VignetteBuilder: knitr
 Author: Vincent Plagnol

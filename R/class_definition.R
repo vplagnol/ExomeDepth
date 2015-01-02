@@ -298,7 +298,7 @@ setMethod("AnnotateExtra", "ExomeDepth", function( x, reference.annotation, min.
   my.calls.GRanges <- GRanges(seqnames = x@CNV.calls$chromosome,
                               IRanges(start=x@CNV.calls$start,end= x@CNV.calls$end))
   
-  test <- findOverlaps(query = my.calls.GRanges, subject = reference.annotation)
+  test <- GenomicRanges::findOverlaps(query = my.calls.GRanges, subject = reference.annotation)
   test <- data.frame(calls = test@queryHits, ref = test@subjectHits)
   
 ###add info about the CNV calls
@@ -314,7 +314,7 @@ setMethod("AnnotateExtra", "ExomeDepth", function( x, reference.annotation, min.
   test$overlap <- pmin (test$callsref.end, test$call.end) -  pmax( test$call.start, test$callsref.start)
   test <- test[ test$overlap > min.overlap*(test$call.end - test$call.start), ]
   
-  my.split <-  split(as.character(elementMetadata(reference.annotation)$names)[ test$ref], f = test$calls)
+  my.split <-  split(as.character(GenomicRanges::elementMetadata(reference.annotation)$names)[ test$ref], f = test$calls)
   my.overlap.frame <- data.frame(call = names(my.split),  target = sapply(my.split, FUN = paste, collapse = ','))
   my.overlap.frame <- data.frame(call = names(my.split),  target = sapply(my.split, FUN = paste, collapse = ','))
   
