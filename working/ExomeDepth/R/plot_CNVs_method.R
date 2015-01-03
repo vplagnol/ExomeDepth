@@ -1,7 +1,5 @@
 
-setMethod("plot", "ExomeDepth", function(x, sequence, xlim, ylim = NULL, count.threshold = 10, ylab = 'Observed by expected read ratio', xlab = '', type = 'b', pch = '+', with.gene = FALSE, annotations = NULL, col = 'red', ...) {
-
-
+setMethod("plot", "ExomeDepth", function(x, sequence, xlim, ylim = NULL, count.threshold = 10, ylab = 'Observed by expected read ratio', xlab = '', type = 'b', pch = '+', with.gene = FALSE, col = 'red', ...) {
 
   anno <- x@annotations
   selected <-  which(anno$chromosome == sequence & anno$start >= xlim[1] & anno$end <= xlim[2] & (x@test + x@reference)*x@expected > count.threshold)
@@ -106,15 +104,15 @@ setMethod("plot", "ExomeDepth", function(x, sequence, xlim, ylim = NULL, count.t
     ################ Now subset the annotations we want to show
 
     
-    if (is.null(annotations)) {
-      anno <- x@annotations
-      selected <-  which(anno$chromosome == sequence & anno$start >= xlim[1] & anno$end <= xlim[2])
-      selected.2 <- max(min(selected) - 1, 1) :  min( max(selected) + 1, nrow(annotations))   ##complicated line that adds one exon on each side of the window
-      exon.array <- x@annotations[ selected.2,,drop = FALSE]
-    } else {
-      selected <-  which(annotations$chromosome == sequence & anno$start >= xlim[1] & annotations$end <= xlim[2])
-      exon.array <- annotations[ selected.2,,drop = FALSE]
-    }
+    #if (is.null(annotations)) {
+    #anno <- x@annotations
+    selected <-  which(anno$chromosome == sequence & anno$start >= xlim[1] & anno$end <= xlim[2])
+    selected.2 <- max(min(selected) - 1, 1) :  min( max(selected) + 1, nrow(anno))   ##complicated line that adds one exon on each side of the window
+    exon.array <- anno[ selected.2,,drop = FALSE]
+   # } else {
+   #   selected <-  which(annotations$chromosome == sequence & anno$start >= xlim[1] & annotations$end <= xlim[2])
+   #   exon.array <- annotations[ selected.2,,drop = FALSE]
+   # }
     
 
     exon.array$short.name <- gsub(exon.array$name, pattern = '-.*', replacement = '')

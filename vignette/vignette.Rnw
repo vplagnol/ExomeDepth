@@ -5,7 +5,7 @@
 \usepackage{amsmath, amsfonts, amssymb, amsthm}
 \usepackage{graphicx}
 \usepackage[margin=2cm]{geometry}
-
+\usepackage[colorlinks=true]{hyperref}
 
 \title{ExomeDepth}
 \author{Vincent Plagnol}
@@ -18,7 +18,7 @@
 
 \section{What is new?}
 
-Version 1.0.9:
+Version 1.1.0:
 \begin{itemize}
 \item Bug fix to deal properly with CNV affecting last exon of a gene (thank you to Anna Fowler).
 \item Moved the vignette to knitr.

@@ -15,6 +15,7 @@ for (folder in c('data', 'src', 'vignettes')) {
 
 file.remove (paste(base, '/ExomeDepth/man/CallCNVs-methods.Rd', sep = ''))
 file.remove (paste(base, '/ExomeDepth/man/TestCNV-methods.Rd', sep = ''))
+file.remove (paste(base, '/ExomeDepth/man/plot-methods.Rd', sep = ''))
 
 methods.file <- list.files(path = paste(base, '/ExomeDepth/man', pattern = '*methods*', full.names = TRUE))
 file.remove(methods.file)
@@ -46,7 +47,6 @@ file.copy(from = 'doc/getBamCounts.Rd', to= paste(base, '/ExomeDepth/man/getBamC
 #file.copy(from = 'doc/AddAnnotations.Rd', to= '/ugi/home/shared/vincent/libraries/R/working/ExomeDepth/man/AddAnnotations.Rd', overwrite = TRUE)
 file.copy(from = 'doc/CallCNVs.Rd', to= paste(base, '/ExomeDepth/man/CallCNVs.Rd', sep = ''), overwrite = TRUE)
 file.copy(from = 'doc/TestCNV.Rd', to= paste(base, '/ExomeDepth/man/TestCNV.Rd', sep = ''), overwrite = TRUE)
-file.copy(from = 'doc/plot-methods.Rd', to= paste(base, '/ExomeDepth/man/plot-methods.Rd', sep = ''), overwrite = TRUE)
 file.copy(from = 'doc/AnnotateExtra-methods.Rd', to= paste(base, '/ExomeDepth/man/AnnotateExtra-methods.Rd', sep = ''), overwrite = TRUE)
 file.copy(from = 'doc/AnnotateExtra.Rd', to= paste(base, '/ExomeDepth/man/AnnotateExtra.Rd', sep = ''), overwrite = TRUE)
 file.copy(from = 'doc/count.everted.reads.Rd', to= paste(base, '/ExomeDepth/man/count.everted.reads.Rd', sep = ''), overwrite = TRUE)
@@ -55,6 +55,7 @@ file.copy(from = 'doc/countBam.everted.Rd', to= paste(base, '/ExomeDepth/man/cou
 file.copy(from = 'doc/genes.hg19.Rd', to= paste(base, '/ExomeDepth/man/genes.hg19.Rd', sep = ''), overwrite = TRUE)
 file.copy(from = 'doc/exons.hg19.Rd', to= paste(base, '/ExomeDepth/man/exons.hg19.Rd', sep = ''), overwrite = TRUE)
 
+file.copy(from = 'doc/plot.ExomeDepth.Rd', to= paste(base, '/ExomeDepth/man/plot.ExomeDepth.Rd', sep = ''), overwrite = TRUE)
 
 file.copy(from = 'doc/somatic.CNV.call.Rd', to= paste(base, '/ExomeDepth/man/somatic.CNV.call.Rd', sep = ''), overwrite = TRUE)
 
