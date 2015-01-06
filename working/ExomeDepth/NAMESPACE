@@ -1,8 +1,8 @@
 exportPattern("^[[:alpha:]]+")
 exportClasses("ExomeDepth")
-exportMethods("TestCNV", "CallCNVs")
+exportMethods("TestCNV", CallCNVs)
 useDynLib(ExomeDepth, .registration=TRUE)
-importFrom(GenomicRanges, "GRanges")
-importFrom(IRanges, "IRanges")
-
-
+importFrom(GenomicRanges, GRanges, seqlevels)
+importFrom(IRanges, IRanges)
+importFrom(methods, initialize, new, show)
+importFrom(aod, betabin)

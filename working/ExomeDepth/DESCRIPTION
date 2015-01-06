@@ -1,13 +1,13 @@
 Package: ExomeDepth
 Type: Package
-Title: Calls CNV from exome sequence data
+Title: Calls Copy Number Variants from Targeted Sequence Data
 Version: 1.1.0
 Date: 2014-10-30
-Depends: R (>= 2.15.0)
-Imports: Biostrings, IRanges, Rsamtools, GenomicRanges (>= 1.8.10), aod, VGAM (>= 0.8.4), methods
+Depends: R (>= 3.0.0)
+Imports: Biostrings, IRanges, Rsamtools, GenomicRanges (>= 1.16.0), aod, VGAM (>= 0.8.4), methods
 Suggests: knitr
 VignetteBuilder: knitr
 Author: Vincent Plagnol
 Maintainer: Vincent Plagnol  <v.plagnol@ucl.ac.uk>
-Description: Calls copy number variants (CNVs) from targeted sequence data
+Description: Calls copy number variants (CNVs) from targeted sequence data, typically exome sequencing experiments designed to identify the genetic basis of Mendelian disorders.
 License: GPL-3

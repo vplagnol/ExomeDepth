@@ -32,7 +32,8 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
   //Rprintf("Number of hidden states: %d\n",nstates_c);
   //Rprintf("Number of data points: %d\n", nobs_c);
 
-  SEXP myList, final, calls_R;  //output variables
+  SEXP myList = NULL;  //output variables
+  SEXP final, calls_R;  //output variables
   
   vector<vector<double> > viterbi_prob;
   vector<vector< int> > from_where;
