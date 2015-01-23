@@ -4,9 +4,6 @@
 countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) {
 
   rds.counts <- numeric(length(granges))
-  seq.names <- GenomicRanges::seqlevels(granges)
-  seq.names.in.bam <- names(Rsamtools::scanBamHeader(bam.file)[[1]]$targets)
-
   message('Parsing ', bam.file, ' with index ', index)
   
   rds <- Rsamtools::scanBam(file = bam.file,
@@ -31,71 +28,61 @@ countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) 
 
 ################################################################################################################################################ low level function for read depth
 countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, min.mapq = 1, read.width = 1, force.single.end = FALSE)  {
+  message("Now parsing ", bam.file)
+  if (class(granges) != "GRanges") stop("Argument granges of countBamInGRanges.exomeDepth must be of the class GRanges")
+  
+  if (is.null(index)) index <- bam.file
+  
+  count.data <- rep(NA_real_, length(granges))
 
-  rds.counts <- numeric(length(granges))
-  seq.names <- GenomicRanges::seqlevels(granges)
-  seq.names.in.bam <- names(Rsamtools::scanBamHeader(bam.file)[[1]]$targets)
+  
+  seqs.in.target <- as.character(unique(GenomicRanges::seqnames(granges)))
+  seqs.in.bam.file <- gsub(pattern = 'SN:', replacement = '',
+                           as.character(grep(pattern = 'SN', unlist(Rsamtools::scanBamHeader(files = bam.file, index = index)), value = TRUE)))
 
-  message('Parsing ', bam.file, ' with index ', index)
 
-  for (seq.name in seq.names) {  ##for each chromosome
-    if (seq.name %in% seq.names.in.bam) {
-      granges.subset <- granges[ GenomicRanges::seqnames(granges) == seq.name]
-      GenomicRanges::strand(granges.subset) <- "*"
-
-      empty <- TRUE
-      if (!force.single.end) {
-      
-############################################################################# read paired end
-        rds <- Rsamtools::scanBam(file = bam.file,
-                                  index = index, 
-                                  param = Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = TRUE, isNotPrimaryRead = FALSE), what = c("mapq", "pos", "isize"), which = range(granges.subset)))
-        mapq.test <- (rds[[1]]$mapq >= min.mapq) & !is.na(rds[[1]]$pos) & (abs(rds[[1]]$isize) < 1000) & (rds[[1]]$isize > 0) & !is.na(rds[[1]]$isize)
-                                        #message('----------------- ', seq.name, ' ', length(rds[[1]]$mapq))
-        
-        if (sum(mapq.test, na.rm = TRUE) > 0) {
-          empty <- FALSE
-          rds.ranges <- GenomicRanges::GRanges(seq.name, IRanges::IRanges(start = rds[[1]]$pos[mapq.test], width  = rds[[1]]$isize[mapq.test]))
-          rds.counts.seq.name <- GenomicRanges::countOverlaps(granges.subset, rds.ranges)
-          rds.counts[as.logical(GenomicRanges::seqnames(granges) == seq.name)] <- rds.counts.seq.name
-        }
-
-      ############################################################################# read single end 
-        rds <- Rsamtools::scanBam(bam.file,
-                                  index = index, 
-                                  param = Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isPaired = FALSE, isNotPrimaryRead = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
-        mapq.test <- (rds[[1]]$mapq >= min.mapq) & !is.na(rds[[1]]$pos) 
-        
-        if (sum(mapq.test, na.rm = TRUE) > 0) {
-          empty <- FALSE
-          rds.ranges <- GenomicRanges::GRanges(seq.name, IRanges::IRanges(start = rds[[1]]$pos[mapq.test] - 0.5*read.width + 0.5*rds[[1]]$qwidth[ mapq.test ], width = read.width))
-          rds.counts.seq.name <- GenomicRanges::countOverlaps(granges.subset, rds.ranges)
-          rds.counts[as.logical(GenomicRanges::seqnames(granges) == seq.name)] <- rds.counts.seq.name
-        }
-      }
-
-      if (force.single.end) {  ##request to deal with reads in a single end manner
-        rds <- Rsamtools::scanBam(bam.file,
-                       index = index,
-                       param = Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isNotPrimaryRead = FALSE), what = c("pos", "mapq", "qwidth"), which = range(granges.subset)))
-
-        mapq.test <- (rds[[1]]$mapq >= min.mapq) & !is.na(rds[[1]]$pos)
-        if (sum(mapq.test, na.rm = TRUE) ) {
-          empty <- FALSE
-          rds.ranges <- GenomicRanges::GRanges(seq.name, IRanges::IRanges(start = rds[[1]]$pos[mapq.test] - 0.5*read.width + 0.5*rds[[1]]$qwidth[ mapq.test ], width = read.width))
-          rds.counts.seq.name <- GenomicRanges::countOverlaps(granges.subset, rds.ranges)
-          rds.counts[as.logical(GenomicRanges::seqnames(granges) == seq.name)] <- rds.counts.seq.name
-        }
-      }
-      
-######################
-      if (empty) rds.counts[as.logical(GenomicRanges::seqnames(granges) == seq.name)] <- 0  ## do I need that?
-                                        #message('Sequence ', seq.name, ' ',  rds.counts[as.logical(seqnames(granges) == seq.name)], '\n')
+  ####### first check for consistency between BAM and target regions
+  if (sum(! seqs.in.target %in% seqs.in.bam.file)) {  ### if some sequences are missing
+    if (sum(!paste0("chr", seqs.in.target) %in% seqs.in.bam.file) == 0) {
+      warning("Apparently the BAM file uses the convention chr1 instead of 1 for chromosome names, but your target sequence does not. Therefore, adding the chr prefix to the target intervals")
+      GenomicRanges::seqnames(target) <- paste0('chr', GenomicRanges::seqnames(target))
+      seqs.in.target <- as.character(unique(GenomicRanges::seqnames(granges)))
     }
   }
-  rds.counts
-}
 
+#####  second check for consistency between BAM and target regions
+  if (sum(! seqs.in.target %in% seqs.in.bam.file)) {  ### if some sequences are missing
+    print("Problematic sequences:")
+    print( seqs.in.target [ ! seqs.in.target %in% seqs.in.bam.file ])
+    stop("Some sequences in the target data frame cannot be found in the index of the BAM file")
+  }
+
+
+  for (seq in seqs.in.target) { ##splits by chromosome to limit memory requirements
+    message("Parsing chromosome ", seq)
+    target.local1 <- GenomicRanges::GRanges(seqnames = seq,
+                                           IRanges::IRanges(start=1, end = 5*10^8))
+    target.local2 <-  granges[ GenomicRanges::seqnames(granges) == seq,]
+
+    my.param <- Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isUnmappedQuery = FALSE, hasUnmappedMate = FALSE,
+                                          isPaired = TRUE, isProperPair = TRUE, isNotPrimaryRead = FALSE),
+                                        what = c("mapq", "pos", "isize"), which = target.local1)
+    gal <- GenomicAlignments::readGAlignments(file = bam.file, index = index, param = my.param)
+    gal <- as(gal, 'data.frame')
+    gal <- gal[ gal$mapq > min.mapq & gal$isize > 0, ]
+
+    gal <- GenomicRanges::GRanges( seqnames = gal$seqnames,
+                                  IRanges::IRanges(start= gal$start, end = gal$start + gal$isize))
+
+    count.data[ which (as.logical(GenomicRanges::seqnames(granges) == seq)) ]  <- GenomicRanges::countOverlaps ( query = target.local2, subjec = gal)
+
+    ##counts <- GenomicRanges::countOverlaps ( query = target.local2, subjec = gal)
+    ##counts2 <- GenomicRanges::assay(GenomicAlignments::summarizeOverlaps ( features = target.local2, reads = gal))[,1]
+  }
+
+  if (sum(is.na(count.data) > 0)) stop('There is a bug here and count data should not contain any missing value')
+  return(count.data)
+}
 
 
 
@@ -104,6 +91,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
 
 getBamCounts <- function(bed.frame = NULL, bed.file = NULL, bam.files, index.files = bam.files,
                          min.mapq = 20, read.width = 300, include.chr = FALSE, referenceFasta = NULL, force.single.end = FALSE) {
+
   if (is.null(bed.frame)) {
     if (is.null(bed.file)) {
       stop("If no bed data frame is provided there must be a link to a bed file")
@@ -140,7 +128,7 @@ getBamCounts <- function(bed.frame = NULL, bed.file = NULL, bam.files, index.fil
   
 ############################################################################# add GC content
 if (!is.null(referenceFasta)) {
-  message('Reference fasta file provided so exomeDepth will compute the GC content in each window')
+  message('Reference fasta file provided so ExomeDepth will compute the GC content in each window')
     target.dnastringset <- Rsamtools::scanFa(referenceFasta, target)
   
     getGCcontent <- function(x) {
@@ -155,18 +143,20 @@ if (!is.null(referenceFasta)) {
   nfiles <- length(bam.files)
   message('Parse ', nfiles, ' BAM files')
   print(bam.files)
+
+
+  my.param <- Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = TRUE, isNotPrimaryRead = FALSE),
+                                      what = c("mapq", "pos", "isize"), )
+
+
   
   for (i in 1:nfiles) {
     bam <- bam.files[ i ]
     index <- index.files[ i ]
-    
-    rdata[[ basename(bam) ]] <- countBamInGRanges.exomeDepth(bam.file = bam,
-                                                             index = index,
-                                                             granges = target,
-                                                             min.mapq = min.mapq,
-                                                             read.width = read.width,
-                                                             force.single.end = force.single.end)
+    rdata[[ basename(bam) ]] <- countBamInGRanges.exomeDepth ( bam.file = bam, index = index, granges = target, min.mapq = min.mapq, force.single.end = force.single.end)
+    message("Number of counted fragments : ", sum(rdata[[ basename(bam) ]]))
   }
+  
   return(rdata)
 }
 

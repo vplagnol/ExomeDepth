@@ -18,6 +18,13 @@
 
 \section{What is new?}
 
+
+Version 1.1.4:
+\begin{itemize}
+\item Bug fix: the parsing of the BAM file was extremely slow because of improper handling of paired end reads.
+\end{itemize}
+
+
 Version 1.1.0:
 \begin{itemize}
 \item Bug fix to deal properly with CNV affecting last exon of a gene (thank you to Anna Fowler).
@@ -262,7 +269,7 @@ head(Conrad.hg19.common.CNVs)
 Note that as for all functions in this package, the default naming for chromosomes is ``1'' rather than ``chr1''.
 You can check it from a GenomicRanges object using
 <<check.chr>>=
-GenomicRanges::seqlevels(Conrad.hg19.common.CNVs)
+levels(GenomicRanges::seqnames(Conrad.hg19.common.CNVs))
 @ 
 
 Then one can use this information to annotate our CNV calls with the function \texttt{AnnotateExtra}.
