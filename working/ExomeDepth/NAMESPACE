@@ -8,3 +8,6 @@ importFrom(GenomicAlignments, readGAlignments, readGAlignmentPairs, summarizeOve
 importFrom(IRanges, IRanges)
 importFrom(methods, initialize, new, show)
 importFrom(aod, betabin)
+importFrom("graphics", "axTicks", "axis", "layout", "lines", "par", "points", "polygon", "text")
+importFrom("stats", "approxfun", "as.formula", "cor", "dbeta","dbinom", "median", "quantile")
+importFrom("utils", "read.delim")
