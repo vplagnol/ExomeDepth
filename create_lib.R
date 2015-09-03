@@ -8,7 +8,7 @@ package.skeleton(name="ExomeDepth",
                  force=TRUE)
 
 
-for (folder in c('data', 'src', 'vignettes')) {
+for (folder in c('data', 'src', 'vignettes', 'inst', 'inst/doc')) {
   my.folder <- paste(base, '/ExomeDepth/', folder, sep = '')
   if (!file.exists(my.folder)) dir.create(path = my.folder)
 }
@@ -71,8 +71,8 @@ file.copy(from = "vignette/vignette.Rnw", to = paste(base, '/ExomeDepth/vignette
 
 
 
-system(paste("/cluster/project8/vyp/vincent/Software/R-3.1.2/bin/R CMD build --resave-data ", base, "/ExomeDepth", sep = ''))
-system("/cluster/project8/vyp/vincent/Software/R-3.1.2/bin/R CMD INSTALL  ExomeDepth_1.1.4.tar.gz")
+system(paste("/cluster/project8/vyp/vincent/Software/R-3.2.0/bin/R CMD build --resave-data ", base, "/ExomeDepth", sep = ''))
+system("/cluster/project8/vyp/vincent/Software/R-3.2.0/bin/R CMD INSTALL  ExomeDepth_1.1.6.tar.gz")
 system(paste('cp /home/ucbtvyp/vyp/vincent/libraries/R/installed/ExomeDepth/doc/ExomeDepth-vignette.pdf .'))
 
 ##system("/cluster/project8/vyp/vincent/Software/R-devel/bin/R CMD check --as-cran ExomeDepth_1.1.0.tar.gz")

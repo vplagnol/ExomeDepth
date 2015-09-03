@@ -1,5 +1,5 @@
 %\VignetteEngine{knitr::knitr}
-%\VignetteIndexEntry{Using ExomeDepth}
+%\VignetteIndexEntry{ExomeDepth}
 
 \documentclass[10pt]{article}
 \usepackage{amsmath, amsfonts, amssymb, amsthm}
@@ -18,6 +18,16 @@
 
 \section{What is new?}
 
+
+Version 1.1.6:
+\begin{itemize}
+\item Bug fix: some issues when some chromosomes had 0 call
+\end{itemize}
+
+Version 1.1.5:
+\begin{itemize}
+\item Bug fix: annotations were missing in version 1.1.4
+\end{itemize}
 
 Version 1.1.4:
 \begin{itemize}

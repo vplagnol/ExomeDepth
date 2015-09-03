@@ -27,13 +27,13 @@ countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) 
 
 
 ################################################################################################################################################ low level function for read depth
-countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, min.mapq = 1, read.width = 1, force.single.end = FALSE)  {
+countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, min.mapq = 1, read.width = 1) {
   message("Now parsing ", bam.file)
   if (class(granges) != "GRanges") stop("Argument granges of countBamInGRanges.exomeDepth must be of the class GRanges")
   
   if (is.null(index)) index <- bam.file
   
-  count.data <- rep(NA_real_, length(granges))
+  count.data <- rep(0, length(granges))
 
   
   seqs.in.target <- as.character(unique(GenomicRanges::seqnames(granges)))
@@ -59,25 +59,41 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
 
 
   for (seq in seqs.in.target) { ##splits by chromosome to limit memory requirements
+    #seq <- '22' ##useful for debugging
     message("Parsing chromosome ", seq)
     target.local1 <- GenomicRanges::GRanges(seqnames = seq,
                                            IRanges::IRanges(start=1, end = 5*10^8))
+    
     target.local2 <-  granges[ GenomicRanges::seqnames(granges) == seq,]
+    my.rows <- which (as.logical(GenomicRanges::seqnames(granges) == seq))
+    
+######## paired end reads
+    my.param.pairs <- Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isUnmappedQuery = FALSE, hasUnmappedMate = FALSE,
+                                                isPaired = TRUE, isProperPair = TRUE, isNotPrimaryRead = FALSE),
+                                              what = c("mapq", "pos", "isize"), which = target.local1)
+    gal <- GenomicAlignments::readGAlignments(file = bam.file, index = index, param = my.param.pairs)
+    if (length(gal) > 0) {
+      gal <- as(gal, 'data.frame')
+      gal <- gal[ gal$mapq > min.mapq & gal$isize > 0, ]
+      
+      gal <- GenomicRanges::GRanges( seqnames = gal$seqnames,
+                                    IRanges::IRanges(start= gal$start, end = gal$start + gal$isize))
+      count.data[ my.rows ]  <- count.data[ my.rows ] +  GenomicRanges::countOverlaps ( query = target.local2, subjec = gal)
+    }
 
-    my.param <- Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isUnmappedQuery = FALSE, hasUnmappedMate = FALSE,
-                                          isPaired = TRUE, isProperPair = TRUE, isNotPrimaryRead = FALSE),
-                                        what = c("mapq", "pos", "isize"), which = target.local1)
-    gal <- GenomicAlignments::readGAlignments(file = bam.file, index = index, param = my.param)
-    gal <- as(gal, 'data.frame')
-    gal <- gal[ gal$mapq > min.mapq & gal$isize > 0, ]
-
-    gal <- GenomicRanges::GRanges( seqnames = gal$seqnames,
-                                  IRanges::IRanges(start= gal$start, end = gal$start + gal$isize))
-
-    count.data[ which (as.logical(GenomicRanges::seqnames(granges) == seq)) ]  <- GenomicRanges::countOverlaps ( query = target.local2, subjec = gal)
-
-    ##counts <- GenomicRanges::countOverlaps ( query = target.local2, subjec = gal)
-    ##counts2 <- GenomicRanges::assay(GenomicAlignments::summarizeOverlaps ( features = target.local2, reads = gal))[,1]
+    ########### single end reads
+    my.param.single <- Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isPaired = FALSE,  isNotPrimaryRead = FALSE),
+                                               what = c("mapq", "pos"), which = target.local1)
+    gal.single <- GenomicAlignments::readGAlignments(file = bam.file, index = index, param = my.param.single)
+    if (length(gal.single) > 0) {
+      message('Some single end reads detected in this BAM file')
+      gal.single <- as(gal.single, 'data.frame')
+      gal.single <- gal.single[ gal.single$mapq > min.mapq,  ]
+      
+      gal.single <- GenomicRanges::GRanges( seqnames = gal.single$seqnames,
+                                    IRanges::IRanges(start= gal.single$start, end = gal.single$start + read.width))
+      count.data[ my.rows ]  <- count.data[ my.rows ] +  GenomicRanges::countOverlaps ( query = target.local2, subjec = gal.single)
+    }
   }
 
   if (sum(is.na(count.data) > 0)) stop('There is a bug here and count data should not contain any missing value')
@@ -90,7 +106,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
 ##########################################################################################################################################################  master function for exomeDepth read counting
 
 getBamCounts <- function(bed.frame = NULL, bed.file = NULL, bam.files, index.files = bam.files,
-                         min.mapq = 20, read.width = 300, include.chr = FALSE, referenceFasta = NULL, force.single.end = FALSE) {
+                         min.mapq = 20, read.width = 300, include.chr = FALSE, referenceFasta = NULL) {
 
   if (is.null(bed.frame)) {
     if (is.null(bed.file)) {
@@ -153,7 +169,7 @@ if (!is.null(referenceFasta)) {
   for (i in 1:nfiles) {
     bam <- bam.files[ i ]
     index <- index.files[ i ]
-    rdata[[ basename(bam) ]] <- countBamInGRanges.exomeDepth ( bam.file = bam, index = index, granges = target, min.mapq = min.mapq, force.single.end = force.single.end)
+    rdata[[ basename(bam) ]] <- countBamInGRanges.exomeDepth ( bam.file = bam, index = index, granges = target, min.mapq = min.mapq, read.width = read.width)
     message("Number of counted fragments : ", sum(rdata[[ basename(bam) ]]))
   }
   

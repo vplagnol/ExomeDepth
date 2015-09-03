@@ -9,7 +9,7 @@
 }
 \usage{
 countBamInGRanges.exomeDepth(bam.file, index = bam.file, granges,
-min.mapq = 1, read.width = 1, force.single.end = FALSE)
+min.mapq = 1, read.width = 1)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -21,9 +21,6 @@ min.mapq = 1, read.width = 1, force.single.end = FALSE)
   \item{read.width}{For single end reads, an estimate of the frament
     size. For paired reads, the fragment size can be directly computed
     from the paired alignment and this value is ignored.}
-  \item{force.single.end}{Treat all paired reads as single end. It is
-    generally a bad idea but may be useful in some rare situations. Only
-    use this option if you really know what you are doing.}
 }
 \details{
   Largely derived from its equivalent function in the exomeCopy package.

@@ -213,7 +213,7 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
     my.calls$calls$start.p <- my.calls$calls$start.p -1  ##remove the dummy exon, which has now served its purpose
     my.calls$calls$end.p <- my.calls$calls$end.p -1  ##remove the dummy exon, which has now served its purpose
     #loc.likelihood <- loc.likelihood[ -1, c(2,1, 3) ]  ##remove the dummy exon, which has now served its purpose
-    loc.likelihood <- loc.likelihood[ -c(1,nrow(loc.likelihood)), c(2,1, 3) ] ##remove both of the dummy exons, which have now served their purpose
+    loc.likelihood <- loc.likelihood[ -c(1,nrow(loc.likelihood)), c(2,1, 3), drop = FALSE ] ##remove both of the dummy exons, which have now served their purpose
     
   ################################ Now make it look better, add relevant info
     if (nrow(my.calls$calls) > 0) {
@@ -288,32 +288,26 @@ setGeneric("AnnotateExtra", def = function(x, reference.annotation, min.overlap 
 
 
 setMethod("AnnotateExtra", "ExomeDepth", function( x, reference.annotation, min.overlap, column.name) {
-
-  if (packageVersion('GenomicRanges') < '1.8.10') {
-    warning('The AnnotateExtra function requires a more recent version of the GenomicRanges package (>= 1.8.10). The easiest way to install is probably to use R version >  2.15 and the bioconductor scripts. This function will therefore annotate the same object without the added annotations')
-    return(x)
-  }
- 
   
-  my.calls.GRanges <- GRanges(seqnames = x@CNV.calls$chromosome,
-                              IRanges(start=x@CNV.calls$start,end= x@CNV.calls$end))
-  
+  my.calls.GRanges <- GenomicRanges::GRanges(seqnames = factor(x@CNV.calls$chromosome),
+                              IRanges::IRanges(start=x@CNV.calls$start,end= x@CNV.calls$end))
+  ##browser()
   test <- GenomicRanges::findOverlaps(query = my.calls.GRanges, subject = reference.annotation)
   test <- data.frame(calls = test@queryHits, ref = test@subjectHits)
-  
+
 ###add info about the CNV calls
   test$call.start <- x@CNV.calls$start[ test$calls ]
   test$call.end <- x@CNV.calls$end[ test$calls ]
   test$chromosome.end <- x@CNV.calls$chromosome[ test$calls ]
   
   ## info about the reference calls
-  test$callsref.start <- start(reference.annotation) [ test$ref ]
-  test$callsref.end<- end(reference.annotation) [ test$ref ]
+  test$callsref.start <- GenomicRanges::start(reference.annotation) [ test$ref ]
+  test$callsref.end<- GenomicRanges::end(reference.annotation) [ test$ref ]
   
 ### estimate the overlap
   test$overlap <- pmin (test$callsref.end, test$call.end) -  pmax( test$call.start, test$callsref.start)
-  test <- test[ test$overlap > min.overlap*(test$call.end - test$call.start), ]
-  
+  test <- test [test$overlap > min.overlap*(test$call.end - test$call.start), ]
+
   my.split <-  split(as.character(GenomicRanges::elementMetadata(reference.annotation)$names)[ test$ref], f = test$calls)
   my.overlap.frame <- data.frame(call = names(my.split),  target = sapply(my.split, FUN = paste, collapse = ','))
   my.overlap.frame <- data.frame(call = names(my.split),  target = sapply(my.split, FUN = paste, collapse = ','))
