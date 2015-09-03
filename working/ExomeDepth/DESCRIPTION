@@ -2,7 +2,7 @@ Package: ExomeDepth
 Type: Package
 Title: Calls Copy Number Variants from Targeted Sequence Data
 Version: 1.1.6
-Date: 2015-06-30
+Date: 2015-09-01
 Depends: R (>= 3.1.0)
 Imports: Biostrings, IRanges, Rsamtools, GenomicRanges (>= 1.16.0), aod, VGAM (>= 0.8.4), methods, GenomicAlignments
 Suggests: knitr
