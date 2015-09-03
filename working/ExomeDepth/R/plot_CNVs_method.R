@@ -123,7 +123,7 @@ setMethod("plot", "ExomeDepth", function(x, sequence, xlim, ylim = NULL, count.t
       if (exon.array$short.name[ nrow(exon.array)]  != exon.array$short.name[ nrow(exon.array)-1]) {exon.array <- exon.array[-nrow(exon.array), ]}
     }
     
-    exon.array$start.gene <- tapply(IND = exon.array$short.name, exon.array$start, FUN = min) [ exon.array$short.name ]  
+    exon.array$start.gene <- tapply(INDEX = exon.array$short.name, exon.array$start, FUN = min) [ exon.array$short.name ]  
     exon.array$middle <- 0.5*(exon.array$start + exon.array$end)
     exon.array <- exon.array[ exon.array$short.name != 'RP11' &
                              ! grepl(pattern = 'ENST.*', exon.array$short.name) &
