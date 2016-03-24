@@ -1,5 +1,6 @@
 #Rbin <- "/cluster/project8/vyp/vincent/Software/R-3.2.0/bin/R"
-Rbin <- "/usr/bin/R"
+#Rbin <- "/usr/bin/R"
+Rbin <- "/share/apps/R-3.2.2/bin/R"
 #Rbin <- " ../R-devel/bin/R"
 
 
@@ -74,8 +75,9 @@ file.copy(from = "vignette/vignette.Rnw", to = paste(base, '/ExomeDepth/vignette
 
 
 
+#system(paste(Rbin, " CMD build ", base, "/ExomeDepth", sep = ''))
 system(paste(Rbin, " CMD build --resave-data ", base, "/ExomeDepth", sep = ''))
-system(paste(Rbin, " CMD INSTALL  ExomeDepth_1.1.6.tar.gz"))
+system(paste(Rbin, " CMD INSTALL  ExomeDepth_1.1.9.tar.gz"))
 system(paste('cp /home/ucbtvyp/vyp/vincent/libraries/R/installed/ExomeDepth/doc/ExomeDepth-vignette.pdf .'))
 
 ##system("/cluster/project8/vyp/vincent/Software/R-devel/bin/R CMD check --as-cran ExomeDepth_1.1.0.tar.gz")

@@ -8,7 +8,7 @@ countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) 
   
   rds <- Rsamtools::scanBam(file = bam.file,
                  index = index, 
-                 param =Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = FALSE, isNotPrimaryRead = FALSE), what = c("rname", "strand", "isize", "mapq", "pos", "isize")))[[1]]
+                 param =Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = FALSE, isSecondaryAlignment = FALSE), what = c("rname", "strand", "isize", "mapq", "pos", "isize")))[[1]]
 
   mapq.test <- (!is.na(rds$isize)) & (rds$mapq >= min.mapq) & !is.na(rds$pos) & (abs(rds$isize) < 100000) & ( ((rds$strand == "+") & (rds$isize < 0) ) | ((rds$strand == "-") & (rds$isize > 0) ) )
   mapq.test <- mapq.test[  !is.na(mapq.test) ]
@@ -69,7 +69,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
     
 ######## paired end reads
     my.param.pairs <- Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isUnmappedQuery = FALSE, hasUnmappedMate = FALSE,
-                                                isPaired = TRUE, isProperPair = TRUE, isNotPrimaryRead = FALSE),
+                                                isPaired = TRUE, isProperPair = TRUE, isSecondaryAlignment = FALSE),
                                               what = c("mapq", "pos", "isize"), which = target.local1)
     gal <- GenomicAlignments::readGAlignments(file = bam.file, index = index, param = my.param.pairs)
     if (length(gal) > 0) {
@@ -82,7 +82,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
     }
 
     ########### single end reads
-    my.param.single <- Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isPaired = FALSE,  isNotPrimaryRead = FALSE),
+    my.param.single <- Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isPaired = FALSE,  isSecondaryAlignment = FALSE),
                                                what = c("mapq", "pos"), which = target.local1)
     gal.single <- GenomicAlignments::readGAlignments(file = bam.file, index = index, param = my.param.single)
     if (length(gal.single) > 0) {
@@ -161,7 +161,7 @@ if (!is.null(referenceFasta)) {
   print(bam.files)
 
 
-  my.param <- Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = TRUE, isNotPrimaryRead = FALSE),
+  my.param <- Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = TRUE, isSecondaryAlignment = FALSE),
                                       what = c("mapq", "pos", "isize"), )
 
 

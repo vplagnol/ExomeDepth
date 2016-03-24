@@ -19,6 +19,11 @@
 \section{What is new?}
 
 
+Version 1.1.8:
+\begin{itemize}
+\item Removed the NAMESPACE assay export for GenomicRanges, as this function is not used and was preventing install with R-devel.
+\end{itemize}
+
 Version 1.1.6:
 \begin{itemize}
 \item Bug fix: some issues when some chromosomes had 0 call
@@ -324,12 +329,12 @@ Note the metadata column \texttt{names} which MUST be specified for the annotati
 
 \section{Visual display}
 
-The ExomeDepth package includes a plot function for ExomeDepth objects. This function shows the ratio between observed and expected read depth.
+The ExomeDepth package includes a plot function for ExomeDepth objects. This function shows the ratio between observed and expected read depth (Figure \ref{RHD.fig}).
 The 95\% confidence interval is marked by a grey shaded area.
 Here we use a common CNV located in the {\it RHD} gene as an example. 
 We can see that the individual in question has more copies than the average (in fact two functional copies of {\it RHD}, which corresponds to rhesus positive).
 
-\begin{figure}
+\begin{figure}[!htb]
 <<echo = TRUE, fig.width = 4, fig.height = 4>>=
 plot (all.exons,
       sequence = '1',
@@ -340,8 +345,10 @@ plot (all.exons,
       with.gene = TRUE)
 @ 
 \caption{An ExomeDepth CNV plot in a region that contains a common deletion of the human genome (this deletion partly defines the Rhesus blood group).}
+\label{RHD.fig}
 \end{figure}
 
+\clearpage
 
 \section{How to loop over the multiple samples}
 A FAQ is a way to deal with a set of a significant number of exomes, i.e. how to loop over all of them using ExomeDepth.
