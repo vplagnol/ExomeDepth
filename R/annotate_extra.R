@@ -9,9 +9,10 @@ setMethod("AnnotateExtra", "ExomeDepth", function( x, reference.annotation, min.
   ##browser()
   print(my.calls.GRanges)
   test <- GenomicRanges::findOverlaps(query = my.calls.GRanges, subject = reference.annotation)
-  test <- data.frame(calls = test@queryHits, ref = test@subjectHits)
+  #test <- data.frame(calls = test@queryHits, ref = test@subjectHits)
+  test <- data.frame(calls = GenomicRanges::queryHits(test), ref = GenomicRanges::subjectHits(test))
 
-  print(test)
+  #print(test)
 ###add info about the CNV calls
   test$call.start <- x@CNV.calls$start[ test$calls ]
   test$call.end <- x@CNV.calls$end[ test$calls ]
