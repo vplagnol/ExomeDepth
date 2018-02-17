@@ -1,9 +1,3 @@
-#Rbin <- "/cluster/project8/vyp/vincent/Software/R-3.2.0/bin/R"
-#Rbin <- "/usr/bin/R"
-#Rbin <- "/share/apps/R-3.2.2/bin/R"
-Rbin <- "/cluster/project8/vyp/vincent/Software/R-3.3.0/bin/R"
-
-
 base <- 'working'
 system(paste('rm ', base, '/ExomeDepth/R/*', sep = ''))
 package.skeleton(name="ExomeDepth",
@@ -72,12 +66,6 @@ file.copy(from = 'doc/viterbi.hmm.Rd', to= paste(base, '/ExomeDepth/man/viterbi.
 
 file.copy(from = 'doc/ExomeDepth-package.Rd', to= paste(base, '/ExomeDepth/man/ExomeDepth-package.Rd', sep = ''), overwrite = TRUE)
 file.copy(from = "vignette/vignette.Rnw", to = paste(base, '/ExomeDepth/vignettes/ExomeDepth-vignette.Rnw', sep =''), overwrite = TRUE)
-
-
-
-#system("R CMD build ", base, "/ExomeDepth", sep = '')
-system(paste0("R CMD build --resave-data ", base, "/ExomeDepth"))
-system("R  CMD INSTALL  ExomeDepth_1.1.10.tar.gz")
 
 
 

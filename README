@@ -1,7 +1,8 @@
-A call to R as show below:
+# Build instructions
 
-R < create_lib.R --no-save
+make build
 
-should create the relevant version of the ExomeDepth package, with the version number defined by doc/DESCRIPTION
-The create_lib.R must also be changed to reflect the different version number I think.
+should create the relevant version of the ExomeDepth package and build.
+
+
 
