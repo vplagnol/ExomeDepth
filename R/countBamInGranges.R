@@ -73,7 +73,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
                                               what = c("mapq", "pos", "isize"), which = target.local1)
     gal <- GenomicAlignments::readGAlignments(file = bam.file, index = index, param = my.param.pairs)
     if (length(gal) > 0) {
-      gal <- as(gal, 'data.frame')
+      gal <- methods::as(gal, 'data.frame')
       gal <- gal[ gal$mapq > min.mapq & gal$isize > 0, ]
       
       gal <- GenomicRanges::GRanges( seqnames = gal$seqnames,
@@ -87,7 +87,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
     gal.single <- GenomicAlignments::readGAlignments(file = bam.file, index = index, param = my.param.single)
     if (length(gal.single) > 0) {
       message('Some single end reads detected in this BAM file')
-      gal.single <- as(gal.single, 'data.frame')
+      gal.single <- methods::as(gal.single, 'data.frame')
       gal.single <- gal.single[ gal.single$mapq > min.mapq,  ]
       
       gal.single <- GenomicRanges::GRanges( seqnames = gal.single$seqnames,
