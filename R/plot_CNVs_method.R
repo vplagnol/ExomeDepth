@@ -1,5 +1,29 @@
 
-setMethod("plot", "ExomeDepth", function(x, sequence, xlim, ylim = NULL, count.threshold = 10, ylab = 'Observed by expected read ratio', xlab = '', type = 'b', pch = '+', with.gene = FALSE, col = 'red', ...) {
+#' Plotting function for ExomeDepth objects
+#'
+#' Plot function for the ExomeDepth class
+#'
+#' @name plot-methods
+#' @aliases plot-methods plot.ExomeDepth plot,ANY-method
+#' plot,ExomeDepth,ANY-method plot,ExomeDepth-method
+#' @docType methods
+#' @param x ExomeDepth object
+#' @param sequence character, Name of the sequence/chromosome of the region to plot (for example "chr5" would be typical)
+#' @param xlim numeric of size 2, start and end position of the region to plot
+#' @param ylim numeric of size 2, range for the y-axis
+#' @param count.threshold numeric, minimum number of reads in the reference set to display a point in the plot
+#' @param ylab Defaults to ''
+#' @param xlab Defaults to ''
+#' @param type Defaults to 'b'
+#' @param pch Defaults to '+'
+#' @param with.gene Logical, defaults to FALSE, Should the gene information (obtained from the annotation data) be plotted under the read depth plot?
+#' @param col character, Colour for the line displaying the read depth ratio for each exon
+
+
+
+setMethod("plot",
+          "ExomeDepth",
+          function(x, sequence, xlim, ylim = NULL, count.threshold = 10, ylab = 'Observed by expected read ratio', xlab = '', type = 'b', pch = '+', with.gene = FALSE, col = 'red', ...) {
 
   anno <- x@annotations
   selected <-  which(anno$chromosome == sequence & anno$start >= xlim[1] & anno$end <= xlim[2] & (x@test + x@reference)*x@expected > count.threshold)

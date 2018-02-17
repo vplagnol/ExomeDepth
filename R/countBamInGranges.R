@@ -1,5 +1,24 @@
 
-################################################################################################################################################ low level function for everted reads
+
+#' Counts everted reads from a single BAM file
+#'
+#' This is a utility function that is called by the higher level
+#' count.everted.reads. It processes each BAM file individually to generate the
+#' count data.
+#'
+#' Most users will not use this function, and it will only be called by the
+#' higher level count.everted.reads. Nevertheless it may be useful on its own
+#' in some cases.
+#'
+#' @param bam.file BAM file that needs to be parsed
+#' @param granges Genomic Ranges object with the location of the bins for which
+#' we want to count the everted reads.
+#' @param index Index for the BAM files.
+#' @param min.mapq Minimum mapping quality to include reads.
+#' @return A list with the number of reads in each bin.
+#' @author Vincent Plagnol
+#' @seealso count.everted.reads
+
 
 countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) {
 
@@ -26,7 +45,24 @@ countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) 
 }
 
 
-################################################################################################################################################ low level function for read depth
+###################################################################################################### low level function for read depth
+
+#' Compute read count data from BAM files.
+#'
+#' Parses a BAM file and count reads that are located within a target region
+#' defined by a GenomicRanges object.
+#'
+#' Largely derived from its equivalent function in the exomeCopy package.
+#'
+#' @param bam.file BAM file to be parsed
+#' @param index Index of the BAM file, without the '.bai' suffix.
+#' @param granges Genomic ranges object defining the bins
+#' @param min.mapq Minimum read mapping quality (Phred scaled).
+#' @param read.width For single end reads, an estimate of the frament size. For
+#' paired reads, the fragment size can be directly computed from the paired
+#' alignment and this value is ignored.
+#' @return A GRanges object with count data.
+
 countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, min.mapq = 1, read.width = 1) {
   message("Now parsing ", bam.file)
   if (class(granges) != "GRanges") stop("Argument granges of countBamInGRanges.exomeDepth must be of the class GRanges")
@@ -103,7 +139,51 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
 
 
 
-##########################################################################################################################################################  master function for exomeDepth read counting
+#########################################################################################  master function for exomeDepth read counting
+
+#' Get count data for multiple exomes
+#'
+#' Essentially a wrapper for the accessory function countBamInGRanges which
+#' only considers a single BAM file at a time.
+#'
+#' This function is largely a copy of a similar one available in the exomeCopy
+#' package.
+#'
+#' @param bed.frame \code{data.frame} containing the definition of the regions.
+#' The first three columns must be chromosome, start, end.
+#' @param bed.file \code{character} file name. Target BED file with the
+#' definition of the regions. This file will only be used if no bed.frame
+#' argument is provided. No headers are assumed so remove them if they exist.
+#' Either a bed.file or a bed.frame must be provided for this function to run.
+#' @param bam.files \code{character}, list of BAM files to extract read count
+#' data from.
+#' @param index.files Optional \code{character} argument with the list of
+#' indexes for the BAM files, without the '.bai' suffix. If the indexes are
+#' simply obtained by adding .bai to the BAM files, this argument does not need
+#' to be specified.
+#' @param min.mapq \code{numeric}, minimum mapping quality to include a read.
+#' @param read.width \code{numeric}, maximum distance between the side of the
+#' target region and the middle of the paired read to include the paired read
+#' into that region.
+#' @param include.chr \code{logical}, if set to TRUE, this function will remove
+#' the string 'chr' from the chromosome names of the target BED file.
+#' @param referenceFasta \code{character}, file name for the reference genome
+#' in fasta format. If available, GC content will be computed and added to the
+#' output.
+#' @return A GenomicRanges object that stores the read count data for the BAM
+#' files listed as argument.
+#' @author Vincent Plagnol
+#' @references exomeCopy R package.
+#' @examples
+#'
+#' \dontrun{
+#' load(exons.hg19)
+#'
+#' my.counts <- getBamCounts(bed.frame = exonpos,
+#'                           bam.files = my.bam,
+#'                           referenceFasta = 'human_g1k_v37.fasta')
+#' }
+#'
 
 getBamCounts <- function(bed.frame = NULL, bed.file = NULL, bam.files, index.files = bam.files,
                          min.mapq = 20, read.width = 300, include.chr = FALSE, referenceFasta = NULL) {
@@ -180,7 +260,55 @@ if (!is.null(referenceFasta)) {
 
 
 
-##########################################################################################################################################################  master function for exomeDepth everted.count
+
+#' Count the number of everted reads for a set of BAM files.
+#'
+#' This is the ExomeDepth high level function that takes a GenomicRanges
+#' object, a list of indexed/sorted BAM files, and compute the number of
+#' everted reads in each of the defined bins.
+#'
+#' Everted reads are characteristic of the presence of duplications in a BAM
+#' files. This routine will parse a BAM files and the suggested use is to
+#' provide relatively large bins (for example gene based, and ExomeDepth has a
+#' genes.hg19 object that is appropriate for this) to flag the genes that
+#' contain such reads suggestive of a duplication. A manual check of the data
+#' using IGV is recommended to confirm that these reads are all located in the
+#' same DNA region, which would confirm the presence of a copy number variant.
+#'
+#' @param bed.frame \code{data.frame} containing the definition of the regions.
+#' The first three columns must be chromosome, start, end.
+#' @param bed.file \code{character} file name. Target BED file with the
+#' definition of the regions. This file will only be used if no bed.frame
+#' argument is provided. No headers are assumed so remove them if they exist.
+#' Either a bed.file or a bed.frame must be provided for this function to run.
+#' @param bam.files \code{character}, list of BAM files to extract read count
+#' data from.
+#' @param index.files Optional \code{character} argument with the list of
+#' indexes for the BAM files, without the '.bai' suffix. If the indexes are
+#' simply obtained by adding .bai to the BAM files, this argument does not need
+#' to be specified.
+#' @param min.mapq \code{numeric}, minimum mapping quality to include a read.
+#' @param include.chr \code{logical}, if set to TRUE, this function will remove
+#' the string 'chr' from the chromosome names of the target BED file.
+#' @return A data frame that contains the region and the number of identified
+#' reads in each bin.
+#' @note This function calls a lower level function called XXX that works on
+#' each single BAM file.
+#' @author Vincent Plagnol
+#' @seealso getBAMCounts
+#' @references Computational methods for discovering structural variation with
+#' next-generation sequencing, Medvedev P, Stanciu M, Brudno M., Nature Methods
+#' 2009
+#' @examples
+#'
+#' \dontrun{  test <- count.everted.reads (bed.frame = genes.hg19,
+#'   bed.file = NULL,
+#'   bam.files = bam.files,
+#'   min.mapq = 20,
+#'   include.chr = FALSE)
+#' }
+#'
+
 count.everted.reads <- function(bed.frame = NULL,
                                 bed.file = NULL,
                                 bam.files,

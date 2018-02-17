@@ -1,5 +1,32 @@
 
 
+#' Class \code{ExomeDepth}
+#'
+#' A class to hold the read count data that is used by ExomeDepth to call CNVs.
+#'
+#'
+#' @name ExomeDepth-class
+#' @aliases ExomeDepth-class AddAnnotations,ExomeDepth-method
+#' CallCNVs,ExomeDepth-method TestCNV,ExomeDepth-method
+#' @docType class
+#' @section Objects from the Class: Objects can be created by calls of the form
+#' \code{new("ExomeDepth", data = NULL, test, reference, formula = 'cbind(test,
+#' reference) ~ 1', subset.for.speed = NULL)}.  \code{data} is optional and is
+#' only used if the \code{formula} argument refers to covariates (in which case
+#' these covariates must be included in the data frame).  \code{test} and
+#' \code{reference} refer to the read count data for the test and reference
+#' samples.  Creating a ExomeDepth object will automatically fit the
+#' beta-binomial model (using routines from the \code{aod} package) and compute
+#' the likelihood for the three copy number states (normal, deletion and
+#' duplication).
+#' @author Vincent Plagnol
+#' @seealso \code{select.reference.set} \code{CallCNVs} \code{aod}
+#' @references Paper recently submitted
+#' @keywords classes
+#' @examples
+#'
+#' showClass("ExomeDepth")
+
 
 setClass("ExomeDepth",
          representation(test = "numeric",
@@ -30,7 +57,7 @@ setMethod("initialize", "ExomeDepth", function(.Object,
     message('It looks like the test samples has only ', sum(test > 5), ' bins with more than 5 reads. The coverage is too small to perform any meaningful inference so no likelihood will be computed.')
     return(.Object)
   }
-  
+
   n.data.points <- length(test)
   if (is.null(data)) data <- data.frame(intercept = rep(1, length(test)))
 
@@ -57,36 +84,36 @@ setMethod("initialize", "ExomeDepth", function(.Object,
       bottom.bins <- seq(from = 0, to =  ceiling.bin[1], by =  ceiling.bin[1]/(phi.bins-1))
       complete.bins <- as.numeric(c(bottom.bins, ceiling.bin[2] + 1))
       data$depth.quant <- factor(sapply(reference, FUN = function(x) {sum (x >= complete.bins)}))
-      
+
 ############# a check
       my.tab <-  table(data$depth.quant)
       if (length(my.tab) != phi.bins) {
         stop('Binning did not happen properly')
       }
-      
+
       mod <- aod::betabin (data = data.for.fit, formula = as.formula(formula), random = as.formula('~ depth.quant'),  link = 'logit', warnings = FALSE)
       phi.estimates <-  as.numeric(mod@random.param)
       data$phi <-  phi.estimates[  data$depth.quant ]
-  
+
 #### Now the linear interpolation
       fc <- approxfun (x = c(complete.bins[ 1:phi.bins] + complete.bins[ 2:(phi.bins+1)])/2, y =  phi.estimates, yleft = phi.estimates[1], yright = phi.estimates[phi.bins])
       data$phi.linear <- fc (reference)
-  
+
       .Object@phi <- data$phi.linear
     }
 
 
-  
+
   .Object@formula <- formula
   .Object@test <- test
   .Object@reference <- reference
   my.coeffs <- mod@fixed.param
 
-  
+
   if (is.null(subset.for.speed)) {
     .Object@expected <- aod::fitted(mod)
   } else {
-    intercept <- my.coeffs[[ '(Intercept)' ]]    
+    intercept <- my.coeffs[[ '(Intercept)' ]]
     .Object@expected <- rep(intercept, times = nrow(data))
     if (length(my.coeffs) > 1) {
       for (na in names(my.coeffs)[ -1 ]) {
@@ -95,9 +122,9 @@ setMethod("initialize", "ExomeDepth", function(.Object,
     }
     .Object@expected <- exp(.Object@expected)/ (1 + exp(.Object@expected))
   }
-  
+
   .Object@annotations <- data.frame()
-  
+
   if (verbose) message('Now computing the likelihood for the different copy number states')
   if (prop.tumor < 1) message('Proportion of tumor DNA is ', prop.tumor)
   .Object@likelihood <- .Call("get_loglike_matrix",
@@ -127,7 +154,19 @@ setMethod("show", "ExomeDepth", function(object) {
 
 #############################################################################
 
+#' @describeIn TestCNV
+
 setGeneric("TestCNV", def = function(x, chromosome, start, end, type) standardGeneric('TestCNV'))
+
+#' @title TestCNV
+#' @md
+#' @description Computes the Bayes Factor in favour of a CNV defined by position and type.
+#' @param x ExomeDepth object
+#' @param chromosome Character, chromosome name.
+#' @param start Numeric, start of the tested CNV
+#' @param end Numeric, end of the tested CNV
+#' @param type Character, must be either `deletion` or `duplication`.
+
 
 setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
   if (! type %in% c('deletion', 'duplication')) stop("type must be either duplication or deletion\n")
@@ -136,9 +175,9 @@ setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
   if (class(chromosome) != 'character') stop('The input chromosome must be a character or a factor')
 
 
-  
+
   which.exons <- which((x@annotations$chromosome == chromosome) & (x@annotations$start >= start) & (x@annotations$end <= end))
-  
+
   if (type == 'deletion') log.ratio <- sum(x@likelihood[ which.exons, 1] - x@likelihood[ which.exons, 2])
   if (type == 'duplication') log.ratio <- sum(x@likelihood[ which.exons, 3] - x@likelihood[ which.exons, 2])
 
@@ -146,6 +185,35 @@ setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
 })
 
 
+
+
+#' @title CallCNVs
+#' @description Call CNV data from an ExomeDepth object.
+#' @md
+#'
+#' @details The function must be called on an ExomeDepth object. Likelihood data must
+#' have been pre-computed which should have been done by default when the ExomeDepth object was created.
+#'
+#' This function fits a hidden Markov model to the read depth data with three
+#' hidden states (normal, deletion, duplication).
+#'
+#' @param x An `ExomeDepth` object
+#' @param chromosome Chromosome information for each exon (factor).
+#' @param start Start (physical position) of each exon (numeric, must have the
+#' same length as the chromosome argument).
+#' @param end End (physical position) of each exome (numeric, must have the
+#' same length as the chromosome argument).
+#' @param name Name of each exon (character or factor).
+#' @param transition.probability Transition probability of the hidden Markov
+#' Chain from the normal copy number state to either a deletion or a
+#' duplication. The default (0.0001) expect approximately 20 CNVs genome-wide.
+#' @param expected.CNV.length The expectation for the length of a CNV. This
+#' value factors into the Viterbi algorithm that is used to compte the
+#' transition from one state to the next, which depends on the distance between
+#' exons.
+#' @return The same ExomeDepth object provided as input but with the slot
+#' CNVcalls containing a data frame with the output of the calling.
+#' @author Vincent Plagnol
 
 
 setGeneric("CallCNVs", def = function(x, chromosome, start, end, name, transition.probability = 0.0001, expected.CNV.length = 50000) standardGeneric('CallCNVs'))
@@ -158,7 +226,7 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
     x@CNV.calls <- data.frame()
     return(x)
   }
-  
+
   if ( length(start) != length(chromosome) || length(end) != length(chromosome) || length(name) != length(chromosome) ) stop('Chromosome, start and end vector must have the same lengths.\n')
   if (nrow(x@likelihood) != length(chromosome) ) stop('The annotation vectors must have the same length as the data in the ExomeDepth x')
 
@@ -166,7 +234,7 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
   chr.names.used <- unique(as.character(chromosome))
   chr.levels <- c(as.character(seq(1, 22)),  chr.names.used[! chr.names.used %in% as.character(seq(1, 22)) ] )
   chr.levels <- chr.levels[ chr.levels %in% chr.names.used ]
-  
+
   x@annotations <- data.frame(name = name, chromosome = factor(chromosome, levels = chr.levels), start = start, end = end)
   my.new.order <-  order(x@annotations$chromosome, 0.5*(x@annotations$start + x@annotations$end) )
 
@@ -181,7 +249,7 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
   cor.test.reference <- cor(x@test, x@reference)
   message('Correlation between reference and tests count is ', signif(cor.test.reference, 5))
   message('To get meaningful result, this correlation should really be above 0.97. If this is not the case, consider the output of ExomeDepth as less reliable (i.e. most likely a high false positive rate)')
-  
+
   total <- x@test + x@reference
   transitions <- matrix(nrow = 3, ncol = 3,
                         c( 1. - transition.probability, transition.probability/2., transition.probability/2.,
@@ -202,45 +270,45 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
     loc.total <- total[ good.pos ]
     positions <- loc.annotations$start
     end.positions <- loc.annotations$end       #end position of targeted exons to be used when adding a dummy exon at the end of the chromosome.
-    
+
     ##loc.likelihood <-  rbind(c(- Inf, 0, -Inf), x@likelihood[good.pos, c(2, 1, 3)]) ##add a dummy exon so that we start at cn = 2 (normal)
     loc.likelihood <- rbind(c(- Inf, 0, -Inf), x@likelihood[good.pos, c(2, 1, 3)],c(-100,0,-100)) ##update from Anna Fowler add a dummy exon so that we start at cn = 2 (normal) and a dummy exon at the end of the chromosome as well so that it ends at cn=2; for some reason I had to use -100 instead of -Inf
-    
+
     my.calls <- viterbi.hmm (transitions, loglikelihood = loc.likelihood,
-                             positions = as.integer(c(positions[1] - 2*expected.CNV.length, positions,end.positions[length(end.positions)]+2*expected.CNV.length)),   #include position of new dummy exon          
+                             positions = as.integer(c(positions[1] - 2*expected.CNV.length, positions,end.positions[length(end.positions)]+2*expected.CNV.length)),   #include position of new dummy exon
                              expected.CNV.length = expected.CNV.length)
 
     my.calls$calls$start.p <- my.calls$calls$start.p -1  ##remove the dummy exon, which has now served its purpose
     my.calls$calls$end.p <- my.calls$calls$end.p -1  ##remove the dummy exon, which has now served its purpose
     #loc.likelihood <- loc.likelihood[ -1, c(2,1, 3) ]  ##remove the dummy exon, which has now served its purpose
     loc.likelihood <- loc.likelihood[ -c(1,nrow(loc.likelihood)), c(2,1, 3), drop = FALSE ] ##remove both of the dummy exons, which have now served their purpose
-    
+
   ################################ Now make it look better, add relevant info
     if (nrow(my.calls$calls) > 0) {
 
       my.calls$calls$start <- loc.annotations$start[ my.calls$calls$start.p ]
       my.calls$calls$end <- loc.annotations$end[ my.calls$calls$end.p ]
       my.calls$calls$chromosome <- as.character(loc.annotations$chromosome[ my.calls$calls$start.p ])
-      
+
       my.calls$calls$id <- paste('chr', my.calls$calls$chromosome, ':',  my.calls$calls$start, '-',  my.calls$calls$end, sep = '')
       my.calls$calls$type <- c('deletion', 'duplication')[ my.calls$calls$type ]
-      
+
 ########## make things pretty
       my.calls$calls$BF <- NA
       my.calls$calls$reads.expected <- NA
       my.calls$calls$reads.observed <- NA
-      
-      
+
+
       for (ir in 1:nrow(my.calls$calls)) {
-        
+
         if (my.calls$calls$type[ir] == 'duplication') my.calls$calls$BF[ir] <-  sum(loc.likelihood [ my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir],3 ] - loc.likelihood [ my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir],2 ])
-        
+
         if (my.calls$calls$type[ir] == 'deletion') my.calls$calls$BF[ir] <-  sum(loc.likelihood [ my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir], 1 ] - loc.likelihood [ my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir],2  ])
-        
+
         my.calls$calls$reads.expected[ ir ] <-  sum( loc.total [my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir] ] * loc.expected [my.calls$calls$start.p[ir] : my.calls$calls$end.p[ ir ] ])
-        my.calls$calls$reads.observed[ ir ] <-  sum( loc.test [my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir] ] )      
+        my.calls$calls$reads.observed[ ir ] <-  sum( loc.test [my.calls$calls$start.p[ir] : my.calls$calls$end.p[ir] ] )
       }
-      
+
       my.calls$calls$reads.expected <- as.integer( my.calls$calls$reads.expected)
       my.calls$calls$reads.ratio <-  signif(my.calls$calls$reads.observed / my.calls$calls$reads.expected, 3)
       my.calls$calls$BF <- signif( log10(exp(1))*my.calls$calls$BF, 3)
@@ -260,6 +328,26 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
 })
 
 
+
+#' @title somatic.CNV.call
+#' @description Call somatic variants between healthy and disease tissues.
+#'
+#' @details Use read depth data from targeted sequencing experiments to call CNV between
+#' a tumor and matched healthy tissue. This is an experimental function at this stage.
+#'
+#' @param normal Read count data (numeric vector) for the normal tissue.
+#' @param tumor Read count data (numeric vector) for the tumor.
+#' @param prop.tumor Proportion of the tumour DNA in the tumour sample (between 0 and 1, and less than 1 if there is normal tissue in the tumor sample).
+#' @param chromosome Chromosome information for the bins.
+#' @param start Start position of each bin (typically in bp).
+#' @param end End position of each bin.
+#' @param names Names for each bin (tyically exon names but any way to track
+#' the bins will do).
+#' @return An ExomeDepth object with CNV calls.
+#' @note Absolutely experimental, not the main function from the package.
+
+
+
 somatic.CNV.call <- function(normal, tumor, prop.tumor = 1, chromosome, start, end, names) {
 
   message('Warning: this function is largely untested and experimental')
@@ -277,18 +365,28 @@ somatic.CNV.call <- function(normal, tumor, prop.tumor = 1, chromosome, start, e
                      start = start,
                      end = end,
                      name = names)
-  
+
  return (myTest)
 }
- 
 
 
+
+
+#' @describeIn AnnotateExtra
 
 setGeneric("AnnotateExtra", def = function(x, reference.annotation, min.overlap = 0.5, column.name = 'overlap') standardGeneric('AnnotateExtra'))
 
 
+#' @title AnnotateExtra
+#' @description  Takes annotations in the GRanges format and adds these to the CNV
+#' calls in the ExomeDepth object.
+#' @param x An ExomeDepth object.
+#' @param reference.annotation The list of reference annotations in GRanges format.
+#' @param min.overlap Numeric, The minimum fraction of the CNV call that is covered by the reference call to declare that there is a significant overlap.
+#' @param column.name Character, the name of the column used to store the overlap (in the slot CNV.calls).
+
 setMethod("AnnotateExtra", "ExomeDepth", function( x, reference.annotation, min.overlap, column.name) {
-  
+
   my.calls.GRanges <- GenomicRanges::GRanges(seqnames = factor(x@CNV.calls$chromosome),
                               IRanges::IRanges(start=x@CNV.calls$start,end= x@CNV.calls$end))
   ##browser()
@@ -297,16 +395,16 @@ setMethod("AnnotateExtra", "ExomeDepth", function( x, reference.annotation, min.
   ##test <- data.frame(calls = GenomicRanges:::queryHits(test), ref = GenomicRanges:::subjectHits(test))
   test <- data.frame(calls = test@from, ref = test@to)
 
-  
+
 ###add info about the CNV calls
   test$call.start <- x@CNV.calls$start[ test$calls ]
   test$call.end <- x@CNV.calls$end[ test$calls ]
   test$chromosome.end <- x@CNV.calls$chromosome[ test$calls ]
-  
+
   ## info about the reference calls
   test$callsref.start <- GenomicRanges::start(reference.annotation) [ test$ref ]
   test$callsref.end<- GenomicRanges::end(reference.annotation) [ test$ref ]
-  
+
 ### estimate the overlap
   test$overlap <- pmin (test$callsref.end, test$call.end) -  pmax( test$call.start, test$callsref.start)
   test <- test [test$overlap > min.overlap*(test$call.end - test$call.start), ]
@@ -314,8 +412,8 @@ setMethod("AnnotateExtra", "ExomeDepth", function( x, reference.annotation, min.
   my.split <-  split(as.character(GenomicRanges::elementMetadata(reference.annotation)$names)[ test$ref], f = test$calls)
   my.overlap.frame <- data.frame(call = names(my.split),  target = sapply(my.split, FUN = paste, collapse = ','))
   my.overlap.frame <- data.frame(call = names(my.split),  target = sapply(my.split, FUN = paste, collapse = ','))
-  
-  
+
+
   x@CNV.calls[, column.name] <- as.character(my.overlap.frame$target)[ match(1:nrow(x@CNV.calls), table = my.overlap.frame$call) ]
   return(x)
 })

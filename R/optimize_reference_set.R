@@ -1,6 +1,43 @@
 
 
-
+#' Combine multiple samples to optimize the reference set in order to maximise
+#' the power to detect CNV.
+#'
+#' The power to detect copy number variant (CNVs) from targeted sequence data
+#' can be maximised if the most appropriate set of sequences is used as
+#' reference. This function is designed to combine multiple reference exomes in
+#' order to build the best reference set.
+#'
+#'
+#' @param test.counts Read count data for the test sample (numeric, typically a
+#' vector of integer values).
+#' @param reference.counts Matrix of read count data for a set of additional
+#' samples that can be used as a comparison point for the test sample.
+#' @param bin.length Length (in bp) of each of the regions (often exons, but
+#' not necessarily) that were used to compute the read count data (i.e. what is
+#' provided in the argument test.counts of this function).  If not provided all
+#' bins are assumed to have equal length.
+#' @param n.bins.reduced This optimization function can be slow when applied
+#' genome-wide. For the purpose of building the reference sample, it is not
+#' necessary to use the full data. The number provided by this argument
+#' specifies the number of regions (typically exons) that will be sub-sampled
+#' (using a grid) to optimise the referenceset. I find that 10,000 is largely
+#' sufficient for exome data.
+#' @param data Defaults to NULL: A data frame of covariates that can be
+#' included in the model.
+#' @param formula Defaults to 'cbind(test, reference) ~ 1'. This formula will
+#' be used to fit the read count data. Covariates present in the data frame
+#' (for example GC content) can be included in the right hand side of the
+#' equation'. If covariates are provided they must be provided as arguments (in
+#' the data frame ``data'').
+#' @param phi.bins Numeric integer (typically 1, 2, or 3) that specifies the
+#' number of windows where the over-dispersion parameter phi can vary. It
+#' defaults to 1, i.e. a single over-dispersion parameter, independently of
+#' read depth.
+#' @return \item{reference.choice }{character: list of samples selected as
+#' optimum reference set.} \item{summary.stats}{A data frame summarizing the
+#' output of this computation, including expected Bayes factor, Rs statistic
+#' (see reference for explanation) for multiple choices of reference set.}
 
 
 select.reference.set <- function(test.counts, reference.counts, bin.length = NULL, n.bins.reduced = 0, data = NULL, formula = 'cbind(test, reference) ~ 1', phi.bins = 1) {
