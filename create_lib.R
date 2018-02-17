@@ -75,12 +75,10 @@ file.copy(from = "vignette/vignette.Rnw", to = paste(base, '/ExomeDepth/vignette
 
 
 
-#system(paste(Rbin, " CMD build ", base, "/ExomeDepth", sep = ''))
-system(paste(Rbin, " CMD build --resave-data ", base, "/ExomeDepth", sep = ''))
-system(paste(Rbin, " CMD INSTALL  ExomeDepth_1.1.10.tar.gz"))
-system(paste('cp /home/ucbtvyp/vyp/vincent/libraries/R/installed/ExomeDepth/doc/ExomeDepth-vignette.pdf .'))
+#system("R CMD build ", base, "/ExomeDepth", sep = '')
+system(paste0("R CMD build --resave-data ", base, "/ExomeDepth"))
+system("R  CMD INSTALL  ExomeDepth_1.1.10.tar.gz")
 
-##system("/cluster/project8/vyp/vincent/Software/R-devel/bin/R CMD check --as-cran ExomeDepth_1.1.10.tar.gz")
 
 
 

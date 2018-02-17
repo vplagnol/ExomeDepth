@@ -12,7 +12,7 @@ setMethod("plot", "ExomeDepth", function(x, sequence, xlim, ylim = NULL, count.t
 
 ### From now on we can assume the selection is not empty
   anno <- anno[selected,]
-  
+
   anno$expected <- x@expected[ selected ]
   anno$freq <- x@test[ selected ]/ (x@reference[selected ] + x@test[selected])
   anno$middle <- 0.5*(anno$start + anno$end)
@@ -51,13 +51,13 @@ setMethod("plot", "ExomeDepth", function(x, sequence, xlim, ylim = NULL, count.t
         ylab = ylab,
         xaxt = ifelse (with.gene, 'n', 's'),
         ...)
-  
-  #title(main = 'A', adj = 0)  
+
+  #title(main = 'A', adj = 0)
   polygon(x = c(anno$middle , rev(anno$middle)),
           y = c(anno$my.min.norm.prop, rev(anno$my.max.norm.prop))/c(anno$expected, rev(anno$expected)),
           col = 'grey',
           border = NA)
-  
+
   ###### make the borders pretty
   polygon(x = c(xlim[1] , anno$middle[1], anno$middle[1], xlim[1]),
           y = c(rep(anno$my.min.norm.prop[1], 2), rep(anno$my.max.norm.prop[1], 2))/anno$expected[1],
@@ -71,9 +71,9 @@ setMethod("plot", "ExomeDepth", function(x, sequence, xlim, ylim = NULL, count.t
           border = 'grey',
           lty = 1)
 
-  
-  
-  
+
+
+
   points (x = anno$middle[ order(anno$middle) ],
           y = anno$ratio [ order(anno$middle) ],
           type = 'b',
@@ -81,12 +81,12 @@ setMethod("plot", "ExomeDepth", function(x, sequence, xlim, ylim = NULL, count.t
           col = col,
           ...)
 
-  
+
   if (with.gene) {
 
     message("Plotting the gene data")
     par(mar = c(4,4,0,2))
-    
+
     plot (x = NA,
           y = NA,
           ylim = c(0,1),
@@ -103,7 +103,7 @@ setMethod("plot", "ExomeDepth", function(x, sequence, xlim, ylim = NULL, count.t
 
     ################ Now subset the annotations we want to show
 
-    
+
     #if (is.null(annotations)) {
     #anno <- x@annotations
     selected <-  which(anno$chromosome == sequence & anno$start >= xlim[1] & anno$end <= xlim[2])
@@ -113,54 +113,53 @@ setMethod("plot", "ExomeDepth", function(x, sequence, xlim, ylim = NULL, count.t
    #   selected <-  which(annotations$chromosome == sequence & anno$start >= xlim[1] & annotations$end <= xlim[2])
    #   exon.array <- annotations[ selected.2,,drop = FALSE]
    # }
-    
+
 
     exon.array$short.name <- gsub(exon.array$name, pattern = '-.*', replacement = '')
 
 ### Now if an additional gene was added at either end, remove it
-       if (nrow(exon.array) > 1) {
-                if (exon.array$short.name[1] != exon.array$short.name[2]) {
-                  exon.array <- exon.array[-1, ]
-                }          
-                if (nrow(exon.array)>1 && (exon.array$short.name[nrow(exon.array)] !=
-                  exon.array$short.name[nrow(exon.array) - 1])) {
-                  exon.array <- exon.array[-nrow(exon.array),
-                    ]
-                }
-            }
+      if (nrow(exon.array) > 1) {
+          if (exon.array$short.name[1] != exon.array$short.name[2]) {
+              exon.array <- exon.array[-1, ]
+          }
+          if (nrow(exon.array)>1 && (exon.array$short.name[nrow(exon.array)] !=
+                                     exon.array$short.name[nrow(exon.array) - 1])) {
+              exon.array <- exon.array[-nrow(exon.array), ]
+          }
+      }
 
-    exon.array$start.gene <- tapply(INDEX = exon.array$short.name, exon.array$start, FUN = min) [ exon.array$short.name ]  
+    exon.array$start.gene <- tapply(INDEX = exon.array$short.name, exon.array$start, FUN = min) [ exon.array$short.name ]
     exon.array$middle <- 0.5*(exon.array$start + exon.array$end)
     exon.array <- exon.array[ exon.array$short.name != 'RP11' &
                              ! grepl(pattern = 'ENST.*', exon.array$short.name) &
                              ! grepl(pattern = 'AC0.*', exon.array$short.name) ,]
 
 
-    
+
     if (nrow(exon.array) >= 1) {
       pos <- 1
       lev <- 0.4
       arr <- by (exon.array, exon.array$start.gene, FUN = function(x){
         my.x <- range(x$middle)
         lines(x = my.x, y = c(lev, lev))
-        
+
         my.x <- mean(range(x$middle))
         if (my.x < xlim[1]) my.x <- xlim[1]
         if (my.x > xlim[2]) my.x <- xlim[2]
-        
+
         text(x = my.x,
              y = ifelse (lev == 0.6, 0.7, 0.3),
              labels = x$short.name[1],
              pos = pos,
              cex = 0.5)
-        
-        
+
+
         for (i in 1:nrow(x)) {
           lines(x = c(x$middle[i], x$middle[i]), y = c(lev - 0.1, lev + 0.1))
-        } 
-        
+        }
+
         if (pos == 1) {pos <<- 3; lev <<- 0.6;} else {pos <<- 1; lev <<- 0.4}  ##this is for the text
-        
+
       })
     }
   }
