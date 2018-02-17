@@ -1,7 +1,7 @@
 #Rbin <- "/cluster/project8/vyp/vincent/Software/R-3.2.0/bin/R"
 #Rbin <- "/usr/bin/R"
-Rbin <- "/share/apps/R-3.2.2/bin/R"
-#Rbin <- " ../R-devel/bin/R"
+#Rbin <- "/share/apps/R-3.2.2/bin/R"
+Rbin <- "/cluster/project8/vyp/vincent/Software/R-3.3.0/bin/R"
 
 
 base <- 'working'

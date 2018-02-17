@@ -3,8 +3,8 @@ Type: Package
 Title: Calls Copy Number Variants from Targeted Sequence Data
 Version: 1.1.10
 Date: 2016-05-13
-Depends: R (>= 3.1.0)
-Imports: Biostrings, IRanges, Rsamtools, GenomicRanges (>= 1.16.0), aod, VGAM (>= 0.8.4), methods, GenomicAlignments
+Depends: R (>= 3.3.0)
+Imports: Biostrings, IRanges, Rsamtools, GenomicRanges (>= 1.23.0), aod, VGAM (>= 0.8.4), methods, GenomicAlignments
 Suggests: knitr
 VignetteBuilder: knitr
 Author: Vincent Plagnol
