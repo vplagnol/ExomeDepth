@@ -13,7 +13,7 @@ make build
 ```
 
 should create the relevant version of the ExomeDepth package and build.
-Note that ExomeDepth uses the package VGAM and apparently this package required R version 3.4.0 of greater, hence the new requirement that ExomeDepth is nuilt using R 3.4 or greater.
+Note that ExomeDepth uses the package VGAM and apparently this package required R version 3.4.0 of greater, hence the new requirement that ExomeDepth is built using R 3.4 or greater.
 
 # Useful links
 
