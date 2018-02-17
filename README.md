@@ -20,6 +20,6 @@ Some relevant publications:
 
 
 Note that a slightly modified version of ExomeDepth is also used inside another CNV detection packaged called  DECoN. 
-See the[ blog post on the topic](http://www.thetgmi.org/tgmi-news/detecting-tricky-gene-mutations/]).
+See the[ blog post on the topic](http://www.thetgmi.org/tgmi-news/detecting-tricky-gene-mutations/).
 
 
