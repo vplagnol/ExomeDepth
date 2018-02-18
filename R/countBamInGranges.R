@@ -1,3 +1,90 @@
+#' Positions of exons on build hg19 of the human genome
+#'
+#' Exon position extracted from the ensembl database version 71.
+#'
+#' @name exons.hg19
+#' @md
+#' @docType data
+#' @format A data frame with 192,379 observations on the following 4 variables:
+#' * chromosome, a factor with levels `1`, `2` `3` `4`, `5` `6` `7` `8` `9`, `10` `11` `12` `13` `14` `15` `16` `17` `18` `19` `2` `20` `21` `22`
+#' * start a numeric vector
+#' * end a numeric vector
+#' * name A character vector of names for the exon(s)
+#' @source Ensemble database version 71.
+#' @keywords datasets
+NULL
+
+#' Positions of exons on build hg19 of the human genome and on chromosome X
+#'
+#' Exon position extracted from the ensembl database version 61 and on
+#' chromosome X only.
+#'
+#' @name exons.hg19.X
+#' @md
+#' @docType data
+#' @format A data frame of exons with the following 4 variables:
+#' * chromosome, a factor with levels `X`, `Y`.
+#' * start Numeric.
+#' * end Numeric.
+#' * name Character names for the exons.
+#' @source Ensemble database version 71.
+#' @keywords datasets
+NULL
+
+
+#' Positions of genes on build hg19 of the human genome
+#'
+#' Exon position extracted from the ensembl database version 71.
+#'
+#'
+#' @name genes.hg19
+#' @docType data
+#' @md
+#' @format A data frame with 18,033 observations on the following 4 variables:
+#' * chromosome, a factor with levels `1`, `2` `3` `4`, `5` `6` `7` `8` `9`, `10` `11` `12` `13` `14` `15` `16` `17` `18` `19` `2` `20` `21` `22`
+#' * start a numeric vector
+#' * end a numeric vector
+#' * name A character vector of names for the exon(s)
+#' @source Ensemble database version 71.
+#' @keywords datasets
+NULL
+
+
+#' Conrad et al common CNVs
+#'
+#' Positions of common CNV calls (detected in a panel of 42 sample) from the
+#' Conrad et al paper (Nature 2010). This is build hg19 of the human genome.
+#'
+#'
+#' @name Conrad.hg19.common.CNVs
+#' @docType data
+#' @format A data frame with common CNV calls.
+#' @source Conrad et al, Origins and functional impact of copy number variation in the human genome, Nature 2010
+#' @keywords datasets
+NULL
+
+
+#' Example dataset for ExomeDepth
+#'
+#' An example dataset of 4 exome samples, chromosome 1 only.
+#'
+#'
+#' @name ExomeCount
+#' @docType data
+#' @md
+#' @format A data frame with 25592 observations on the following 9 variables:
+#' * chromosome, Character vector with chromosome names (only chromosome 1 in that case)
+#' * start, start of exons
+#' * end, end of exons
+#' * exons, character name of exons
+#' * camfid.032KA_sorted_unique.bam
+#' * camfid.033ahw_sorted_unique.bam
+#' * camfid.034pc_sorted_unique.bam
+#' * camfid.035if_sorted_unique.bam
+#' * GC, a numeric vector with the GC content
+#' @source Dataset generated in collaboration with Sergey Nejentsev, University of Cambridge.
+#' @keywords datasets
+NULL
 
 
 #' Counts everted reads from a single BAM file
@@ -16,7 +103,6 @@
 #' @param index Index for the BAM files.
 #' @param min.mapq Minimum mapping quality to include reads.
 #' @return A list with the number of reads in each bin.
-#' @author Vincent Plagnol
 #' @seealso count.everted.reads
 
 
@@ -24,9 +110,9 @@ countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) 
 
   rds.counts <- numeric(length(granges))
   message('Parsing ', bam.file, ' with index ', index)
-  
+
   rds <- Rsamtools::scanBam(file = bam.file,
-                 index = index, 
+                 index = index,
                  param =Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isPaired = TRUE, isProperPair = FALSE, isSecondaryAlignment = FALSE), what = c("rname", "strand", "isize", "mapq", "pos", "isize")))[[1]]
 
   mapq.test <- (!is.na(rds$isize)) & (rds$mapq >= min.mapq) & !is.na(rds$pos) & (abs(rds$isize) < 100000) & ( ((rds$strand == "+") & (rds$isize < 0) ) | ((rds$strand == "-") & (rds$isize > 0) ) )
@@ -34,18 +120,17 @@ countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) 
 
   if (sum(mapq.test, na.rm = TRUE) > 0) {
     empty <- FALSE
-    
+
     reads.ranges <- GenomicRanges::GRanges ( seqnames = rds$rname[ mapq.test],
                             IRanges::IRanges(start = pmin( rds$pos[ mapq.test ], rds$pos[ mapq.test ] + rds$isize [mapq.test]) , end =  pmax( rds$pos[ mapq.test ], rds$pos[ mapq.test ] + rds$isize [mapq.test])),
                             strand = rds$strand[ mapq.test ])
-    
+
     rds.counts <- GenomicRanges::countOverlaps(granges, reads.ranges)
   }
-  rds.counts      
+  rds.counts
 }
 
 
-###################################################################################################### low level function for read depth
 
 #' Compute read count data from BAM files.
 #'
@@ -66,12 +151,12 @@ countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) 
 countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, min.mapq = 1, read.width = 1) {
   message("Now parsing ", bam.file)
   if (class(granges) != "GRanges") stop("Argument granges of countBamInGRanges.exomeDepth must be of the class GRanges")
-  
+
   if (is.null(index)) index <- bam.file
-  
+
   count.data <- rep(0, length(granges))
 
-  
+
   seqs.in.target <- as.character(unique(GenomicRanges::seqnames(granges)))
   seqs.in.bam.file <- gsub(pattern = 'SN:', replacement = '',
                            as.character(grep(pattern = 'SN', unlist(Rsamtools::scanBamHeader(files = bam.file, index = index)), value = TRUE)))
@@ -99,10 +184,10 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
     message("Parsing chromosome ", seq)
     target.local1 <- GenomicRanges::GRanges(seqnames = seq,
                                            IRanges::IRanges(start=1, end = 5*10^8))
-    
+
     target.local2 <-  granges[ GenomicRanges::seqnames(granges) == seq,]
     my.rows <- which (as.logical(GenomicRanges::seqnames(granges) == seq))
-    
+
 ######## paired end reads
     my.param.pairs <- Rsamtools::ScanBamParam(flag = Rsamtools::scanBamFlag(isDuplicate = FALSE, isUnmappedQuery = FALSE, hasUnmappedMate = FALSE,
                                                 isPaired = TRUE, isProperPair = TRUE, isSecondaryAlignment = FALSE),
@@ -111,7 +196,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
     if (length(gal) > 0) {
       gal <- methods::as(gal, 'data.frame')
       gal <- gal[ gal$mapq > min.mapq & gal$isize > 0, ]
-      
+
       gal <- GenomicRanges::GRanges( seqnames = gal$seqnames,
                                     IRanges::IRanges(start= gal$start, end = gal$start + gal$isize))
       count.data[ my.rows ]  <- count.data[ my.rows ] +  GenomicRanges::countOverlaps ( query = target.local2, subjec = gal)
@@ -125,7 +210,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
       message('Some single end reads detected in this BAM file')
       gal.single <- methods::as(gal.single, 'data.frame')
       gal.single <- gal.single[ gal.single$mapq > min.mapq,  ]
-      
+
       gal.single <- GenomicRanges::GRanges( seqnames = gal.single$seqnames,
                                     IRanges::IRanges(start= gal.single$start, end = gal.single$start + read.width))
       count.data[ my.rows ]  <- count.data[ my.rows ] +  GenomicRanges::countOverlaps ( query = target.local2, subjec = gal.single)
@@ -139,7 +224,6 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
 
 
 
-#########################################################################################  master function for exomeDepth read counting
 
 #' Get count data for multiple exomes
 #'
@@ -205,28 +289,28 @@ getBamCounts <- function(bed.frame = NULL, bed.file = NULL, bam.files, index.fil
     }
     bed.frame$seqnames <- paste('chr', bed.frame$seqnames, sep = '')
   }
-  
+
   chr.names.used <- unique(as.character(bed.frame$seqnames))
   chr.levels <- c(as.character(seq(1, 22)), subset( chr.names.used, ! chr.names.used %in% as.character(seq(1, 22))))
 
   bed.frame$seqnames <- factor(bed.frame$seqnames, levels = chr.levels)  ####specifying the levels is important here to not mess up the order
   bed.frame <- bed.frame[ order(bed.frame$seqnames, bed.frame$start + bed.frame$end), ]  ##order the data frame by position
 
-  target <- GenomicRanges::GRanges(seqnames = bed.frame$seqnames,  
+  target <- GenomicRanges::GRanges(seqnames = bed.frame$seqnames,
                     IRanges::IRanges(start=bed.frame$start+1,end=bed.frame$end))
-  
+
   rdata <- IRanges::RangedData(space= GenomicRanges::seqnames(target),
                                ranges=GenomicRanges::ranges(target))
-  
-  if  ((ncol(bed.frame) >= 4) && (class(bed.frame[,4]) %in% c('character', 'factor'))) {    
+
+  if  ((ncol(bed.frame) >= 4) && (class(bed.frame[,4]) %in% c('character', 'factor'))) {
     row.names(rdata) <- make.unique(as.character(bed.frame[,4]))  ##add exon names if available
   }
-  
+
 ############################################################################# add GC content
 if (!is.null(referenceFasta)) {
   message('Reference fasta file provided so ExomeDepth will compute the GC content in each window')
     target.dnastringset <- Rsamtools::scanFa(referenceFasta, target)
-  
+
     getGCcontent <- function(x) {
       GC.count <- Biostrings::letterFrequency(x,"GC")
       all.count <- Biostrings::letterFrequency(x,"ATGC")
@@ -245,14 +329,14 @@ if (!is.null(referenceFasta)) {
                                       what = c("mapq", "pos", "isize"), )
 
 
-  
+
   for (i in 1:nfiles) {
     bam <- bam.files[ i ]
     index <- index.files[ i ]
     rdata[[ basename(bam) ]] <- countBamInGRanges.exomeDepth ( bam.file = bam, index = index, granges = target, min.mapq = min.mapq, read.width = read.width)
     message("Number of counted fragments : ", sum(rdata[[ basename(bam) ]]))
   }
-  
+
   return(rdata)
 }
 
@@ -294,7 +378,6 @@ if (!is.null(referenceFasta)) {
 #' reads in each bin.
 #' @note This function calls a lower level function called XXX that works on
 #' each single BAM file.
-#' @author Vincent Plagnol
 #' @seealso getBAMCounts
 #' @references Computational methods for discovering structural variation with
 #' next-generation sequencing, Medvedev P, Stanciu M, Brudno M., Nature Methods
@@ -327,15 +410,15 @@ count.everted.reads <- function(bed.frame = NULL,
   names(bed.frame)[2] <- 'start'
   names(bed.frame)[3] <- 'end'
 
-  
+
   if (include.chr) bed.frame$seqnames <- paste('chr', bed.frame$seqnames, sep = '')
 
-  target <- GenomicRanges::GRanges(seqnames = bed.frame$seqnames,  
+  target <- GenomicRanges::GRanges(seqnames = bed.frame$seqnames,
                     IRanges::IRanges(start=bed.frame$start+1,end=bed.frame$end))
   rdata <- IRanges::RangedData(space=GenomicRanges::seqnames(target),
                                ranges=GenomicRanges::ranges(target))
-  
-  if  ((ncol(bed.frame) >= 4) && (class(bed.frame[,4]) %in% c('character', 'factor'))) {    
+
+  if  ((ncol(bed.frame) >= 4) && (class(bed.frame[,4]) %in% c('character', 'factor'))) {
     row.names(rdata) <- make.unique(as.character(bed.frame[,4]))  ##add exon names if available
   }
 

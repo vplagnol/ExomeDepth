@@ -18,6 +18,7 @@
 #' @param pch Defaults to '+'
 #' @param with.gene Logical, defaults to FALSE, Should the gene information (obtained from the annotation data) be plotted under the read depth plot?
 #' @param col character, Colour for the line displaying the read depth ratio for each exon
+#' @param ... Additional arguments to be passed to the base plot function
 
 
 

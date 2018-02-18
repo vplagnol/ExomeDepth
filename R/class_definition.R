@@ -1,30 +1,28 @@
 
 
-#' Class \code{ExomeDepth}
+#' Class `ExomeDepth`
 #'
 #' A class to hold the read count data that is used by ExomeDepth to call CNVs.
 #'
 #'
 #' @name ExomeDepth-class
-#' @aliases ExomeDepth-class AddAnnotations,ExomeDepth-method
-#' CallCNVs,ExomeDepth-method TestCNV,ExomeDepth-method
+#' @md
+#' @aliases ExomeDepth-class
 #' @docType class
 #' @section Objects from the Class: Objects can be created by calls of the form
-#' \code{new("ExomeDepth", data = NULL, test, reference, formula = 'cbind(test,
-#' reference) ~ 1', subset.for.speed = NULL)}.  \code{data} is optional and is
-#' only used if the \code{formula} argument refers to covariates (in which case
-#' these covariates must be included in the data frame).  \code{test} and
-#' \code{reference} refer to the read count data for the test and reference
+#' `new("ExomeDepth", data = NULL, test, reference, formula = 'cbind(test,
+#' reference) ~ 1', subset.for.speed = NULL)`.  `data` is optional and is
+#' only used if the `formula` argument refers to covariates (in which case
+#' these covariates must be included in the data frame).  `test` and
+#' `reference` refer to the read count data for the test and reference
 #' samples.  Creating a ExomeDepth object will automatically fit the
-#' beta-binomial model (using routines from the \code{aod} package) and compute
+#' beta-binomial model (using routines from the `aod` package) and compute
 #' the likelihood for the three copy number states (normal, deletion and
 #' duplication).
-#' @author Vincent Plagnol
-#' @seealso \code{select.reference.set} \code{CallCNVs} \code{aod}
-#' @references Paper recently submitted
+#' @seealso `?select.reference.set` `?CallCNVs`
+#' @references A robust model for read count data in exome sequencing experiments and implications for copy number variant calling, Plagnol et al 2012
 #' @keywords classes
 #' @examples
-#'
 #' showClass("ExomeDepth")
 
 
@@ -40,8 +38,8 @@ setClass("ExomeDepth",
 
 
 
+#' @describeIn ExomeDepth-class
 
-#############################################################################
 setMethod("initialize", "ExomeDepth", function(.Object,
                                                data = NULL,
                                                test,
@@ -187,6 +185,12 @@ setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
 
 
 
+#' @describeIn CallCNVs
+
+setGeneric("CallCNVs",
+           def = function(x, chromosome, start, end, name, transition.probability = 0.0001, expected.CNV.length = 50000) standardGeneric('CallCNVs'))
+
+
 #' @title CallCNVs
 #' @description Call CNV data from an ExomeDepth object.
 #' @md
@@ -213,10 +217,7 @@ setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
 #' exons.
 #' @return The same ExomeDepth object provided as input but with the slot
 #' CNVcalls containing a data frame with the output of the calling.
-#' @author Vincent Plagnol
 
-
-setGeneric("CallCNVs", def = function(x, chromosome, start, end, name, transition.probability = 0.0001, expected.CNV.length = 50000) standardGeneric('CallCNVs'))
 
 
 setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, transition.probability, expected.CNV.length) {
