@@ -1,7 +1,12 @@
 base <- 'working'
 system(paste('rm ', base, '/ExomeDepth/R/*', sep = ''))
 package.skeleton(name="ExomeDepth",
-                 code_files = c('R/class_definition.R', 'R/optimize_reference_set.R', 'R/tools.R', 'R/countBamInGranges.R', 'R/plot_CNVs_method.R'),
+                 code_files = c('R/class_definition.R', 
+		 'R/optimize_reference_set.R', 
+		 'R/tools.R',		       
+		 'R/countBamInGranges.R', 
+		 'R/plot_CNVs_method.R',
+		 'R/annotate_extra.R'),
                  path= base,
                  force=TRUE)
 
@@ -34,7 +39,7 @@ file.copy(from = 'data/Conrad.hg19.RData', to = paste(base, '/ExomeDepth/data/Co
 
 clean.Rd.files <- file.remove(list.files(paste0(base, "/ExomeDepth/man"), 
 	       full.names = TRUE)) ## now useful to let roxygen write the doc
-file.remove(paste0(base, "/working/Read-and-delete-me"))
+file.remove(paste0(base, "/ExomeDepth/Read-and-delete-me"))
 
 ## now oxygenize
 roxygen2::roxygenize(package.dir = paste0(base, "/ExomeDepth"))

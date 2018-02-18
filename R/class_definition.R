@@ -1,5 +1,4 @@
 
-
 #' Class `ExomeDepth`
 #'
 #' A class to hold the read count data that is used by ExomeDepth to call CNVs.
@@ -38,7 +37,23 @@ setClass("ExomeDepth",
 
 
 
+
+#' @title ExomeDepth initialization tool
+#' @description Builds an exomeDepth object from test and reference vectors
 #' @describeIn ExomeDepth-class
+#' @param .Object ExomeDepth object
+#' @param data Data frame containing potential covariates.
+#' @param test Numeric, vector of counts for the test sample.
+#' @param reference Numeric, vector of counts for the reference sample.
+#' @param formula Linear model to be used when fitting the data.
+#' @param phi.bins Numeric, defaults to 1. Number of discrete bins for the over-dispersion parameter phi, depending on read depth.
+#' Do not modify this parameter for the standard use of ExomeDepth.
+#' @param prop.tumor Numeric, defaults to 1. For the somatic variant calling, this assesses the proportion of the test sample data originating from the tumour.
+#' Do not modify this parameter for the standard use of ExomeDepth.
+#' @param subset.for.speed Numeric, defaults to NULL. If non-null, this sets the number of data points to be used for an accelerated fit of the data.
+#' @param verbose Logical, controls the output level.
+
+
 
 setMethod("initialize", "ExomeDepth", function(.Object,
                                                data = NULL,
@@ -152,12 +167,23 @@ setMethod("show", "ExomeDepth", function(object) {
 
 #############################################################################
 
-#' @describeIn TestCNV
+
+#' @name TestCNV-generic
+#' @aliases TestCNV-generic
+#' @description Generic method for testCNV
+#' @describeIn TestCNV-ExomeDepth-method
+#' @param x ExomeDepth object
+#' @param chromosome Character, chromosome name.
+#' @param start Numeric, start of the tested CNV
+#' @param end Numeric, end of the tested CNV
+#' @param type Character, must be either `deletion` or `duplication`.
+
 
 setGeneric("TestCNV", def = function(x, chromosome, start, end, type) standardGeneric('TestCNV'))
 
 #' @title TestCNV
 #' @md
+#' @aliases TestCNV
 #' @description Computes the Bayes Factor in favour of a CNV defined by position and type.
 #' @param x ExomeDepth object
 #' @param chromosome Character, chromosome name.
@@ -184,19 +210,36 @@ setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
 
 
 
-
-#' @describeIn CallCNVs
+#' @name CallCNVs-generic
+#' @aliases CallCNVs-generic
+#' @describeIn CallCNVs-ExomeDepth-method
+#' @description Generic method for callCNVs
+#' @param x An `ExomeDepth` object
+#' @param chromosome Chromosome information for each exon (factor).
+#' @param start Start (physical position) of each exon (numeric, must have the
+#' same length as the chromosome argument).
+#' @param end End (physical position) of each exome (numeric, must have the
+#' same length as the chromosome argument).
+#' @param name Name of each exon (character or factor).
+#' @param transition.probability Transition probability of the hidden Markov
+#' Chain from the normal copy number state to either a deletion or a
+#' duplication. The default (0.0001) expect approximately 20 CNVs genome-wide.
+#' @param expected.CNV.length The expectation for the length of a CNV. This
+#' value factors into the Viterbi algorithm that is used to compte the
+#' transition from one state to the next, which depends on the distance between
+#' exons.
 
 setGeneric("CallCNVs",
            def = function(x, chromosome, start, end, name, transition.probability = 0.0001, expected.CNV.length = 50000) standardGeneric('CallCNVs'))
 
 
 #' @title CallCNVs
+#' @aliases CallCNVs
 #' @description Call CNV data from an ExomeDepth object.
 #' @md
 #'
-#' @details The function must be called on an ExomeDepth object. Likelihood data must
-#' have been pre-computed which should have been done by default when the ExomeDepth object was created.
+#' @details The function must be called on an ExomeDepth object.
+#' Likelihood data must have been pre-computed which should have been done by default when the ExomeDepth object was created.
 #'
 #' This function fits a hidden Markov model to the read depth data with three
 #' hidden states (normal, deletion, duplication).
@@ -373,49 +416,17 @@ somatic.CNV.call <- function(normal, tumor, prop.tumor = 1, chromosome, start, e
 
 
 
-#' @describeIn AnnotateExtra
 
-setGeneric("AnnotateExtra", def = function(x, reference.annotation, min.overlap = 0.5, column.name = 'overlap') standardGeneric('AnnotateExtra'))
+#' @title get_loglike_matrix
+#' @name  get_loglike_matrix
+#' @description Computes the loglikelihood matrix for the three states and each exon
 
-
-#' @title AnnotateExtra
-#' @description  Takes annotations in the GRanges format and adds these to the CNV
-#' calls in the ExomeDepth object.
-#' @param x An ExomeDepth object.
-#' @param reference.annotation The list of reference annotations in GRanges format.
-#' @param min.overlap Numeric, The minimum fraction of the CNV call that is covered by the reference call to declare that there is a significant overlap.
-#' @param column.name Character, the name of the column used to store the overlap (in the slot CNV.calls).
-
-setMethod("AnnotateExtra", "ExomeDepth", function( x, reference.annotation, min.overlap, column.name) {
-
-  my.calls.GRanges <- GenomicRanges::GRanges(seqnames = factor(x@CNV.calls$chromosome),
-                              IRanges::IRanges(start=x@CNV.calls$start,end= x@CNV.calls$end))
-  ##browser()
-  test <- GenomicRanges::findOverlaps(query = my.calls.GRanges, subject = reference.annotation)
-  ##test <- data.frame(calls = test@queryHits, ref = test@subjectHits)
-  ##test <- data.frame(calls = GenomicRanges:::queryHits(test), ref = GenomicRanges:::subjectHits(test))
-  test <- data.frame(calls = test@from, ref = test@to)
+NULL
 
 
-###add info about the CNV calls
-  test$call.start <- x@CNV.calls$start[ test$calls ]
-  test$call.end <- x@CNV.calls$end[ test$calls ]
-  test$chromosome.end <- x@CNV.calls$chromosome[ test$calls ]
 
-  ## info about the reference calls
-  test$callsref.start <- GenomicRanges::start(reference.annotation) [ test$ref ]
-  test$callsref.end<- GenomicRanges::end(reference.annotation) [ test$ref ]
+#' @title C_hmm
+#' @name C_hmm
+#' @description Implements the hidden Markov Model using a C routine
 
-### estimate the overlap
-  test$overlap <- pmin (test$callsref.end, test$call.end) -  pmax( test$call.start, test$callsref.start)
-  test <- test [test$overlap > min.overlap*(test$call.end - test$call.start), ]
-
-  my.split <-  split(as.character(GenomicRanges::elementMetadata(reference.annotation)$names)[ test$ref], f = test$calls)
-  my.overlap.frame <- data.frame(call = names(my.split),  target = sapply(my.split, FUN = paste, collapse = ','))
-  my.overlap.frame <- data.frame(call = names(my.split),  target = sapply(my.split, FUN = paste, collapse = ','))
-
-
-  x@CNV.calls[, column.name] <- as.character(my.overlap.frame$target)[ match(1:nrow(x@CNV.calls), table = my.overlap.frame$call) ]
-  return(x)
-})
-
+NULL
