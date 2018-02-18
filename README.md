@@ -17,6 +17,8 @@ Note that ExomeDepth uses the package VGAM and apparently this package required 
 
 # Useful links
 
+The key paper that describes ExomeDepth is: [A robust model for read count data in exome sequencing experiments and implications for copy number variant calling](https://academic.oup.com/bioinformatics/article/28/21/2747/236565).
+
 Some relevant publications:
 * [An evaluation of copy number variation detection tools for cancer using whole exome sequencing data](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-017-1705-x)
 * [Validation of copy number variation analysis for next-generation sequencing diagnostics](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5427176/)
@@ -26,4 +28,10 @@ Some relevant publications:
 Note that a slightly modified version of ExomeDepth is also used inside another CNV detection packaged called [DECoN](https://www.icr.ac.uk/our-research/research-divisions/division-of-genetics-and-epidemiology/genetic-susceptibility/genetic-data-and-software-resources/decon). 
 See the[ blog post on the topic](http://www.thetgmi.org/tgmi-news/detecting-tricky-gene-mutations/).
 
+
+# Release notes
+
+* ExomeDepth 1.1.10 has been released to CRAN in May 2016.
+* ExomeDepth 1.1.11 is a documentation update, that cleans up ExomeDepth using more modern Roxygen documentation.
+* A planned version 1.1.12 would improve data visualisation.
 

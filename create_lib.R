@@ -10,6 +10,7 @@ package.skeleton(name="ExomeDepth",
                  path= base,
                  force=TRUE)
 
+file.copy(from = "doc/_pkgdown.yml", to = paste0(base, "/ExomeDepth/"), overwrite = TRUE)
 
 for (folder in c('data', 'src', 'vignettes', 'inst', 'inst/doc')) {
   my.folder <- paste(base, '/ExomeDepth/', folder, sep = '')
@@ -22,6 +23,7 @@ file.remove(methods.file)
 print(list.files(path = paste(base, '/ExomeDepth/man', sep = ''), pattern = '*methods*', full.names = TRUE))
 
 system(paste("cp src/*.cpp src/*.c src/*.h ", base, '/ExomeDepth/src', sep = ''))
+file.copy(from = "README.md", to = paste0(base, "/ExomeDepth/"), overwrite = TRUE)
                         
 file.copy(from = 'R/zzz.R', to= paste(base, '/ExomeDepth/R/zzz.R', sep = ''), overwrite = TRUE)
 
