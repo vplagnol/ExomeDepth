@@ -249,8 +249,8 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
 #' @param read.width \code{numeric}, maximum distance between the side of the
 #' target region and the middle of the paired read to include the paired read
 #' into that region.
-#' @param include.chr \code{logical}, if set to TRUE, this function will remove
-#' the string 'chr' from the chromosome names of the target BED file.
+#' @param include.chr \code{logical}, if set to TRUE, this function will add
+#' the string 'chr' to the chromosome names of the target BED file.
 #' @param referenceFasta \code{character}, file name for the reference genome
 #' in fasta format. If available, GC content will be computed and added to the
 #' output.
@@ -372,8 +372,8 @@ if (!is.null(referenceFasta)) {
 #' simply obtained by adding .bai to the BAM files, this argument does not need
 #' to be specified.
 #' @param min.mapq \code{numeric}, minimum mapping quality to include a read.
-#' @param include.chr \code{logical}, if set to TRUE, this function will remove
-#' the string 'chr' from the chromosome names of the target BED file.
+#' @param include.chr \code{logical}, if set to TRUE, this function will add
+#' the string 'chr' to the chromosome names of the target BED file.
 #' @return A data frame that contains the region and the number of identified
 #' reads in each bin.
 #' @note This function calls a lower level function called XXX that works on
