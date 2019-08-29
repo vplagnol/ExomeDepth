@@ -40,7 +40,6 @@ setClass("ExomeDepth",
 
 #' @title ExomeDepth initialization tool
 #' @description Builds an exomeDepth object from test and reference vectors
-#' @describeIn ExomeDepth-class
 #' @param .Object ExomeDepth object
 #' @param data Data frame containing potential covariates.
 #' @param test Numeric, vector of counts for the test sample.
@@ -168,18 +167,6 @@ setMethod("show", "ExomeDepth", function(object) {
 #############################################################################
 
 
-#' @title TestCNV-generic
-#' @name TestCNV-generic
-#' @aliases TestCNV-generic
-#' @description Generic method for testCNV
-#' @describeIn TestCNV-ExomeDepth-method
-#' @param x ExomeDepth object
-#' @param chromosome Character, chromosome name.
-#' @param start Numeric, start of the tested CNV
-#' @param end Numeric, end of the tested CNV
-#' @param type Character, must be either `deletion` or `duplication`.
-
-
 setGeneric("TestCNV", def = function(x, chromosome, start, end, type) standardGeneric('TestCNV'))
 
 #' @title TestCNV
@@ -210,26 +197,6 @@ setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
 })
 
 
-
-#' @title CallCNVs-generic
-#' @name CallCNVs-generic
-#' @aliases CallCNVs-generic
-#' @describeIn CallCNVs-ExomeDepth-method
-#' @description Generic method for callCNVs
-#' @param x An `ExomeDepth` object
-#' @param chromosome Chromosome information for each exon (factor).
-#' @param start Start (physical position) of each exon (numeric, must have the
-#' same length as the chromosome argument).
-#' @param end End (physical position) of each exome (numeric, must have the
-#' same length as the chromosome argument).
-#' @param name Name of each exon (character or factor).
-#' @param transition.probability Transition probability of the hidden Markov
-#' Chain from the normal copy number state to either a deletion or a
-#' duplication. The default (0.0001) expect approximately 20 CNVs genome-wide.
-#' @param expected.CNV.length The expectation for the length of a CNV. This
-#' value factors into the Viterbi algorithm that is used to compte the
-#' transition from one state to the next, which depends on the distance between
-#' exons.
 
 setGeneric("CallCNVs",
            def = function(x, chromosome, start, end, name, transition.probability = 0.0001, expected.CNV.length = 50000) standardGeneric('CallCNVs'))

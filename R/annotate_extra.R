@@ -1,16 +1,5 @@
 
 
-#' @title AnnotateExtra-generic
-#' @name AnnotateExtra-generic
-#' @aliases AnnotateExtra-generic
-#' @description Generic method for AnnotateExtra
-#' @describeIn AnnotateExtra-ExomeDepth-method
-#' @param x An `ExomeDepth` object.
-#' @param reference.annotation The list of reference annotations in GRanges format.
-#' @param min.overlap Numeric, defaults to 0.5. This defines the minimum fraction of the CNV call that is covered by the reference call to declare that there is a significant overlap.
-#' @param column.name The name of the column used to store the overlap (in the slot CNV.calls).
-
-
 setGeneric("AnnotateExtra", def = function(x, reference.annotation, min.overlap = 0.5, column.name) standardGeneric('AnnotateExtra'))
 
 
