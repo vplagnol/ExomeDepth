@@ -152,7 +152,7 @@ Here is how this object could for example be used to obtain a more generic data 
 <<Rsamtools.load>>=
 library(ExomeDepth)
 data(ExomeCount)
-ExomeCount.dafr <- as(ExomeCount[,  colnames(ExomeCount)], 'data.frame')
+ExomeCount.dafr <- as(ExomeCount, 'data.frame')
 ExomeCount.dafr$chromosome <- gsub(as.character(ExomeCount.dafr$seqnames), 
                                         pattern = 'chr', 
                                         replacement = '')  ##remove the annoying chr letters
@@ -237,7 +237,7 @@ We can now call the CNV by running the underlying hidden Markov model:
 <<call.CNVs>>=
 all.exons <- CallCNVs(x = all.exons, 
                       transition.probability = 10^-4, 
-                      chromosome = ExomeCount.dafr$space, 
+                      chromosome = ExomeCount.dafr$chromosome, 
                       start = ExomeCount.dafr$start, 
                       end = ExomeCount.dafr$end, 
                       name = ExomeCount.dafr$names)
@@ -400,7 +400,7 @@ for (i in 1:nsamples) {
 ################ Now call the CNVs
   all.exons <- CallCNVs(x = all.exons,
                         transition.probability = 10^-4,
-                        chromosome = ExomeCount.dafr$space,
+                        chromosome = ExomeCount.dafr$chromosome,
                         start = ExomeCount.dafr$start,
                         end = ExomeCount.dafr$end,
                         name = ExomeCount.dafr$names)
