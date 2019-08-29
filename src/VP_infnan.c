@@ -124,7 +124,8 @@ gsl_isinf (const double x)
 int
 gsl_isinf (const double x)
 {
-    return (! gsl_finite(x)) && (! gsl_isnan(x));
+  //return (! gsl_finite(x)) && (! gsl_isnan(x));
+  return (! isfinite((double)x) && (! gsl_isnan(x)));
 }
 #endif
 

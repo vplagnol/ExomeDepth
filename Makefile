@@ -1,5 +1,7 @@
+full: createPackage build
+
 createPackage:
-	Rscript  --default-packages=methods,utils,graphics create_lib.R --no-save
+	Rscript  --default-packages=methods,utils,graphics util/create_lib.R --no-save
 
 build: createPackage
 	R CMD build --resave-data working/ExomeDepth

@@ -28,8 +28,8 @@ file.copy(from = "README.md", to = paste0(base, "/ExomeDepth/"), overwrite = TRU
 file.copy(from = 'R/zzz.R', to= paste(base, '/ExomeDepth/R/zzz.R', sep = ''), overwrite = TRUE)
 
 
-file.copy(from = 'doc/NAMESPACE', to = paste(base, '/ExomeDepth/NAMESPACE', sep = ''), overwrite = TRUE)
-file.copy(from = 'doc/DESCRIPTION', to = paste(base, '/ExomeDepth/DESCRIPTION', sep= ''), overwrite = TRUE)
+file.copy(from = 'NAMESPACE', to = paste(base, '/ExomeDepth/NAMESPACE', sep = ''), overwrite = TRUE)
+file.copy(from = 'DESCRIPTION', to = paste(base, '/ExomeDepth/DESCRIPTION', sep= ''), overwrite = TRUE)
 
 file.copy(from = "vignette/vignette.Rnw", to = paste(base, '/ExomeDepth/vignettes/ExomeDepth-vignette.Rnw', sep =''), overwrite = TRUE)
 
@@ -44,4 +44,5 @@ clean.Rd.files <- file.remove(list.files(paste0(base, "/ExomeDepth/man"),
 file.remove(paste0(base, "/ExomeDepth/Read-and-delete-me"))
 
 ## now oxygenize
-roxygen2::roxygenize(package.dir = paste0(base, "/ExomeDepth"))
+pkgbuild::compile_dll(paste0(base, "/ExomeDepth"))
+devtools::document(paste0(base, "/ExomeDepth"))
