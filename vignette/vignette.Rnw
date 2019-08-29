@@ -153,7 +153,7 @@ Here is how this object could for example be used to obtain a more generic data 
 library(ExomeDepth)
 data(ExomeCount)
 ExomeCount.dafr <- as(ExomeCount[,  colnames(ExomeCount)], 'data.frame')
-ExomeCount.dafr$chromosome <- gsub(as.character(ExomeCount.dafr$space), 
+ExomeCount.dafr$chromosome <- gsub(as.character(ExomeCount.dafr$seqnames), 
                                         pattern = 'chr', 
                                         replacement = '')  ##remove the annoying chr letters
 print(head(ExomeCount.dafr))
