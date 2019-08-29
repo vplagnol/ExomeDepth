@@ -18,6 +18,11 @@
 
 \section{What is new?}
 
+Version 1.1.12:
+\begin{itemize}
+\item Updated for GRanges changes.
+\end{itemize}
+
 Version 1.1.10:
 \begin{itemize}
 \item Modification to deal with the new GenomicRanges slots.
