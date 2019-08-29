@@ -1,5 +1,6 @@
 
 
+#' @title AnnotateExtra-generic
 #' @name AnnotateExtra-generic
 #' @aliases AnnotateExtra-generic
 #' @description Generic method for AnnotateExtra

@@ -168,6 +168,7 @@ setMethod("show", "ExomeDepth", function(object) {
 #############################################################################
 
 
+#' @title TestCNV-generic
 #' @name TestCNV-generic
 #' @aliases TestCNV-generic
 #' @description Generic method for testCNV
@@ -210,6 +211,7 @@ setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
 
 
 
+#' @title CallCNVs-generic
 #' @name CallCNVs-generic
 #' @aliases CallCNVs-generic
 #' @describeIn CallCNVs-ExomeDepth-method

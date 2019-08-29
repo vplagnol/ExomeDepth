@@ -1,4 +1,6 @@
 base <- 'working'
+if (!file.exists(base)) dir.create(base)
+
 system(paste('rm ', base, '/ExomeDepth/R/*', sep = ''))
 package.skeleton(name="ExomeDepth",
                  code_files = c('R/class_definition.R', 
