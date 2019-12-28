@@ -340,7 +340,7 @@ if (!is.null(referenceFasta)) {
   }
 
 
-  return(exon_count_frame)
+  return(data.frame(exon_count_frame))
 }
 
 
@@ -438,5 +438,5 @@ count.everted.reads <- function(bed.frame = NULL,
                                                   min.mapq = min.mapq)
    }
 
-  return (exon_count_frame)
+  return(data.frame(exon_count_frame))
 }

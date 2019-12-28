@@ -1,7 +1,7 @@
 Package: ExomeDepth
 Type: Package
 Title: Calls Copy Number Variants from Targeted Sequence Data
-Version: 1.1.13
+Version: 1.1.14
 Date: 2019-12-23
 Encoding: UTF-8
 Depends: R (>= 3.4.0)

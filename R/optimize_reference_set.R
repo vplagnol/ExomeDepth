@@ -52,7 +52,7 @@ select.reference.set <- function(test.counts, reference.counts, bin.length = NUL
   
 
   
-  if (class(reference.counts) != 'matrix') stop('The reference sequence count data must be provided as a matrix')
+  if (!is.matrix(reference.counts)) stop('The reference sequence count data must be provided as a matrix')
   if (nrow(reference.counts) != length(test.counts)) stop("The number of rows of the reference matrix must match the length of the test count data\n")
   if (is.null(bin.length)) bin.length <- rep(1, length(test.counts))
   
