@@ -328,8 +328,8 @@ if (!is.null(referenceFasta)) {
 
 
   exon_count_frame <- dplyr::tibble(chromosome = as(GenomicRanges::seqnames(target), 'character'),
-                                    start = as(GenomicRanges::start(target), 'character'),
-                                    end = as(GenomicRanges::end(target), 'character'))
+                                    start = as(GenomicRanges::start(target), 'numeric'),
+                                    end = as(GenomicRanges::end(target), 'numeric'))
   exon_count_frame <- dplyr::bind_cols(exon_count_frame, as(GenomicRanges::values(target), 'data.frame'))
 
   for (i in 1:nfiles) {
@@ -424,8 +424,8 @@ count.everted.reads <- function(bed.frame = NULL,
   }
 
   exon_count_frame <- dplyr::tibble(chromosome = as(GenomicRanges::seqnames(target), 'character'),
-                                    start = as(GenomicRanges::start(target), 'character'),
-                                    end = as(GenomicRanges::end(target), 'character'))
+                                    start = as(GenomicRanges::start(target), 'numeric'),
+                                    end = as(GenomicRanges::end(target), 'numeric'))
   exon_count_frame <- dplyr::bind_cols(exon_count_frame, as(GenomicRanges::values(target), 'data.frame'))
 
   nfiles <- length(bam.files)
