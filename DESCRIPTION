@@ -10,5 +10,5 @@ Suggests: knitr
 VignetteBuilder: knitr
 Authors@R: c(person("Vincent", "Plagnol", role = c("aut", "cre"), email = "v.plagnol@ucl.ac.uk"))
 Maintainer: Vincent Plagnol  <v.plagnol@ucl.ac.uk>
-Description: Calls copy number variants (CNVs) from targeted sequence data, typically exome sequencing experiments designed to identify the genetic basis of Mendelian disorders.
-License: GPL-3
+Description: Calls copy number variants (CNVs) from targeted sequence data, typically exome sequencing experiments designed to identify the genetic basis of Mendelian disorders. To solve dependency issues, and because mninor updates to the GSL code was required, this package includes slightly modified GSL code (rather than treating GSL as a dependency).
+License: GPL-3. 
