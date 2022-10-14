@@ -79,7 +79,7 @@ setMethod("initialize", "ExomeDepth", function(.Object,
 
   if (!is.null(subset.for.speed)) {
 
-    if ( (class(subset.for.speed) == 'numeric') && (length(subset.for.speed) == 1)) {subset.for.speed <- seq(from = 1, to = nrow(data), by = floor( nrow(data) / subset.for.speed ) )}  ###deals with unexpected use of subset.for.speed
+    if ( is.numeric(subset.for.speed) && (length(subset.for.speed) == 1)) {subset.for.speed <- seq(from = 1, to = nrow(data), by = floor( nrow(data) / subset.for.speed ) )}  ###deals with unexpected use of subset.for.speed
     subset.for.speed <- subset.for.speed[ subset.for.speed %in% 1:nrow(data) ] ##make sure we do not select non-existing rows
     data.for.fit <- data[ subset.for.speed, , drop = FALSE]
   } else {
@@ -183,8 +183,8 @@ setGeneric("TestCNV", def = function(x, chromosome, start, end, type) standardGe
 setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
   if (! type %in% c('deletion', 'duplication')) stop("type must be either duplication or deletion\n")
   if (length(chromosome) != 1 || length(start) != 1 || length(end) != 1 || length(type) != 1) stop("The arguments chromosome, start, end and type must all be of length 1")
-  if (class(chromosome) == 'factor') chromosome <- as.character(chromosome)
-  if (class(chromosome) != 'character') stop('The input chromosome must be a character or a factor')
+  if (is.factor(chromosome)) chromosome <- as.character(chromosome)
+  if (!is.character(chromosome)) stop('The input chromosome must be a character or a factor')
 
 
 

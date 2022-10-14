@@ -3,10 +3,10 @@ if (!file.exists(base)) dir.create(base)
 
 system(paste('rm ', base, '/ExomeDepth/R/*', sep = ''))
 package.skeleton(name="ExomeDepth",
-                 code_files = c('R/class_definition.R', 
-		 'R/optimize_reference_set.R', 
-		 'R/tools.R',		       
-		 'R/countBamInGranges.R', 
+                 code_files = c('R/class_definition.R',
+		 'R/optimize_reference_set.R',
+		 'R/tools.R',
+		 'R/countBamInGranges.R',
 		 'R/plot_CNVs_method.R',
 		 'R/annotate_extra.R'),
                  path= base,
@@ -26,8 +26,10 @@ print(list.files(path = paste(base, '/ExomeDepth/man', sep = ''), pattern = '*me
 
 system(paste("cp src/*.cpp src/*.c src/*.h ", base, '/ExomeDepth/src', sep = ''))
 #file.copy(from = "README.md", to = paste0(base, "/ExomeDepth/"), overwrite = TRUE) ## creates a NOTE
-                        
+
 file.copy(from = 'R/zzz.R', to= paste(base, '/ExomeDepth/R/zzz.R', sep = ''), overwrite = TRUE)
+
+file.copy(from = 'AUTHORS', to= paste(base, '/ExomeDepth/inst/AUTHORS', sep = ''), overwrite = TRUE)
 
 
 file.copy(from = 'NAMESPACE', to = paste(base, '/ExomeDepth/NAMESPACE', sep = ''), overwrite = TRUE)
@@ -41,7 +43,7 @@ file.copy(from = 'data/genes.hg19.RData', to = paste(base, '/ExomeDepth/data/gen
 file.copy(from = 'data/exons.hg19.X.RData', to = paste(base, '/ExomeDepth/data/exons.hg19.X.RData', sep = ''), overwrite = TRUE)
 file.copy(from = 'data/Conrad.hg19.RData', to = paste(base, '/ExomeDepth/data/Conrad.hg19.RData', sep = ''), overwrite = TRUE)
 
-clean.Rd.files <- file.remove(list.files(paste0(base, "/ExomeDepth/man"), 
+clean.Rd.files <- file.remove(list.files(paste0(base, "/ExomeDepth/man"),
 	       full.names = TRUE)) ## now useful to let roxygen write the doc
 file.remove(paste0(base, "/ExomeDepth/Read-and-delete-me"))
 

@@ -114,7 +114,8 @@ __BEGIN_DECLS
 #define GSL_SIGN(x)    ((x) >= 0.0 ? 1 : -1)
 
 /* Return nonzero if x is a real number, i.e. non NaN or infinite. */
-#define GSL_IS_REAL(x) (gsl_finite(x))
+/* #define GSL_IS_REAL(x) (gsl_finite(x)) */
+#define GSL_IS_REAL(x) (isfinite((double)x))
 
 /* Define MAX and MIN macros/functions if they don't exist. */
 

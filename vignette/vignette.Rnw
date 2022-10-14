@@ -235,6 +235,7 @@ all.exons <- new('ExomeDepth',
 
 We can now call the CNV by running the underlying hidden Markov model:
 <<call.CNVs>>=
+print(head(ExomeCount.dafr))
 all.exons <- CallCNVs(x = all.exons, 
                       transition.probability = 10^-4, 
                       chromosome = ExomeCount.dafr$chromosome, 
