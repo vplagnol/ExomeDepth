@@ -41,11 +41,13 @@
  *   4.4.37, 4.4.38, 4.4.39
  */
 
-#include "config.h"
+
 #include "math.h"
 #include "gsl_math.h"
 #include "gsl_complex.h"
 #include "gsl_complex_math.h"
+#include "config.h"
+
 
 /**********************************************************************
  * Complex numbers

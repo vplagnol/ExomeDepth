@@ -19,15 +19,14 @@
 
 /* Author:  G. Jungman */
 
-#include "config.h"
+
 #include "gsl_math.h"
 #include "gsl_errno.h"
 #include "gsl_sf_log.h"
-
 #include "error.h"
-
 #include "chebyshev.h"
 
+#include "config.h"
 
 static inline int
 cheb_eval_e(const cheb_series * cs,

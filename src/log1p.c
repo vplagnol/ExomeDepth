@@ -17,8 +17,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "config.h"
+
 #include "math.h"
+#include "config.h"
+
 
 double gsl_log1p (const double x);
 

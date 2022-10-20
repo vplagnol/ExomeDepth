@@ -19,15 +19,15 @@
 
 /* Author:  G. Jungman */
 
-#include "config.h"
 #include "gsl_math.h"
 #include "gsl_errno.h"
 #include "gsl_sf_exp.h"
 #include "gsl_sf_log.h"
 #include "gsl_sf_psi.h"
 #include "gsl_sf_gamma.h"
-
 #include "error.h"
+#include "config.h"
+
 
 static double
 isnegint (const double x) 

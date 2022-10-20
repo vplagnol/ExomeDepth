@@ -19,7 +19,7 @@
 
 /* Author:  G. Jungman */
 
-#include "config.h"
+
 #include "gsl_math.h"
 #include "gsl_errno.h"
 #include "gsl_sf_exp.h"
@@ -27,11 +27,10 @@
 #include "gsl_sf_psi.h"
 #include "gsl_sf_trig.h"
 #include "gsl_sf_gamma.h"
-
 #include "error.h"
 #include "check.h"
-
 #include "chebyshev.h"
+#include "config.h"
 
 
 static inline int

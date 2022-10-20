@@ -19,13 +19,13 @@
 
 /* Author:  G. Jungman */
 
-#include "config.h"
+
 #include "gsl_math.h"
 #include "gsl_errno.h"
 #include "gsl_sf_elementary.h"
-
 #include "error.h"
 #include "check.h"
+#include "config.h"
 
 int
 gsl_sf_multiply_e(const double x, const double y, gsl_sf_result * result)

@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "config.h"
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -25,7 +25,7 @@
 #include "gsl_errno.h"
 #include "gsl_message.h"
 #include <Rinternals.h>
-
+#include "config.h"
 
 
 gsl_error_handler_t * gsl_error_handler = NULL;
