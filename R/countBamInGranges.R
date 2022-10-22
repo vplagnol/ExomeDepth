@@ -173,9 +173,9 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
 
 #####  second check for consistency between BAM and target regions
   if (sum(! seqs.in.target %in% seqs.in.bam.file)) {  ### if some sequences are missing
-    print("Problematic sequences:")
-    print(seqs.in.bam.file)
-    print( seqs.in.target [ ! seqs.in.target %in% seqs.in.bam.file ])
+    warning("Problematic sequences:")
+    warning(seqs.in.bam.file)   ## not sure warning is appropriate here- used to be print
+    warning( seqs.in.target [ ! seqs.in.target %in% seqs.in.bam.file ])  ## not sure warning is appropriate here- used to be print
     stop("Some sequences in the target data frame cannot be found in the index of the BAM file")
   }
 
@@ -261,7 +261,7 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
 #' @references exomeCopy R package.
 #' @examples
 #'
-#' \dontrun{
+#' \donttest{
 #' load(exons.hg19)
 #'
 #' my.counts <- getBamCounts(bed.frame = exonpos,

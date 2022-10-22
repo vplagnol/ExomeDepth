@@ -209,12 +209,10 @@ setGeneric("CallCNVs",
 #' @description Call CNV data from an ExomeDepth object.
 #' @md
 #'
-#' @details The function must be called on an ExomeDepth object.
+#' @details Must be called on an ExomeDepth object and fits a hidden Markov model to the read depth data with three hidden states (normal, deletion, duplication).
 #' Likelihood data must have been pre-computed which should have been done by default when the ExomeDepth object was created.
 #'
-#' This function fits a hidden Markov model to the read depth data with three
-#' hidden states (normal, deletion, duplication).
-#'
+
 #' @param x An `ExomeDepth` object
 #' @param chromosome Chromosome information for each exon (factor).
 #' @param start Start (physical position) of each exon (numeric, must have the
