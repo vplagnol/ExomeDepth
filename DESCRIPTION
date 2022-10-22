@@ -13,5 +13,5 @@ Authors@R: c(person("Vincent", "Plagnol", role = c("aut", "cre"), email = "vince
 	    person("Brian", "Gough", role = "ctb", comment = "Author of included GSL fragments"),
    	    person(c("Jorma", "O"), "Tahtinen", role = "ctb", comment = "Author of included GSL fragments"),
       	    person("Gert", "Van den Eynde", role = "ctb", comment = "Author of included GSL fragments"))
-Description: Calls copy number variants (CNVs) from targeted sequence data, typically exome sequencing experiments designed to identify the genetic basis of Mendelian disorders. 
+Description: Calls copy number variants (CNVs) from targeted sequence data, typically exome sequencing experiments designed to identify the genetic basis of Mendelian disorders. The method is presented in details in Plagnol et al (2012) <https://pubmed.ncbi.nlm.nih.gov/22942019/>.
 License: GPL-3 

@@ -26,6 +26,9 @@ setMethod("plot",
           "ExomeDepth",
           function(x, sequence, xlim, ylim = NULL, count.threshold = 10, ylab = 'Observed by expected read ratio', xlab = '', type = 'b', pch = '+', with.gene = FALSE, col = 'red', ...) {
 
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(par(oldpar))
+
   anno <- x@annotations
   selected <-  which(anno$chromosome == sequence & anno$start >= xlim[1] & anno$end <= xlim[2] & (x@test + x@reference)*x@expected > count.threshold)
 
