@@ -51,6 +51,7 @@ setClass("ExomeDepth",
 #' Do not modify this parameter for the standard use of ExomeDepth.
 #' @param subset.for.speed Numeric, defaults to NULL. If non-null, this sets the number of data points to be used for an accelerated fit of the data.
 #' @param verbose Logical, controls the output level.
+#' @return An ExomeDepth object, which contains the CNV calls after running a Viterbi algorithm.
 
 
 
@@ -178,6 +179,7 @@ setGeneric("TestCNV", def = function(x, chromosome, start, end, type) standardGe
 #' @param start Numeric, start of the tested CNV
 #' @param end Numeric, end of the tested CNV
 #' @param type Character, must be either `deletion` or `duplication`.
+#' @return A single numeric value that is the log likelihood ratio in favour of a call present at this location.
 
 
 setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
@@ -389,6 +391,7 @@ somatic.CNV.call <- function(normal, tumor, prop.tumor = 1, chromosome, start, e
 #' @title get_loglike_matrix
 #' @name  get_loglike_matrix
 #' @description Computes the loglikelihood matrix for the three states and each exon
+#' @return A likelihood matrix with the states as rows and the exons as columns
 
 NULL
 
@@ -396,6 +399,7 @@ NULL
 
 #' @title C_hmm
 #' @name C_hmm
-#' @description Implements the hidden Markov Model using a C routine
+#' @description Implements the hidden Markov model (Viterbi algorithm) using a C routine
+#' @return A list with two objects: the first contains the optimum Viterbi path and the second the actual CNV calls
 
 NULL
