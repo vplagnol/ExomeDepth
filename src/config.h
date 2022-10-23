@@ -252,9 +252,11 @@
 #define frexp gsl_frexp
 #endif
 
-#if !HAVE_DECL_ISINF
+/*#if !HAVE_DECL_ISINF
 #define isinf gsl_isinf
 #endif
+*/
+
 
 #if !HAVE_DECL_FINITE
 #if HAVE_DECL_ISFINITE
@@ -264,9 +266,10 @@
 #endif
 #endif
 
-#if !HAVE_DECL_ISNAN
+/*#if !HAVE_DECL_ISNAN
 #define isnan gsl_isnan
 #endif
+*/
 
 #ifdef __GNUC__
 #define DISCARD_POINTER(p) do { ; } while(p ? 0 : 0);

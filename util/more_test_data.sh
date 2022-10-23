@@ -1,4 +1,4 @@
-../samtools-1.16.1/samtools view -b ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/HG00138/alignment/HG00138.mapped.ILLUMINA.bwa.GBR.low_coverage.20120522.bam 1:25630000-25650000 > minimum_1_25630000_25650000.bam
+../samtools-1.16.1/samtools view -b ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/HG00138/alignment/HG00138.mapped.ILLUMINA.bwa.GBR.low_coverage.20120522.bam 1:2612742-2629815 1:25630000-25650000  > minimum_1_25630000_25650000.bam
 
 ../samtools-1.16.1/samtools index minimum_1_25630000_25650000.bam
 

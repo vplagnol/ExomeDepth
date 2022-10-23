@@ -15,3 +15,5 @@ make_vignette:
 html: build
 	Rscript -e "setwd('working/ExomeDepth'); devtools::load_all(); pkgdown::build_site()"
 
+make_and_checks: createPackage build checks
+
