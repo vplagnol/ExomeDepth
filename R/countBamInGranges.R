@@ -150,7 +150,7 @@ countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) 
 
 countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, min.mapq = 1, read.width = 1) {
   message("Now parsing ", bam.file)
-  if (! "GRanges" %in% is(granges)) stop("Argument granges of countBamInGRanges.exomeDepth must be of the class GRanges")
+  if (!is(granges, "GRanges")) stop("Argument granges of countBamInGRanges.exomeDepth must be of the class GRanges")
 
   if (is.null(index)) index <- bam.file
 
