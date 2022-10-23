@@ -14,7 +14,7 @@ package.skeleton(name="ExomeDepth",
 
 file.copy(from = "doc/_pkgdown.yml", to = paste0(base, "/ExomeDepth/"), overwrite = TRUE)
 
-for (folder in c('data', 'src', 'vignettes', 'inst', 'inst/doc')) {
+for (folder in c('data', 'src', 'vignettes', 'inst', 'inst/doc', 'inst/extdata')) {
   my.folder <- paste(base, '/ExomeDepth/', folder, sep = '')
   if (!file.exists(my.folder)) dir.create(path = my.folder)
 }
@@ -42,6 +42,8 @@ file.copy(from = 'data/exons.hg19.RData', to = paste(base, '/ExomeDepth/data/exo
 file.copy(from = 'data/genes.hg19.RData', to = paste(base, '/ExomeDepth/data/genes.hg19.RData', sep = ''), overwrite = TRUE)
 file.copy(from = 'data/exons.hg19.X.RData', to = paste(base, '/ExomeDepth/data/exons.hg19.X.RData', sep = ''), overwrite = TRUE)
 file.copy(from = 'data/Conrad.hg19.RData', to = paste(base, '/ExomeDepth/data/Conrad.hg19.RData', sep = ''), overwrite = TRUE)
+file.copy(from = 'data/minimum_1_25630000_25650000.bam', to = paste(base, '/ExomeDepth/inst/extdata/minimum_1_25630000_25650000.bam', sep = ''), overwrite = TRUE)
+file.copy(from = 'data/minimum_1_25630000_25650000.bam.bai', to = paste(base, '/ExomeDepth/inst/extdata/minimum_1_25630000_25650000.bam.bai', sep = ''), overwrite = TRUE)
 
 clean.Rd.files <- file.remove(list.files(paste0(base, "/ExomeDepth/man"),
 	       full.names = TRUE)) ## now useful to let roxygen write the doc

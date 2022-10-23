@@ -261,13 +261,11 @@ countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, m
 #' @references exomeCopy R package.
 #' @examples
 #'
-#' \donttest{
 #' load(exons.hg19)
-#'
-#' my.counts <- getBamCounts(bed.frame = exonpos,
-#'                           bam.files = my.bam,
-#'                           referenceFasta = 'human_g1k_v37.fasta')
-#' }
+#' minimum_bam_file <- system.file('inst/extdata/minimum_1_25630000_25650000_HG00138.bam', package = 'ExomeDepth')
+#' my.counts <- getBamCounts(bed.frame = exons.hg19,
+#'                           bam.files = minimum_bam_file)
+#' print(subset(my.counts, grepl(pattern = '^RHD', my.counts[['exon']])))
 #'
 
 getBamCounts <- function(bed.frame = NULL, bed.file = NULL, bam.files, index.files = bam.files,
