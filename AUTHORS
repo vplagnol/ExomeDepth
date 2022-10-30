@@ -1,0 +1,3 @@
+To solve dependency issues, and because minor updates to the GSL code were required, this package directly includes slightly modified GSL code (rather than treating GSL as a dependency) with appropriate authorship listed in the code.
+
+Additionally, a minimum version of a BAM file (approximately 700 reads) has been processed from the 1,000 Genomes dataset <https://www.internationalgenome.org/data-portal/sample>. See reference paper "A global reference for human genetic variation" <http://www.nature.com/nature/journal/v526/n7571/full/nature15393.html>.
