@@ -104,6 +104,17 @@ NULL
 #' @param min.mapq Minimum mapping quality to include reads.
 #' @return A list with the number of reads in each bin.
 #' @seealso count.everted.reads
+#' @examples
+#'
+#' data(genes.hg19)
+#' bam_file <- system.file('extdata/minimum_1_25630000_25650000.bam',
+#'                         package = 'ExomeDepth')
+#' genes.hg19.small <- subset(genes.hg19, grepl(pattern = '^TTC34|^RHD', genes.hg19[['name']]))
+#' my_range <- GenomicRanges::GRanges(paste0(genes.hg19.small$chromosome, ":",
+#'                        genes.hg19.small$start, '-', genes.hg19.small$end))
+#' print(my_range)
+#' print(countBam.everted (granges = my_range, bam.file = bam_file, min.mapq = 0))
+#
 
 
 countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) {
@@ -147,6 +158,20 @@ countBam.everted <- function(bam.file, granges, index = bam.file, min.mapq = 1) 
 #' paired reads, the fragment size can be directly computed from the paired
 #' alignment and this value is ignored.
 #' @return A GRanges object with count data.
+#' @examples
+#'
+#' minimum_bam_file <- system.file('extdata/minimum_1_25630000_25650000.bam',
+#'                                 package = 'ExomeDepth')
+#'
+#' data(exons.hg19)
+#' exons.hg19.RHD <- subset(exons.hg19, grepl(pattern = '^RHD', exons.hg19[['name']]))
+#' my_range <- GenomicRanges::GRanges(paste0(exons.hg19.RHD$chromosome, ":",
+#'                        exons.hg19.RHD$start, '-', exons.hg19.RHD$end))
+#'
+#' print(countBamInGRanges.exomeDepth(bam.file = minimum_bam_file,
+#'                             granges = my_range))
+#'
+
 
 countBamInGRanges.exomeDepth <- function (bam.file, index = bam.file, granges, min.mapq = 1, read.width = 1) {
   message("Now parsing ", bam.file)
