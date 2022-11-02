@@ -14,10 +14,18 @@
 #' only used if the `formula` argument refers to covariates (in which case
 #' these covariates must be included in the data frame).  `test` and
 #' `reference` refer to the read count data for the test and reference
-#' samples.  Creating a ExomeDepth object will automatically fit the
+#' samples.
+#'
+#' Critically, it is not required to store the positions of the DNA fragments
+#' that led to the test and reference counts. That is only required for the
+#' function `TestCNV`. If this is of use, a GRanges object can be provided
+#' using the argument `positions`.
+#'
+#' Creating a ExomeDepth object will automatically fit the
 #' beta-binomial model (using routines from the `aod` package) and compute
 #' the likelihood for the three copy number states (normal, deletion and
 #' duplication).
+#'
 #' @seealso `?select.reference.set` `?CallCNVs`
 #' @references A robust model for read count data in exome sequencing experiments and implications for copy number variant calling, Plagnol et al 2012
 #' @keywords classes
@@ -33,6 +41,7 @@ setClass("ExomeDepth",
                         phi = "numeric",
                         likelihood = "matrix",
                         annotations = "data.frame",
+                        positions = "GRanges",
                         CNV.calls = "data.frame"))
 
 
@@ -50,6 +59,7 @@ setClass("ExomeDepth",
 #' @param prop.tumor Numeric, defaults to 1. For the somatic variant calling, this assesses the proportion of the test sample data originating from the tumour.
 #' Do not modify this parameter for the standard use of ExomeDepth.
 #' @param subset.for.speed Numeric, defaults to NULL. If non-null, this sets the number of data points to be used for an accelerated fit of the data.
+#' @param positions Optional GRanges argument specifying the positions of the exons (or DNA regions) where the reads were counted for test and reference.
 #' @param verbose Logical, controls the output level.
 #' @return An ExomeDepth object, which contains the CNV calls after running a Viterbi algorithm.
 #' @examples
@@ -76,6 +86,7 @@ setMethod("initialize", "ExomeDepth", function(.Object,
                                                phi.bins = 1,
                                                prop.tumor = 1,
                                                subset.for.speed = NULL,
+                                               positions = GenomicRanges::GRanges(),
                                                verbose = TRUE) {
   if (length(test) != length(reference)) stop("Length of test and numeric must match")
 
@@ -83,6 +94,7 @@ setMethod("initialize", "ExomeDepth", function(.Object,
     message('It looks like the test samples has only ', sum(test > 5), ' bins with more than 5 reads. The coverage is too small to perform any meaningful inference so no likelihood will be computed.')
     return(.Object)
   }
+
 
   n.data.points <- length(test)
   if (is.null(data)) data <- data.frame(intercept = rep(1, length(test)))
@@ -135,12 +147,19 @@ setMethod("initialize", "ExomeDepth", function(.Object,
 
 
 
-
+  .Object@positions <- positions
   .Object@formula <- formula
   .Object@test <- test
   .Object@reference <- reference
   my.coeffs <- mod@fixed.param
 
+
+  ## if positions were provided, check that they match the expected length
+  if (length(.Object@positions) > 0) {
+      if (length(.Object@positions) != length(test)) {
+          stop("The provided genomic positions (GRanges object) and test count vector are not matching in length: ", length(.Object@positions), ", ", length(test))
+      }
+  }
 
   if (is.null(subset.for.speed)) {
       ## looks like a bug in model.matrix(mt, mfb, contrasts) in aod::fitted
@@ -201,7 +220,24 @@ setGeneric("TestCNV", def = function(x, chromosome, start, end, type) standardGe
 #' @param end Numeric, end of the tested CNV
 #' @param type Character, must be either `deletion` or `duplication`.
 #' @return A single numeric value that is the log likelihood ratio in favour of a call present at this location.
-
+#' @examples
+#' data(ExomeCount)
+#' ExomeCount <- ExomeCount[1:500,] ## small for the purpose of this test
+#' ref_counts <- ExomeCount$Exome2 + ExomeCount$Exome3 + ExomeCount$Exome4
+#'
+#' ## creates a simple ExomeDepth object
+#' ## Note that I include the positions here (GRanges format)
+#' ## This is necessary for TestCNV to work
+#' test_object <- new('ExomeDepth', test = ExomeCount$Exome1,
+#'                                  reference = ref_counts,
+#'                                  positions = ExomeCount)
+#'
+#' ## A positive control first
+#' TestCNV (test_object, chromosome = 'chr1', start = 1387428, end = 1405539, type = 'deletion')
+#'
+#' ## And a region without evidence of call
+#' TestCNV (test_object, chromosome = 'chr1', start = 987428, end = 1005539, type = 'deletion')
+#'
 
 setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
   if (! type %in% c('deletion', 'duplication')) stop("type must be either duplication or deletion\n")
@@ -209,13 +245,12 @@ setMethod("TestCNV", "ExomeDepth", function(x, chromosome, start, end, type) {
   if (is.factor(chromosome)) chromosome <- as.character(chromosome)
   if (!is.character(chromosome)) stop('The input chromosome must be a character or a factor')
 
+  if (length(x@positions) == 0) stop("This function cannot be used if the position of the exons/DNA segments was not included in the ExomeDepth object")
 
-
-  which.exons <- which((x@annotations$chromosome == chromosome) & (x@annotations$start >= start) & (x@annotations$end <= end))
+  which.exons <- which(as.logical( (GenomicRanges::seqnames(x@positions) == chromosome) & (GenomicRanges::start(x@positions) >= start) & (GenomicRanges::end(x@positions) <= end)))
 
   if (type == 'deletion') log.ratio <- sum(x@likelihood[ which.exons, 1] - x@likelihood[ which.exons, 2])
   if (type == 'duplication') log.ratio <- sum(x@likelihood[ which.exons, 3] - x@likelihood[ which.exons, 2])
-
   return  (log.ratio)
 })
 
