@@ -52,6 +52,19 @@ setClass("ExomeDepth",
 #' @param subset.for.speed Numeric, defaults to NULL. If non-null, this sets the number of data points to be used for an accelerated fit of the data.
 #' @param verbose Logical, controls the output level.
 #' @return An ExomeDepth object, which contains the CNV calls after running a Viterbi algorithm.
+#' @examples
+#'
+#' data(ExomeCount)  #pick an example count file
+#' small_count <- ExomeCount[1:100, ]  #reduce the size for speedy computations
+#'
+#' ## remove exons without data below
+#' small_count <- small_count[ small_count$Exome2 + small_count$Exome3 > 0, ]
+#'
+#' example_object <- new('ExomeDepth', test = small_count$Exome2,
+#'                                     reference = small_count$Exome3,
+#'                                     formula = 'cbind(test, reference) ~ 1')
+#' print(example_object)
+#' print( mean(example_object@expected)) ## proportion of reads expected to match the test set
 
 
 
@@ -89,7 +102,7 @@ setMethod("initialize", "ExomeDepth", function(.Object,
 
   if (verbose) message('Now fitting the beta-binomial model on a data frame with ', nrow(data.for.fit), ' rows : this step can take a few minutes.')
     if (phi.bins == 1) {
-      mod <- aod::betabin( data = data.for.fit, formula = as.formula(formula), random = ~ 1, link = 'logit', warnings = FALSE)
+      mod <- aod::betabin(data = data.for.fit, formula = as.formula(formula), random = ~ 1, link = 'logit', warnings = FALSE)
       .Object@phi <- rep(mod@param[[ 'phi.(Intercept)']], n.data.points)
     } else {
       if (!is.null(subset.for.speed)) {stop('Subset for speed option is not compatible with variable phi. This will be fixed later on but for now please adapt your code.')}
@@ -98,22 +111,28 @@ setMethod("initialize", "ExomeDepth", function(.Object,
       complete.bins <- as.numeric(c(bottom.bins, ceiling.bin[2] + 1))
       data$depth.quant <- factor(sapply(reference, FUN = function(x) {sum (x >= complete.bins)}))
 
-############# a check
+      ## a check
       my.tab <-  table(data$depth.quant)
       if (length(my.tab) != phi.bins) {
         stop('Binning did not happen properly')
       }
 
-      mod <- aod::betabin (data = data.for.fit, formula = as.formula(formula), random = as.formula('~ depth.quant'),  link = 'logit', warnings = FALSE)
+      mod <- aod::betabin (data = data.for.fit,
+                           formula = as.formula(formula),
+                           random = as.formula('~ depth.quant'),
+                           link = 'logit',
+                           warnings = FALSE)
+
       phi.estimates <-  as.numeric(mod@random.param)
       data$phi <-  phi.estimates[  data$depth.quant ]
 
-#### Now the linear interpolation
+      ## Now the linear interpolation for phi, the over-dispersion parameter
       fc <- approxfun (x = c(complete.bins[ 1:phi.bins] + complete.bins[ 2:(phi.bins+1)])/2, y =  phi.estimates, yleft = phi.estimates[1], yright = phi.estimates[phi.bins])
       data$phi.linear <- fc (reference)
 
       .Object@phi <- data$phi.linear
     }
+
 
 
 
@@ -124,7 +143,9 @@ setMethod("initialize", "ExomeDepth", function(.Object,
 
 
   if (is.null(subset.for.speed)) {
-    .Object@expected <- aod::fitted(mod)
+      ## looks like a bug in model.matrix(mt, mfb, contrasts) in aod::fitted
+      ## so suppressing warnings below
+      .Object@expected <- suppressWarnings(aod::fitted(mod))
   } else {
     intercept <- my.coeffs[[ '(Intercept)' ]]
     .Object@expected <- rep(intercept, times = nrow(data))
