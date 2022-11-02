@@ -67,19 +67,21 @@ qbetabinom.ab <- function (p, size, shape1, shape2)  {
 #' @param loglikelihood numeric matrix containing the loglikelihood of the data
 #' under the possible states
 #' @param positions Positions of the exons
-#' @param expected.CNV.length Expected length of CNV calls, which has an impact
-#' on the transition matrix between CNV states.
+#' @param expected.CNV.length Expected length of CNV calls, which impacts
+#' the transition matrix between CNV states.
 #' @return A list with the two slots `Viterbi.path` and `calls`.
 #' @examples
 #' transitions <- matrix(data = 1/3, ncol = 3, nrow = 3)
 #' loglikelihood <- matrix(c(rep(c(0, -10, -10), 3),
 #'                           rep(c(-10, -10, 0), 3),
 #'                           rep(c(-10, 0, -10), 4)), nrow = 3)
+#' ## note the final 0 state, enforced by the code
 #' viterbi.hmm(transitions, t(loglikelihood), positions = 1:10, expected.CNV.length = 1)
 #'
-#' ## Now we cannot transition out of 0
+#' ## Now we cannot transition out of 0 and should have no call
 #' transitions <- matrix(c(1, 0, 0, 0, 1, 0, 0, 0, 1), ncol = 3)
-#' ## note the final 0 state, enforced by the code
+#'
+#' ## we can check that no call is made
 #' viterbi.hmm(transitions, t(loglikelihood), positions = 1:10, expected.CNV.length = 1)
 
 
@@ -118,6 +120,9 @@ viterbi.hmm <- function(transitions, loglikelihood, positions, expected.CNV.leng
 #' @param limit \code{logical}, should another large sample size limit be used?
 #' Defaults to FALSE.
 #' @return An expected Bayes factor.
+#' @examples
+#' get.power.betabinom(size = 200, my.phi = 0.1, my.p = 0.2, my.alt.p = 0.6)
+#' get.power.betabinom(size = 200, my.phi = 0.1, my.p = 0.2, my.alt.p = 0.2)
 
 
 get.power.betabinom <- function (size, my.phi, my.p, my.alt.p, theory = FALSE, frequentist = FALSE, limit = FALSE) {
@@ -138,8 +143,6 @@ get.power.betabinom <- function (size, my.phi, my.p, my.alt.p, theory = FALSE, f
 
 
   if (!theory) {  ##betabinomial case
-
-
 
     if (limit) { ##### beta approx
 
