@@ -23,10 +23,6 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
   const double * trans_c = REAL(transitions);  //reads first column first
   const double * proba_c = REAL(probabilities);
 
-  if (nstates_c != 3) {
-    Rprintf("ERROR: The code must assume 3 states\n");
-    exit(1);
-  }
   
   const int *locations = INTEGER (positions);
   const double Expected = *REAL(expectedLength);
@@ -36,6 +32,12 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
 
   SEXP myList = NULL;  //output variables
   SEXP final, calls_R;  //output variables
+
+  // check that we have 3 states
+  if (nstates_c != 3) {
+    Rprintf("ERROR: The code must assume 3 states\n");
+    return(myList);
+  }
   
   vector<vector<double> > viterbi_prob;
   vector<vector< int> > from_where;
