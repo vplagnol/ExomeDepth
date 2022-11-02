@@ -72,7 +72,9 @@ qbetabinom.ab <- function (p, size, shape1, shape2)  {
 #' @return A list with the two slots `Viterbi.path` and `calls`.
 #' @examples
 #' transitions <- matrix(data = 1/3, ncol = 3, nrow = 3)
-#' loglikelihood <- matrix(c(rep(c(0, -10, -10), 3), rep(c(-10, -10, 0), 3), rep(c(-10, 0, -10), 4)), nrow = 3)
+#' loglikelihood <- matrix(c(rep(c(0, -10, -10), 3),
+#'                           rep(c(-10, -10, 0), 3),
+#'                           rep(c(-10, 0, -10), 4)), nrow = 3)
 #' viterbi.hmm(transitions, t(loglikelihood), positions = 1:10, expected.CNV.length = 1)
 #'
 #' ## Now we cannot transition out of 0
