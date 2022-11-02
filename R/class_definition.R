@@ -250,6 +250,25 @@ setGeneric("CallCNVs",
 #' exons.
 #' @return The same ExomeDepth object provided as input but with the slot
 #' CNVcalls containing a data frame with the output of the calling.
+#' @examples
+#'
+#' data(ExomeCount)
+#' ExomeCount <- ExomeCount[1:500,] ## small for the purpose of this test
+#' ref_counts <- ExomeCount$Exome2 + ExomeCount$Exome3 + ExomeCount$Exome4
+#'
+#' ## creates a simple ExomeDepth object
+#' test_object <- new('ExomeDepth', test = ExomeCount$Exome1, reference = ref_counts)
+#'
+#' ## Call CNVs
+#' called_object <- CallCNVs(x = test_object, transition.probability = 10^-4,
+#'                          chromosome = GenomicRanges::seqnames(ExomeCount),
+#'                          start = GenomicRanges::start(ExomeCount),
+#'                          end = GenomicRanges::end(ExomeCount),
+#'                          name = ExomeCount$names)
+#'
+#'
+#' print(called_object@CNV.calls)
+#'
 
 
 
@@ -325,8 +344,9 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
       my.calls$calls$end <- loc.annotations$end[ my.calls$calls$end.p ]
       my.calls$calls$chromosome <- as.character(loc.annotations$chromosome[ my.calls$calls$start.p ])
 
-      my.calls$calls$id <- paste('chr', my.calls$calls$chromosome, ':',  my.calls$calls$start, '-',  my.calls$calls$end, sep = '')
-      my.calls$calls$type <- c('deletion', 'duplication')[ my.calls$calls$type ]
+        my.calls$calls$id <- paste('chr', my.calls$calls$chromosome, ':',  my.calls$calls$start, '-',  my.calls$calls$end, sep = '')
+        my.calls$calls$id <- gsub(pattern = "chrchr", replacement = "chr", my.calls$calls$id) ## in case the user already included chr
+        my.calls$calls$type <- c('deletion', 'duplication')[ my.calls$calls$type ]
 
 ########## make things pretty
       my.calls$calls$BF <- NA

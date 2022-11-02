@@ -31,12 +31,12 @@ setGeneric("AnnotateExtra", def = function(x, reference.annotation, min.overlap 
 #'                                        end = c(109000909,61296735))
 #'
 #' data(Conrad.hg19)
-#' print(all.exons@CNV.calls)
-#' all.exons <- AnnotateExtra(x = example_object,
-#'                           reference.annotation = Conrad.hg19.common.CNVs,
-#'                           min.overlap = 0.1,
-#'                           column.name = 'Conrad.hg19')
-#' print(all.exons@CNV.calls)
+#' print(example_object@CNV.calls)
+#' example_object_annotated <- AnnotateExtra(x = example_object,
+#'                              reference.annotation = Conrad.hg19.common.CNVs,
+#'                              min.overlap = 0.1,
+#'                              column.name = 'Conrad.hg19')
+#' print(example_object_annotated@CNV.calls)
 
 setMethod("AnnotateExtra", "ExomeDepth", function( x, reference.annotation, min.overlap, column.name) {
 
