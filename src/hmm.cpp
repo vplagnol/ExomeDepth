@@ -22,15 +22,17 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
   const int nobs_c = *INTEGER (nobs);
   const double * trans_c = REAL(transitions);  //reads first column first
   const double * proba_c = REAL(probabilities);
+
+  if (nstates_c != 3) {
+    Rprintf("ERROR: The code must assume 3 states\n");
+    exit(1);
+  }
   
   const int *locations = INTEGER (positions);
   const double Expected = *REAL(expectedLength);
 
   vector<double> trans (3, 0.);
   double dist, dist_effect;
-
-  //Rprintf("Number of hidden states: %d\n",nstates_c);
-  //Rprintf("Number of data points: %d\n", nobs_c);
 
   SEXP myList = NULL;  //output variables
   SEXP final, calls_R;  //output variables
@@ -39,7 +41,6 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
   vector<vector< int> > from_where;
   
   //---------------- starting point in 0 state
-  //Rprintf("Initializing the HMM\n");
   vector<int> temp_i(nstates_c,-1);
   from_where.push_back( temp_i );
 
@@ -64,15 +65,17 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
     for (int j = 0; j != nstates_c; j++) {         //for each state
       viterbi_prob[i][j] = - HUGE_VAL;
 
+      // transition probabilities, note that we assume 3 states
+      // note that the code is set up such that if dist is very large
+      // dist_effect is very small and we are more likely to trqnsition
+      // into a normal copy number state
       trans[0] = trans_c[j*nstates_c];
       trans[1] = dist_effect*trans_c[j*nstates_c + 1 ] + (1.0 - dist_effect)*trans_c[j*nstates_c];
       trans[2] = dist_effect*trans_c[j*nstates_c + 2 ] + (1.0 - dist_effect)*trans_c[j*nstates_c];
       
-      for (int k = 0; k != nstates_c; k++) {   //state one is coming from
-	//double newp = loglikelihood[i][j] + viterbi_prob[i - 1][k] + log(trans_matrix[k][j]);
-	//double newp = proba_c[j*nobs_c + i] + viterbi_prob[i - 1][k] + log(trans_c[j*nstates_c + k]);
+      for (int k = 0; k != nstates_c; k++) {   //state one is coming from: k means we come from k
 	double newp = proba_c[j*nobs_c + i] + viterbi_prob[i - 1][k] + log(trans[ k ]);
-	
+
 	if (newp >  viterbi_prob[i][j] ) {
 	  viterbi_prob[i][j] = newp;
 	  from_where[i][j] = k;
@@ -81,17 +84,6 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
       
       if (proba_c[j*nobs_c + i] == -HUGE_VAL) {from_where[i][j] = 0;}  //weak stuff, but it deals with me setting some likelihoods to -Inf
     
-      //-----------
-      if (from_where[i][j] == -1) {  //catching bugs
-	for (int k = 0; k != nstates_c; k++) { 
-	  Rprintf("bug"); return (myList);
-	}
-	Rprintf("Error: Value equal to -1\n"); 
-	return myList;
-      }
-      //-------------
-
-
     }
   }
 
@@ -99,7 +91,7 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
 
   //-------------------------------------------- trace back
   vector<int> trace_back ( nobs_c, 0);
-  trace_back[ nobs_c - 1] = 0;
+  trace_back[ nobs_c - 1] = 0;  //assumes we finish at 0- odd but OK
 
   for (int i = 1; i != nobs_c; i++) {
     trace_back[ nobs_c - i - 1] = from_where[ nobs_c - i ] [trace_back[ nobs_c - i ] ];
