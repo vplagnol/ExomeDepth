@@ -18,6 +18,13 @@
 
 \section{What is new?}
 
+Version 1.1.16:
+\begin{itemize}
+\item Fixed Debian compilation issues.
+\item Added multiple test units (examples in doc).
+\item Added GSL to the authors list in DESCRIPTION.
+\end{itemize}
+
 Version 1.1.12:
 \begin{itemize}
 \item Updated for GRanges changes.
