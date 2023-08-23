@@ -31,6 +31,6 @@ See the[ blog post on the topic](http://www.thetgmi.org/tgmi-news/detecting-tric
 
 # Release notes
 
-* ExomeDepth 1.1.16 has been released to CRAN in November 2022 to accommodate underlying library changes as well as a different citation mechanism for some of the GSL code under the hood.
+* ExomeDepth 1.1.16 has been released to CRAN in October 2022 to accommodate underlying library changes as well as a different citation mechanism for some of the GSL code under the hood.
 
 
