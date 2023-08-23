@@ -31,7 +31,6 @@ See the[ blog post on the topic](http://www.thetgmi.org/tgmi-news/detecting-tric
 
 # Release notes
 
-* ExomeDepth 1.1.10 has been released to CRAN in May 2016.
-* ExomeDepth 1.1.11 is a documentation update, that cleans up ExomeDepth using more modern Roxygen documentation.
-* A planned version 1.1.12 would improve data visualisation.
+* ExomeDepth 1.1.16 has been released to CRAN in November 2022 to accommodate underlying library changes as well as a different citation mechanism for some of the GSL code under the hood.
+
 
