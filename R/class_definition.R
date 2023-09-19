@@ -315,7 +315,7 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
     return(x)
   }
 
-  if ( length(start) != length(chromosome) || length(end) != length(chromosome) || length(name) != length(chromosome) ) stop('Chromosome, start and end vector must have the same lengths.\n')
+  if ( length(start) != length(chromosome) || length(end) != length(chromosome) || length(name) != length(chromosome) ) stop('Chromosome, name, start and end vector must have the same lengths.\n')
   if (nrow(x@likelihood) != length(chromosome) ) stop('The annotation vectors must have the same length as the data in the ExomeDepth x')
 
   ### Try to get the chromosome order right
