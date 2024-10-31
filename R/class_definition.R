@@ -42,6 +42,7 @@ setClass("ExomeDepth",
                         likelihood = "matrix",
                         annotations = "data.frame",
                         positions = "GRanges",
+                        cor.test.reference = "numeric",
                         CNV.calls = "data.frame"))
 
 
@@ -334,8 +335,8 @@ setMethod("CallCNVs", "ExomeDepth", function( x, chromosome, start, end, name, t
     x@likelihood <- x@likelihood[ my.new.order, ]
   }
 
-  cor.test.reference <- cor(x@test, x@reference)
-  message('Correlation between reference and tests count is ', signif(cor.test.reference, 5))
+  x@cor.test.reference <- cor(x@test, x@reference)
+  message('Correlation between reference and tests count is ', signif(x@cor.test.reference, 5))
   message('To get meaningful result, this correlation should really be above 0.97. If this is not the case, consider the output of ExomeDepth as less reliable (i.e. most likely a high false positive rate)')
 
   total <- x@test + x@reference
