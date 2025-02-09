@@ -42,7 +42,7 @@ gsl_error (const char * reason, const char * file, int line, int gsl_errno)
     }
 
   //gsl_stream_printf ("ERROR", file, line, reason);
-  Rprintf ("ERROR %s %s %s\n", file, line, reason);
+  Rprintf ("ERROR %s %i %s\n", file, line, reason);
 
   //fflush (stdout);
   Rprintf ("Default GSL error handler invoked.\n");
