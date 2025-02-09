@@ -7,7 +7,7 @@ build: createPackage
 	R CMD build --resave-data working/ExomeDepth
 
 checks: 
-	R CMD check --as-cran  ExomeDepth_1.1.16.tar.gz
+	R CMD check --as-cran  ExomeDepth_1.1.18.tar.gz
 
 make_vignette:
 	cd vignette && Rscript -e 'knitr::knit("vignette.Rnw")' && pdflatex vignette.tex
