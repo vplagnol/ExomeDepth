@@ -62,8 +62,15 @@ select.reference.set <- function(test.counts, reference.counts, bin.length = NUL
 
     if (!is.matrix(reference.counts)) stop('The reference sequence count data must be provided as a matrix')
     if (nrow(reference.counts) != length(test.counts)) stop("The number of rows of the reference matrix must match the length of the test count data\n")
-    if (is.null(bin.length)) bin.length <- rep(1, length(test.counts))
-
+    if (is.null(bin.length)) {
+        bin.length <- rep(1, length(test.counts))
+    } else {
+        # If using user's bin.length, check for zeros and stop execution and stop if any present
+        zero.counts <- sum(bin.length == 0)
+        if (zero.counts > 0) {
+            stop(paste0("bin.length contains ", zero.counts, " zero", ifelse(zero.counts > 1, "s", ""), ". This causes NAs in correlation computing. All bin lengths must be positive"))
+        }
+    }
 
     n.ref.samples <- ncol(reference.counts)
 
