@@ -109,7 +109,6 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
   for (int i = 1; i != nobs_c; i++) {
 
     if (trace_back[i - 1 ] != trace_back[i]) {
-      if (current == 0) start = i; 
       if (current != 0) {
 	end = i-1;
 	temp_s[0] = start + 1;  //because R starts at 1 not 0
@@ -119,6 +118,7 @@ SEXP C_hmm (const SEXP nstates, const SEXP nobs, const SEXP transitions, const S
 	summary.push_back(temp_s);
 	nexons = 0;
       }
+      start = i;
     }
 
     if ( trace_back[i] != 0) nexons++;
